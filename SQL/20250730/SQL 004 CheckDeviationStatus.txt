@@ -1,0 +1,201 @@
+
+create proc [dbo].[CheckDeviationStatus]
+
+@docid int
+, @newstatus nvarchar(100)
+, @username nvarchar(100)
+AS
+
+begin
+	declare @Draft nvarchar(100) = 'Draft'
+	declare @UnderReview nvarchar(100) = 'Under Review'
+	declare @Closed nvarchar(100) = 'Closed'
+	declare @Approved nvarchar(100) = 'Approved'
+	declare @PendingApproval nvarchar(100) = 'Pending Approval'
+	declare @ApprovedExtension nvarchar(100) = 'Approved Extension'
+	declare @DraftExtension nvarchar(100) = 'Draft Extension'
+	declare @Withdrawn nvarchar(100) = 'Withdrawn'
+	declare @Cancel nvarchar(100) = 'Cancel'
+	declare @DeviationStatusSubmitAck nvarchar(100) = 'Submit Acknowledge'
+	declare @id int = 0
+	declare @msg nvarchar(255) = ''
+	declare @temp int = 0
+
+	if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode = @newstatus)
+	begin
+		select @id = -1, @msg = 'Cannot proceed with same status.'
+		goto returnstep
+	end
+
+	if @newstatus = @PendingApproval
+	begin
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@UnderReview))
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to Submit for Approval.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@UnderReview)
+			goto returnstep
+		end
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationReviewers T1 on T1.Deviation_ID = T0.ID
+			where T0.ID = @docid
+			and T1.KeyReviewer = 1 and T1.ActReviewer = 0)
+		begin
+			select Top 1 @id = -1, @msg = 'Reviewer #' + convert(nvarchar,isnull(T1.RowNumber, 0)) + ' is yet to acknowledge.'
+			from Deviation2025 T0 
+			inner join DeviationReviewers T1 on T1.Deviation_ID = T0.ID
+			where T0.ID = @docid
+			and T1.KeyReviewer = 1 and T1.ActReviewer = 0
+		end
+
+	end
+	if @newstatus = @DeviationStatusSubmitAck
+	begin
+		goto returnstep
+	end
+	if @newstatus = @Approved
+	begin
+		;with cte as
+		(
+			select replace(T2.[Name], 'DeviationApprover-R', '') as DRank
+			from PermissionPolicyUsers T0 
+			inner join PermissionPolicyUserPermissionPolicyRoles T1 on T0.ID = T1.PermissionPolicyUser_ID
+			inner join PermissionPolicyRoleBases T2 on T1.PermissionPolicyRole_ID = T2.ID
+			where T0.UserName = @username
+			and T2.[Name] like 'DeviationApprover-R%'
+		)
+		select @temp = count(*)
+		from Deviation2025 T0
+		inner join cte on T0.DeviationRank = cte.DRank
+		where T0.ID = @docid
+
+		if @temp = 0
+		begin
+			select @id = -1, @msg = 'Deviation Rank not match with current user approval role.'
+			goto returnstep
+		end
+
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @PendingApproval)
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to approve.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @PendingApproval
+			goto returnstep
+		end
+	end
+
+	if @newstatus = @ApprovedExtension
+	begin
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @PendingApproval)
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to extend approval.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @PendingApproval
+			goto returnstep
+		end
+	end
+
+	if @newstatus = @DraftExtension
+	begin
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@Draft, @UnderReview))
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to extend draft.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@Draft, @UnderReview)
+			goto returnstep
+		end
+	end
+
+	if @newstatus = @Closed
+	begin
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @Approved)
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to close.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode <> @Approved
+			goto returnstep
+		end
+
+	end
+	if @newstatus = @UnderReview
+	begin
+		if exists(select 1 
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@Draft, @ApprovedExtension, @DraftExtension, @Withdrawn))
+		begin
+			select Top 1 @id = -1, @msg = T1.BoCode + ' is not allowed to submit.'
+			from Deviation2025 T0 
+			inner join DeviationStatus T1 on T0.DeviationStatus_ID = T1.ID
+			where T0.ID = @docid
+			and T1.BoCode not in (@Draft, @ApprovedExtension, @DraftExtension, @Withdrawn)
+			goto returnstep
+		end
+
+		if exists (select T2.UserName
+			from Deviation2025 T0 
+			inner join DeviationReviewers T1 on T0.ID = T1.Deviation_ID
+			inner join PermissionPolicyUsers T2 on T1.Reviewer_ID = T2.ID
+			where T0.ID = @docid
+			group by T2.UserName
+			having count(*) > 1)
+		begin
+			select top 1 @id = -1, @msg = 'Duplicate Reviewer [' + T2.UserName + '] found.'
+			from Deviation2025 T0 
+			inner join DeviationReviewers T1 on T0.ID = T1.Deviation_ID
+			inner join PermissionPolicyUsers T2 on T1.Reviewer_ID = T2.ID
+			where T0.ID = @docid
+			group by T2.UserName
+			having count(*) > 1
+			goto returnstep
+
+		end
+	end
+	if @newstatus = @Withdrawn
+	begin
+		goto returnstep
+	end
+	if @newstatus = @Cancel
+	begin
+		goto returnstep
+	end
+
+	returnstep:
+	select @id as id, @msg as msg
+end

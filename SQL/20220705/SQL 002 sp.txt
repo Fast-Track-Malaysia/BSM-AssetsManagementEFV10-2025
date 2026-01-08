@@ -1,0 +1,233 @@
+
+create proc [dbo].[GetListWODeviation]
+@WODateFrom DateTime,
+@WODateTo DateTime
+
+as
+begin
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  Equipment nvarchar(200), 
+	  Component nvarchar(200), 
+	  DocNo nvarchar(50), 
+	  DocDate datetime,
+	  PlannerGroup nvarchar(50), 
+	  LastDeviationDocNo nvarchar(50), 
+	  LastDeviationDocDate datetime,
+	  LastIsolatedDeviationDocNo nvarchar(50), 
+	  LastIsolatedDeviationDocDate datetime
+	)
+
+	insert into @newtable
+	select ROW_NUMBER() over (order by T9.ID), T1.Equipment, T1.Component, T9.DocNum, T9.DocDate, T8.BoCode, T2.DeviationNo, T2.DueDate, T3.DeviationNo, T3.DueDate
+	from WorkOrders T9
+	inner join (
+		select WorkOrders.ID from WorkOrders inner join DeviationWorkOrders on WorkOrders.ID = DeviationWorkOrders.WorkOrder_ID
+		where WorkOrders.DocDate >= @WODateFrom
+			and WorkOrders.DocDate <= @WODateTo
+		group by WorkOrders.ID
+	) T10 on T9.ID = T10.ID
+	inner join PlannerGroups T8 on T9.AssignPlannerGroup_ID = T8.ID
+	left join (
+		select T.ID, T.[Equipment], T.[Component], ROW_NUMBER() over (partition by T.ID order by T.[seq]) as [row]
+		from
+		(
+			select T9.ID as [ID], concat('[', (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T1.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T1.BoCode end),']',T1.BoName) as [Equipment], '' as [Component], concat('A', convert(nvarchar, T0.ID)) as [seq]
+			from WorkOrders T9
+			inner join WorkOrderEquipments T0 on T0.WorkOrder_ID = T9.ID
+			inner join Equipments T1 on T0.Equipment_ID = T1.ID
+			inner join Areas on Areas.ID = T1.Area_ID
+			inner join Locations on Locations.ID = T1.Location_ID
+			inner join SubLocations on SubLocations.ID = T1.SubLocation_ID
+			inner join EqClasses on EqClasses.ID = T1.EqClass_ID
+			where T9.DocDate >= @WODateFrom
+			and T9.DocDate <= @WODateTo
+			union all
+			select T9.ID as [ID], concat('[', (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T1.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T1.BoCode end),']',T1.BoName) as [Equipment], concat('[', EqComponentClasses.BoShortName, T2.BoCode,']',T2.BoName) as [Component], concat('B', convert(nvarchar, T0.ID)) as [seq]
+			from WorkOrders T9
+			inner join WorkOrderEqComponents T0 on T0.WorkOrder_ID = T9.ID
+			inner join Equipments T1 on T0.Equipment_ID = T1.ID
+			inner join Areas on Areas.ID = T1.Area_ID
+			inner join Locations on Locations.ID = T1.Location_ID
+			inner join SubLocations on SubLocations.ID = T1.SubLocation_ID
+			inner join EqClasses on EqClasses.ID = T1.EqClass_ID
+			inner join EquipmentComponents T2 on T0.EquipmentComponent_ID = T2.ID
+			inner join EqComponentClasses on T2.EqComponentClass_ID = EqComponentClasses.ID
+			where T9.DocDate >= @WODateFrom
+			and T9.DocDate <= @WODateTo
+		) T
+	) T1 on T9.ID = T1.ID and T1.[row] = 1
+	left join (
+		select T9.ID, T0.DeviationNo, T0.DueDate, ROW_NUMBER() over (partition by T9.ID order by T0.ID desc) as [row]
+		from WorkOrders T9
+		inner join DeviationWorkOrders T0 on T0.WorkOrder_ID = T9.ID
+		inner join DeviationWOTypes T1 on T0.DeviationType_ID = T1.ID
+		where T9.DocDate >= @WODateFrom
+		and T9.DocDate <= @WODateTo
+		and T1.BoCode = 'LAFD'
+	) T2 on T9.ID = T2.ID and T2.[row] = 1
+	left join (
+		select T9.ID, T0.DeviationNo, T0.DueDate, ROW_NUMBER() over (partition by T9.ID order by T0.ID desc) as [row]
+		from WorkOrders T9
+		inner join DeviationWorkOrders T0 on T0.WorkOrder_ID = T9.ID
+		inner join DeviationWOTypes T1 on T0.DeviationType_ID = T1.ID
+		where T9.DocDate >= @WODateFrom
+		and T9.DocDate <= @WODateTo
+		and T1.BoCode = 'Isolation'
+	) T3 on T9.ID = T3.ID and T3.[row] = 1
+	where T9.DocDate >= @WODateFrom
+	and T9.DocDate <= @WODateTo
+
+	select ID, Equipment, Component, DocNo, DocDate, PlannerGroup, LastDeviationDocNo, LastDeviationDocDate, LastIsolatedDeviationDocNo, LastIsolatedDeviationDocDate
+	from @newtable
+	order by ID
+
+end
+go
+
+
+
+create proc [dbo].[GetListWRDeviation]
+@WODateFrom DateTime,
+@WODateTo DateTime
+
+as
+begin
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  Equipment nvarchar(200), 
+	  Component nvarchar(200), 
+	  DocNo nvarchar(50), 
+	  DocDate datetime,
+	  PlannerGroup nvarchar(50), 
+	  LastDeviationDocNo nvarchar(50), 
+	  LastDeviationDocDate datetime
+	)
+
+	insert into @newtable
+	select ROW_NUMBER() over (order by T9.ID), T1.Equipment, T1.Component, T9.DocNum, T9.DocDate, T8.BoCode, T2.DeviationNo, T2.DueDate
+	from WorkRequests T9
+	inner join (
+		select WorkRequests.ID from WorkRequests inner join DeviationWorkRequests on WorkRequests.ID = DeviationWorkRequests.WorkRequest_ID
+		where WorkRequests.DocDate >= @WODateFrom
+			and WorkRequests.DocDate <= @WODateTo
+		group by WorkRequests.ID
+	) T10 on T9.ID = T10.ID
+	inner join PlannerGroups T8 on T9.PlannerGroup_ID = T8.ID
+	left join (
+		select T.ID, T.[Equipment], T.[Component], ROW_NUMBER() over (partition by T.ID order by T.[seq]) as [row]
+		from
+		(
+			select T9.ID as [ID], concat('[', (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T1.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T1.BoCode end),']',T1.BoName) as [Equipment], '' as [Component], concat('A', convert(nvarchar, T0.ID)) as [seq]
+			from WorkRequests T9
+			inner join WorkRequestEquipments T0 on T0.WorkRequest_ID = T9.ID
+			inner join Equipments T1 on T0.Equipment_ID = T1.ID
+			inner join Areas on Areas.ID = T1.Area_ID
+			inner join Locations on Locations.ID = T1.Location_ID
+			inner join SubLocations on SubLocations.ID = T1.SubLocation_ID
+			inner join EqClasses on EqClasses.ID = T1.EqClass_ID
+			where T9.DocDate >= @WODateFrom
+			and T9.DocDate <= @WODateTo
+			union all
+			select T9.ID as [ID], concat('[', (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T1.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T1.BoCode end),']',T1.BoName) as [Equipment], concat('[', EqComponentClasses.BoShortName, T2.BoCode,']',T2.BoName) as [Component], concat('B', convert(nvarchar, T0.ID)) as [seq]
+			from WorkRequests T9
+			inner join WorkRequestEqComponents T0 on T0.WorkRequest_ID = T9.ID
+			inner join Equipments T1 on T0.Equipment_ID = T1.ID
+			inner join Areas on Areas.ID = T1.Area_ID
+			inner join Locations on Locations.ID = T1.Location_ID
+			inner join SubLocations on SubLocations.ID = T1.SubLocation_ID
+			inner join EqClasses on EqClasses.ID = T1.EqClass_ID
+			inner join EquipmentComponents T2 on T0.EquipmentComponent_ID = T2.ID
+			inner join EqComponentClasses on T2.EqComponentClass_ID = EqComponentClasses.ID
+			where T9.DocDate >= @WODateFrom
+			and T9.DocDate <= @WODateTo
+		) T
+	) T1 on T9.ID = T1.ID and T1.[row] = 1
+	left join (
+		select T9.ID, T0.DeviationNo, T0.DueDate, ROW_NUMBER() over (partition by T9.ID order by T0.ID desc) as [row]
+		from WorkRequests T9
+		inner join DeviationWorkRequests T0 on T0.WorkRequest_ID = T9.ID
+		inner join DeviationWRTypes T1 on T0.DeviationType_ID = T1.ID
+		where T9.DocDate >= @WODateFrom
+		and T9.DocDate <= @WODateTo
+		--and T1.BoCode = 'LAFD'
+	) T2 on T9.ID = T2.ID and T2.[row] = 1
+	where T9.DocDate >= @WODateFrom
+	and T9.DocDate <= @WODateTo
+
+	select ID, Equipment, Component, DocNo, DocDate, PlannerGroup, LastDeviationDocNo, LastDeviationDocDate
+	from @newtable
+	order by ID
+end
+go
+
+
+
+
+create proc [dbo].[GenCloseOlderWorks]
+
+@docremarks nvarchar(100), @username nvarchar(50), @lastdate datetime = '2021-12-31'
+
+AS
+
+begin
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+	declare @userid int
+	declare @today datetime
+	declare @DocStatus nvarchar(50)
+
+	select @DocStatus = 'Closed'
+	select @today = getdate()
+	select @userid = ID from PermissionPolicyUsers where UserName = @username
+
+	-- Work Orders - Close old WO
+	select T0.ID, T0.DocNum, T0.DocDate
+	INTO #newWO
+	from WorkOrders T0
+	where T0.Cancelled = 0 and T0.IsClosed = 0 and T0.DocDate <= @lastdate
+
+	update T0
+	set T0.IsClosed = 1, T0.Cancelled = 0, T0.DocPassed = 0, T0.DocPassed = 0, T0.Approved = 0, T0.Rejected = 0
+	, T0.DocStatus = @DocStatus
+	from WorkOrders T0
+	inner join #newWO T1 on T0.ID = T1.ID
+
+	insert into WorkOrderDocStatuses
+	( CreateDate, UpdateDate, DocStatus, DocRemarks, IsReverse, CreateUser_ID, UpdateUser_ID, WorkOrder_ID )
+	select @today, @today, 5, @docremarks, 0, @userid, @userid, T0.ID
+	from #newWO T0
+
+	DROP TABLE #newWO
+
+	-- Work Requests - Cancel old WR
+	select @DocStatus = 'Cancelled'
+
+	select T0.ID, T0.DocNum, T0.DocDate
+	INTO #newWR
+	from WorkRequests T0
+	where T0.Cancelled = 0 and T0.Approved = 0 and T0.DocDate <= @lastdate
+
+	update T0
+	set T0.Cancelled = 1, T0.DocPassed = 0, T0.DocPassed = 0, T0.Approved = 0, T0.Rejected = 0
+	, T0.DocStatus = @DocStatus
+	from WorkRequests T0
+	inner join #newWR T1 on T0.ID = T1.ID
+
+	insert into WorkRequestDocStatuses
+	( CreateDate, UpdateDate, DocStatus, DocRemarks, IsReverse, CreateUser_ID, UpdateUser_ID, WorkRequest_ID )
+	select @today, @today, 4, @docremarks, 0, @userid, @userid, T0.ID
+	from #newWR T0
+
+	DROP TABLE #newWR
+
+end

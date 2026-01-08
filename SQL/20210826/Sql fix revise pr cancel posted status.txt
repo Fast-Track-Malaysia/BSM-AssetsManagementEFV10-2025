@@ -1,0 +1,1 @@
+update PurchaseRequests set DocStatus = 'Cancel Posted' where Cancelled = 1 and DocPosted = 1 and DocStatus != 'Cancel Posted'

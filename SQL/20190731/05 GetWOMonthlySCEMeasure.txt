@@ -1,0 +1,390 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWOMonthlySCEMeasure]    Script Date: 30/06/2019 11:12:59 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER proc [dbo].[GetWOMonthlySCEMeasure]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10), 
+	  PG01 int, 
+	  PG02 int,
+	  PG03 int,
+	  PG04 int
+	)
+
+	declare @id int
+	declare @analysisname nvarchar(200)
+	declare @analysisremarks nvarchar(10)
+	declare @pg01done numeric(10,2)
+	declare @pg02done numeric(10,2)
+	declare @pg03done numeric(10,2)
+	declare @pg04done numeric(10,2)
+	declare @pg01total numeric(10,2)
+	declare @pg02total numeric(10,2)
+	declare @pg03total numeric(10,2)
+	declare @pg04total numeric(10,2)
+
+	begin --PM-start
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		where T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		group by T0.ID
+		) T10 on T10.ID = T0.ID
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1	
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+		and T0.PlanStartDate <= T1.CreateDate and T0.PlanEndDate >= T1.CreateDate
+
+		set @id = 15
+		set @analysisname = 'SCE PM Job Compliance'
+		set @analysisremarks = ''
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		where T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		group by T0.ID
+		) T10 on T10.ID = T0.ID
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+
+		set @id = 16
+		set @analysisname = 'SCE PM All Job'
+		set @analysisremarks = ''
+
+		select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done , @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+
+		set @id = 1
+		set @analysisname = 'SCE PM Compliance'
+		set @analysisremarks = '>85%'
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 2) end
+		, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 2) end
+		, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 2) end
+		, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 2) end
+	end --PM-end
+
+	
+	begin --CM-start
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+		group by T0.ID
+		) T10 on T10.ID = T0.ID		
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1	
+		and T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+		and T0.ScheduleStartDate <= T1.CreateDate and T0.ScheduleEndDate >= T1.CreateDate
+
+		set @id = 25
+		set @analysisname = 'SCE CM Job Compliance'
+		set @analysisremarks = ''
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done , @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		group by T0.ID
+		) T10 on T10.ID = T0.ID		
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+
+		set @id = 26
+		set @analysisname = 'SCE CM All Job'
+		set @analysisremarks = ''
+
+		select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done , @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+
+		set @id = 2
+		set @analysisname = 'SCE CM Compliance'
+		set @analysisremarks = '>85%'
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 0) end
+		, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 0) end
+		, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 0) end
+		, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 0) end
+	end --CM-end
+
+
+	--begin --Schedule-start
+	--	select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 
+	--	inner join
+	--	(
+	--	select T0.ID 
+	--	from WorkOrders T0
+	--	left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+	--	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	--	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	--	left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	--	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	--	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+	--	and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+	--	group by T0.ID
+	--	) T10 on T10.ID = T0.ID		
+	--	inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+	--	and T0.ScheduleStartDate = T0.ActualStartDate
+	--	and T0.ScheduleStartDate <= T0.ActualEndDate and T0.ScheduleEndDate >= T0.ActualEndDate
+
+	--	set @id = 35
+	--	set @analysisname = 'SCE Schedule Job Compliance'
+	--	set @analysisremarks = ''
+
+	--	select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	,@pg01done , @pg02done, @pg03done, @pg04done
+	--	--,@pg01total , @pg02total, @pg03total, @pg04total
+
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 
+	--	inner join
+	--	(
+	--	select T0.ID 
+	--	from WorkOrders T0
+	--	left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+	--	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	--	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	--	left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	--	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	--	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+	--	and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+	--	group by T0.ID
+	--	) T10 on T10.ID = T0.ID		
+	--	inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+
+	--	set @id = 36
+	--	set @analysisname = 'SCE Schedule All Job'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+
+	--	set @id = 3
+	--	set @analysisname = 'SCE Schedule Compliance'
+	--	set @analysisremarks = '>70%'
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 0) end
+	--	, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 0) end
+	--	, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 0) end
+	--	, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 0) end
+
+
+	--end --Schedule-end
+
+
+	insert into @newtable
+	select 9, '', '', null, null, null, null
+
+	insert into @newtable
+	select 10, '', '', null, null, null, null
+
+	begin
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		where T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		group by T0.ID
+		) T10 on T10.ID = T0.ID		
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		where T0.IsPreventiveMaintenance = 1 and
+			T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo and
+			(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+		set @id = 45
+		set @analysisname = 'Non-schedule SCE PM'
+		set @analysisremarks = ''
+
+		select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done , @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+
+
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 
+		inner join
+		(
+		select T0.ID 
+		from WorkOrders T0
+		left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+		left join Equipments T8 on T8.ID = T10.Equipment_ID
+		left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+		left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+		left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+		left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+		where T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo
+		and (Criticalities.ID is not null or ComCriticalities.ID is not null)
+		group by T0.ID
+		) T10 on T10.ID = T0.ID		
+		inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		where T0.IsPreventiveMaintenance = 0 and
+			T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo and
+			(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+		set @id = 46
+		set @analysisname = 'Non-schedule SCE CM'
+		set @analysisremarks = ''
+
+		select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done , @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+	end
+
+	--select ID, AnalysisName, AnalysisRemarks, sum(PG01) as PG01, sum(PG02) as PG02, sum(PG03) as PG03, sum(PG04) as PG04
+	select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04
+	from @newtable
+	order by ID
+end
+

@@ -1,0 +1,112 @@
+
+/****** Object:  StoredProcedure [dbo].[GetListWOPRCntByEquipmentGroup]    Script Date: 15/12/2020 3:43:47 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+create proc [dbo].[GetListWOPRCntByEquipmentGroup]
+
+@WODateFrom DateTime,
+@WODateTo DateTime
+
+AS
+
+begin
+	-- Bad Actor
+	DECLARE @newtable TABLE
+	(
+      ID int,
+	  WorkOrder nvarchar(50),
+	  WorkOrderDate datetime,
+	  PurchaseRequest nvarchar(50),
+	  PurchaseRequestDate datetime,
+	  EquipmentGroup nvarchar(50), 
+	  EqCount int, 
+	  PRCount int, 
+	  PRAmount numeric(20,6),
+	  EquipmentClass nvarchar(50), 
+	  EquipmentCode nvarchar(50)
+	)
+
+	CREATE TABLE #TempTable
+	(
+	  EquipmentGroup nvarchar(50), 
+	  WOID nvarchar(50), 
+	  PRID nvarchar(50), 
+	  EqCount int, 
+	  PRCount int, 
+	  PRAmount numeric(20,6),
+	  WOEQID int,
+	  EquipmentClass nvarchar(50), 
+	  EquipmentCode nvarchar(50)
+	)
+
+	insert into #TempTable
+	( EquipmentGroup, WOID, EqCount, PRAmount, WOEQID)
+	select T1.BoCode, T3.ID, count(T2.ID), 0, min(T2.ID)
+	from Equipments T0 inner join EqGroups T1 on T0.EqGroup_ID = T1.ID
+	inner join WorkOrderEquipments T2 on T0.ID = T2.Equipment_ID
+	inner join WorkOrders T3 on T2.WorkOrder_ID = T3.ID and T3.Cancelled = 0 and T3.IsPreventiveMaintenance = 0
+	where T3.DocDate >= @WODateFrom and T3.DocDate <= @WODateTo
+	group by T1.BoCode, T3.ID
+
+
+	update T0 set T0.EquipmentClass = EqClasses.BoCode,
+					T0.EquipmentCode = (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T2.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T2.BoCode end)
+	from #TempTable T0
+	inner join WorkOrderEquipments T1 on T1.ID = T0.WOEQID
+	inner join Equipments T2 on T2.ID = T1.Equipment_ID
+	inner join Areas on Areas.ID = T2.Area_ID
+	inner join Locations on Locations.ID = T2.Location_ID
+	inner join SubLocations on SubLocations.ID = T2.SubLocation_ID
+	inner join EqClasses on EqClasses.ID = T2.EqClass_ID
+
+
+	update T0 set T0.PRAmount = isnull(T2.PRAmount,0),
+					T0.PRID = T2.PRID
+	from #TempTable T0
+	left join 
+	(
+	select T3.ID, sum(isnull(T5.QTY,0) * isnull(T5.Price,0)) as PRAmount, min(T4.ID) as PRID
+	from WorkOrders T3 
+	inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	inner join PurchaseRequestDtls T5 on T4.ID = T5.PurchaseRequest_ID
+	where T3.DocDate >= @WODateFrom and T3.DocDate <= @WODateTo
+		and T4.Cancelled = 0
+	group by T3.ID
+	) T2 on T0.WOID = T2.ID
+
+	update T0 set T0.PRCount = T2.PRCount
+	from #TempTable T0
+	left join 
+	(
+	select T3.ID, count(T4.ID) as PRCount
+	from WorkOrders T3 
+	inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	where T3.DocDate >= @WODateFrom and T3.DocDate <= @WODateTo
+		and T4.Cancelled = 0
+	group by T3.ID
+	) T2 on T0.WOID = T2.ID
+		
+	update #TempTable set PRCount = 1
+	where isnull(PRCount,0) = 0
+	update #TempTable set EqCount = 1
+	where isnull(EqCount,0) = 0
+
+	insert into @newtable
+	(ID, T1.EquipmentGroup, T1.PRAmount, WorkOrder, WorkOrderDate, PurchaseRequest, PurchaseRequestDate, EqCount, PRCount, EquipmentClass, EquipmentCode)
+	select ROW_NUMBER() over(order by EquipmentGroup), T1.EquipmentGroup, T1.PRAmount/ T1.EqCount / T1.PRCount, T3.DocNum, T3.DocDate, T4.DocNum, T4.DocDate, T1.EqCount, T1.PRCount, T1.EquipmentClass, T1.EquipmentCode
+	from #TempTable T1 inner join WorkOrders T3 on T1.WOID = T3.ID
+	left join PurchaseRequests T4 on T1.PRID = T4.ID
+
+	DROP TABLE #TempTable
+
+
+	select ID, WorkOrder, WorkOrderDate, PurchaseRequest, EquipmentGroup, PurchaseRequestDate, PRAmount, EqCount, PRCount, EquipmentClass, EquipmentCode
+	from @newtable
+	order by ID
+end
+
+
+

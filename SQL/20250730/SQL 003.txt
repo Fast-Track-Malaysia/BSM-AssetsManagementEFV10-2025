@@ -1,0 +1,217 @@
+update DeviationStatus set BoCode = 'Closed', BoName = 'Closed' where BoCode = 'Close'
+
+insert into DeviationStatus
+(BoCode, BoName)
+select 'New', 'New'
+union all
+select 'Draft', 'Draft'
+union all
+select 'Under Review', 'Under Review'
+union all
+select 'Pending Approval', 'Pending Approval'
+union all
+select 'Approved', 'Approved'
+union all
+select 'Expired', 'Expired'
+union all
+select 'Draft Extension', 'Draft Extension'
+union all
+select 'Approved Extension', 'Approved Extension'
+union all
+select 'Withdrawn', 'Withdrawn'
+
+insert into DeviationTypes
+(BoCode, BoName)
+select 'OLAFD', 'OLAFD'
+union all
+select 'SCE', 'SCE Function Impaired'
+
+
+insert into DeviationLocations
+(BoCode, BoName)
+select 'Muara Terminal', 'Muara Terminal'
+union all
+select 'Bitumen Depo', 'Bitumen Depo'
+union all
+select 'Aviation Terminal', 'Aviation Terminal'
+union all
+select 'Muara Warehouse', 'Muara Warehouse'
+union all
+select 'Retail', 'Retail'
+union all
+select 'BSM-HQ', 'BSM-HQ'
+
+
+insert into DeviationDisciplines
+(BoCode, BoName)
+select 'Rotat', 'Rotating'
+union all
+select 'Stat', 'Static'
+union all
+select 'Civil', 'Civil'
+union all
+select 'Struct', 'Structural'
+union all
+select 'Inst', 'Instrument'
+union all
+select 'Elect', 'Electrical'
+union all
+select 'Insp', 'Inspection'
+
+
+
+insert into DeviationFrequencies
+(BoCode, BoName)
+select 'Weekly', 'Weekly'
+union all
+select 'Monthly', 'Monthly'
+union all
+select 'Yearly', 'Yearly'
+
+
+insert into Risks
+(BoCode, BoName)
+select 'Blue', 'Blue'
+union all
+select 'Yellow', 'Yellow'
+union all
+select 'Red', 'Red'
+
+insert into RiskPeoples
+(BoCode, BoName)
+ select 'A0', 'A0 - L.Blue'
+union all select 'B0', 'B0 - L.Blue'
+union all select 'C0', 'C0 - L.Blue'
+union all select 'D0', 'D0 - L.Blue'
+union all select 'E0', 'E0 - L.Blue'
+union all select 'A1', 'A1 - L.Blue'
+union all select 'B1', 'B1 - L.Blue'
+union all select 'C1', 'C1 - D.Blue'
+union all select 'D1', 'D1 - D.Blue'
+union all select 'E1', 'E1 - D.Blue'
+union all select 'A2', 'A2 - L.Blue'
+union all select 'B2', 'B2 - D.Blue'
+union all select 'C2', 'C2 - D.Blue'
+union all select 'D2', 'D2 - Yellow'
+union all select 'E2', 'E2 - Yellow'
+union all select 'A3', 'A3 - D.Blue'
+union all select 'B3', 'B3 - D.Blue'
+union all select 'C3', 'C3 - Yellow'
+union all select 'D3', 'D3 - Yellow'
+union all select 'E3', 'E3 - Red'
+union all select 'A4', 'A4 - D.Blue'
+union all select 'B4', 'B4 - Yellow'
+union all select 'C4', 'C4 - Yellow'
+union all select 'D4', 'D4 - Red'
+union all select 'E4', 'E4 - Red'
+union all select 'A5', 'A5 - Yellow'
+union all select 'B5', 'B5 - Yellow'
+union all select 'C5', 'C5 - Red'
+union all select 'D5', 'D5 - Red'
+union all select 'E5', 'E5 - Red'
+
+
+
+insert into RiskAssets
+(BoCode, BoName)
+ select 'A0', 'A0 - L.Blue'
+union all select 'B0', 'B0 - L.Blue'
+union all select 'C0', 'C0 - L.Blue'
+union all select 'D0', 'D0 - L.Blue'
+union all select 'E0', 'E0 - L.Blue'
+union all select 'A1', 'A1 - L.Blue'
+union all select 'B1', 'B1 - L.Blue'
+union all select 'C1', 'C1 - D.Blue'
+union all select 'D1', 'D1 - D.Blue'
+union all select 'E1', 'E1 - D.Blue'
+union all select 'A2', 'A2 - L.Blue'
+union all select 'B2', 'B2 - D.Blue'
+union all select 'C2', 'C2 - D.Blue'
+union all select 'D2', 'D2 - Yellow'
+union all select 'E2', 'E2 - Yellow'
+union all select 'A3', 'A3 - D.Blue'
+union all select 'B3', 'B3 - D.Blue'
+union all select 'C3', 'C3 - Yellow'
+union all select 'D3', 'D3 - Yellow'
+union all select 'E3', 'E3 - Red'
+union all select 'A4', 'A4 - D.Blue'
+union all select 'B4', 'B4 - Yellow'
+union all select 'C4', 'C4 - Yellow'
+union all select 'D4', 'D4 - Red'
+union all select 'E4', 'E4 - Red'
+union all select 'A5', 'A5 - Yellow'
+union all select 'B5', 'B5 - Yellow'
+union all select 'C5', 'C5 - Red'
+union all select 'D5', 'D5 - Red'
+union all select 'E5', 'E5 - Red'
+
+
+insert into RiskCommunities
+(BoCode, BoName)
+ select 'A0', 'A0 - L.Blue'
+union all select 'B0', 'B0 - L.Blue'
+union all select 'C0', 'C0 - L.Blue'
+union all select 'D0', 'D0 - L.Blue'
+union all select 'E0', 'E0 - L.Blue'
+union all select 'A1', 'A1 - L.Blue'
+union all select 'B1', 'B1 - L.Blue'
+union all select 'C1', 'C1 - D.Blue'
+union all select 'D1', 'D1 - D.Blue'
+union all select 'E1', 'E1 - D.Blue'
+union all select 'A2', 'A2 - L.Blue'
+union all select 'B2', 'B2 - D.Blue'
+union all select 'C2', 'C2 - D.Blue'
+union all select 'D2', 'D2 - Yellow'
+union all select 'E2', 'E2 - Yellow'
+union all select 'A3', 'A3 - D.Blue'
+union all select 'B3', 'B3 - D.Blue'
+union all select 'C3', 'C3 - Yellow'
+union all select 'D3', 'D3 - Yellow'
+union all select 'E3', 'E3 - Red'
+union all select 'A4', 'A4 - D.Blue'
+union all select 'B4', 'B4 - Yellow'
+union all select 'C4', 'C4 - Yellow'
+union all select 'D4', 'D4 - Red'
+union all select 'E4', 'E4 - Red'
+union all select 'A5', 'A5 - Yellow'
+union all select 'B5', 'B5 - Yellow'
+union all select 'C5', 'C5 - Red'
+union all select 'D5', 'D5 - Red'
+union all select 'E5', 'E5 - Red'
+
+
+insert into RiskEnvironments
+(BoCode, BoName)
+ select 'A0', 'A0 - L.Blue'
+union all select 'B0', 'B0 - L.Blue'
+union all select 'C0', 'C0 - L.Blue'
+union all select 'D0', 'D0 - L.Blue'
+union all select 'E0', 'E0 - L.Blue'
+union all select 'A1', 'A1 - L.Blue'
+union all select 'B1', 'B1 - L.Blue'
+union all select 'C1', 'C1 - D.Blue'
+union all select 'D1', 'D1 - D.Blue'
+union all select 'E1', 'E1 - D.Blue'
+union all select 'A2', 'A2 - L.Blue'
+union all select 'B2', 'B2 - D.Blue'
+union all select 'C2', 'C2 - D.Blue'
+union all select 'D2', 'D2 - Yellow'
+union all select 'E2', 'E2 - Yellow'
+union all select 'A3', 'A3 - D.Blue'
+union all select 'B3', 'B3 - D.Blue'
+union all select 'C3', 'C3 - Yellow'
+union all select 'D3', 'D3 - Yellow'
+union all select 'E3', 'E3 - Red'
+union all select 'A4', 'A4 - D.Blue'
+union all select 'B4', 'B4 - Yellow'
+union all select 'C4', 'C4 - Yellow'
+union all select 'D4', 'D4 - Red'
+union all select 'E4', 'E4 - Red'
+union all select 'A5', 'A5 - Yellow'
+union all select 'B5', 'B5 - Yellow'
+union all select 'C5', 'C5 - Red'
+union all select 'D5', 'D5 - Red'
+union all select 'E5', 'E5 - Red'
+
+
+

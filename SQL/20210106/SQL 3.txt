@@ -1,0 +1,151 @@
+update PurchaseRequests set DocStatus = null
+go
+update PurchaseRequests set
+DocStatus = 'Approver Rejected'
+where isnull(DocStatus,'') = '' and Rejected = 1
+go
+update PurchaseRequests set
+DocStatus = 'Cancel Posted'
+where isnull(DocStatus,'') = '' and Cancelled = 1 and DocPosted = 1
+go
+update PurchaseRequests set
+DocStatus = 'Cancelled'
+where isnull(DocStatus,'') = '' and Cancelled = 1 and DocPosted = 0
+go
+update PurchaseRequests set
+DocStatus = 'SAP B1 Posted'
+where isnull(DocStatus,'') = '' and DocPosted = 1
+go
+update PurchaseRequests set
+DocStatus = 'PR Requestor Passed'
+where isnull(DocStatus,'') = '' and DocPassed = 1
+go
+update PurchaseRequests set
+DocStatus = 'PR Requestor Pending'
+where isnull(DocStatus,'') = ''
+go
+
+
+
+update WorkOrders set DocStatus = null
+go
+update WorkOrders set
+DocStatus = 'WO Closed'
+where isnull(DocStatus,'') = '' and IsClosed = 1
+go
+update WorkOrders set
+DocStatus = 'Rejected'
+where isnull(DocStatus,'') = '' and Rejected = 1
+go
+update WorkOrders set
+DocStatus = 'Approved'
+where isnull(DocStatus,'') = '' and Approved = 1
+go
+update WorkOrders set
+DocStatus = 'Cancelled'
+where isnull(DocStatus,'') = '' and Cancelled = 1
+go
+update WorkOrders set
+DocStatus = 'Passed'
+where isnull(DocStatus,'') = '' and DocPassed = 1
+go
+update WorkOrders set
+DocStatus = case when isnull(JobStatus_ID,0) = 1 then 'Waiting Acknowledge' else 'Planner Pending' end
+where isnull(DocStatus,'') = '' and isnull(JobStatus_ID,0) > 0 and IsPreventiveMaintenance = 1 
+go
+update WorkOrders set
+DocStatus = 'Waiting Acknowledge'
+where isnull(DocStatus,'') = '' and isnull(JobStatus_ID,0) = 0 and IsPreventiveMaintenance = 1 
+go
+update WorkOrders set
+DocStatus = 'Planner Pending'
+where isnull(DocStatus,'') = ''
+go
+
+
+
+update WorkRequests set DocStatus = null
+go
+update WorkRequests set
+DocStatus = 'Rejected'
+where isnull(DocStatus,'') = '' and Rejected = 1
+go
+update WorkRequests set
+DocStatus = 'Approved'
+where isnull(DocStatus,'') = '' and Approved = 1
+go
+update WorkRequests set
+DocStatus = 'Cancelled'
+where isnull(DocStatus,'') = '' and Cancelled = 1
+go
+update WorkRequests set
+DocStatus = 'Passed'
+where isnull(DocStatus,'') = '' and DocPassed = 1
+go
+update WorkRequests set
+DocStatus = 'Requestor Pending'
+where isnull(DocStatus,'') = ''
+go
+
+
+
+update Equipments set FullCode = null
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'') = '' then T0.BoCode else T1.BoShortName + T0.BoCode end
+from Equipments T0 left join EqClasses T1 on T0.EqClass_ID = T1.ID
+where isnull(T0.FullCode,'') = ''
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'') = '' then T0.FullCode else T1.BoShortName + '-' + T0.FullCode end
+from Equipments T0 left join SubLocations T1 on T0.SubLocation_ID = T1.ID
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'') = '' then T0.FullCode else T1.BoShortName + '-' + T0.FullCode end
+from Equipments T0 left join Locations T1 on T0.Location_ID = T1.ID
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'') = '' then T0.FullCode else T1.BoShortName + '-' + T0.FullCode end
+from Equipments T0 left join Areas T1 on T0.Area_ID = T1.ID
+go
+
+
+update EquipmentComponents set FullCode = null
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'-') = '-' then T0.BoCode else T1.BoShortName + T0.BoCode end
+from EquipmentComponents T0 left join EqComponentClasses T1 on T0.EqComponentClass_ID = T1.ID
+where isnull(T0.FullCode,'') = ''
+go
+
+
+update EquipmentComponents set ComponentFullCode = null
+go
+update T0 set
+T0.ComponentFullCode = case when isnull(T1.FullCode,'-') = '-' then T0.BoCode else T1.FullCode + '<C>' + T0.FullCode end
+from EquipmentComponents T0 left join Equipments T1 on T0.Equipment_ID = T1.ID
+where isnull(T0.ComponentFullCode,'') = ''
+go
+
+
+
+update PMSchedules set FullCode = null
+go
+update T0 set
+T0.FullCode = case when isnull(T1.BoShortName,'-') = '-' then T0.BoCode else T1.BoShortName + T0.BoCode end
+from PMSchedules T0 left join PMClasses T1 on T0.PMClass_ID = T1.ID
+where isnull(T0.FullCode,'') = ''
+go
+
+
+
+update Priorities set
+FullCode = isnull(BoCode,'') + '-' + isnull(BoName,'') + case when isnull(BoDescription,'') = '' then '' else ' [' + BoDescription + ']' end
+go
+
+
+
+update T0
+set T0.SortingBy = case when T1.ID is null then 0 else (T1.Frequency * 10000) + (T0.IsNested * 1000) + T1.CycleCount end
+from PMSchedules T0 left join PMFrequencies T1 on T0.PMFrequency_ID = T1.ID
+go

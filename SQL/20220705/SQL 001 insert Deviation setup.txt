@@ -1,0 +1,26 @@
+
+insert into DeviationWOTypes
+(BoCode, BoName)
+select 'LAFD', 'LAFD'
+union all
+select 'Isolation', 'Isolation'
+go
+insert into DeviationWRTypes
+(BoCode, BoName)
+select 'Permenent', 'Permenent'
+union all
+select 'Temporary', 'Temporary'
+go
+insert into DeviationStatus
+(BoCode, BoName)
+select 'Open' as BoCode, 'Open' as BoName
+union all
+select 'Close' as BoCode, 'Close' as BoName
+union all
+select 'Cancel' as BoCode, 'Cancel' as BoName
+go
+
+update WorkOrders set IsDeviationApproved = 0, IsDeviationNotApproved = 0
+go
+update WorkRequests set IsDeviationApproved = 0, IsDeviationNotApproved = 0
+go

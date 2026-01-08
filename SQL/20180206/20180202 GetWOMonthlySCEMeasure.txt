@@ -1,0 +1,135 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWOMonthlyMeasure]    Script Date: 02/02/2018 2:55:12 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+alter proc [dbo].[GetWOMonthlySCEMeasure]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10), 
+	  PG01 int, 
+	  PG02 int,
+	  PG03 int,
+	  PG04 int
+	)
+
+	declare @analysisname nvarchar(200)
+	declare @analysisremarks nvarchar(10)
+
+	set @analysisname = 'SCE PM Compliance'
+	set @analysisremarks = '100%'
+
+	insert into @newtable
+	select T1.ID, @analysisname, @analysisremarks
+	, (case when PlannerGroups.BoCode = 'PG01' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG02' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG03' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG04' then 1 else 0 end)
+	from WorkOrders T1
+	left join WorkOrderEquipments T10 on T1.ID = T10.WorkOrder_ID
+	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	left join WorkOrderEqComponents T11 on T1.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	where T1.IsPreventiveMaintenance = 1
+	and T1.IsClosed = 1
+	and T1.DocDate >= @WODataFrom and T1.DocDate <= @WODataTo
+	group by T1.ID, PlannerGroups.BoCode
+
+
+	set @analysisname = 'SCE CM Compliance'
+	set @analysisremarks = '100%'
+
+	insert into @newtable
+	select T1.ID, @analysisname, @analysisremarks
+	, (case when PlannerGroups.BoCode = 'PG01' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG02' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG03' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG04' then 1 else 0 end)
+	from WorkOrders T1
+	left join WorkOrderEquipments T10 on T1.ID = T10.WorkOrder_ID
+	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	left join WorkOrderEqComponents T11 on T1.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	where T1.IsPreventiveMaintenance = 0
+	and T1.IsClosed = 1
+	and T1.DocDate >= @WODataFrom and T1.DocDate <= @WODataTo
+	group by T1.ID, PlannerGroups.BoCode
+	
+	set @analysisname = 'SCE PM Overdue OLAFD w/o approved deviation'
+	set @analysisremarks = '0%'
+
+	insert into @newtable
+	select T1.ID, @analysisname, @analysisremarks
+	, (case when PlannerGroups.BoCode = 'PG01' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG02' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG03' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG04' then 1 else 0 end)
+	from WorkOrders T1
+	left join WorkOrderEquipments T10 on T1.ID = T10.WorkOrder_ID
+	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	left join WorkOrderEqComponents T11 on T1.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	where T1.IsPreventiveMaintenance = 1
+	and T1.DocPassed = 1
+	and T1.DocDate >= @WODataFrom and T1.DocDate <= @WODataTo
+	group by T1.ID, PlannerGroups.BoCode
+
+	set @analysisname = 'SCE CM Overdue OLAFD w/o approved deviation'
+	set @analysisremarks = '0%'
+
+	insert into @newtable
+	select T1.ID, @analysisname, @analysisremarks
+	, (case when PlannerGroups.BoCode = 'PG01' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG02' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG03' then 1 else 0 end)
+	, (case when PlannerGroups.BoCode = 'PG04' then 1 else 0 end)
+	from WorkOrders T1
+	left join WorkOrderEquipments T10 on T1.ID = T10.WorkOrder_ID
+	left join Equipments T8 on T8.ID = T10.Equipment_ID
+	left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+	left join WorkOrderEqComponents T11 on T1.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	where T1.IsPreventiveMaintenance = 0
+	and T1.DocPassed = 1
+	and T1.DocDate >= @WODataFrom and T1.DocDate <= @WODataTo
+	group by T1.ID, PlannerGroups.BoCode
+	
+	select ID, AnalysisName, AnalysisRemarks, sum(PG01) as PG01, sum(PG02) as PG02, sum(PG03) as PG03, sum(PG04) as PG04
+	from @newtable
+	group by ID, AnalysisName, AnalysisRemarks
+end
+

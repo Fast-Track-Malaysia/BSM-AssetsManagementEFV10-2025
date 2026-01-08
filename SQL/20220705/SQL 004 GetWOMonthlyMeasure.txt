@@ -1,0 +1,878 @@
+
+ALTER proc [dbo].[GetWOMonthlyMeasure]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10), 
+	  PG01 int, 
+	  PG02 int,
+	  PG03 int,
+	  PG04 int,
+	  Total int,
+	  TargetKPI int,
+	  AchieveKPI int
+	)
+
+	declare @id int
+	declare @analysisname nvarchar(200)
+	declare @analysisremarks nvarchar(10)
+	declare @pg01done numeric(10,2)
+	declare @pg02done numeric(10,2)
+	declare @pg03done numeric(10,2)
+	declare @pg04done numeric(10,2)
+	declare @pg01total numeric(10,2)
+	declare @pg02total numeric(10,2)
+	declare @pg03total numeric(10,2)
+	declare @pg04total numeric(10,2)
+	declare @total numeric(10,2)
+	declare @targetkpi numeric(10,2)
+	declare @achievekpi numeric(10,2)
+	declare @temp numeric(10,2)
+
+	begin -- PM
+		set @id = 0
+		set @analysisname = 'Preventive Maintenance'
+		set @analysisremarks = ''
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,0 , 0, 0, 0
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 1
+		set @analysisname = 'PM Planned Monthly'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.Cancelled = 0
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done , @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 2
+		set @analysisname = 'PM Planned Backlog'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 0
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 3
+		set @analysisname = 'PM Planned Total'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01total = sum(PG01)
+		,@pg02total = sum(PG02)
+		,@pg03total = sum(PG03)
+		,@pg04total = sum(PG04)
+		from @newtable
+		where AnalysisName in ('PM Planned Monthly','PM Planned Backlog')
+
+		select @total = @pg01total + @pg02total + @pg03total + @pg04total
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done, @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 4
+		set @analysisname = 'PM Scheduled Total'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.Cancelled = 0
+		and ((T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo) or (T0.ReScheduleStartDate >= @WODataFrom and T0.ReScheduleStartDate <= @WODataTo))
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done , @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 5
+		set @analysisname = 'PM Scheduled Compliance'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and ((T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo) or (T0.ReScheduleStartDate >= @WODataFrom and T0.ReScheduleStartDate <= @WODataTo))
+		and ((T0.ScheduleStartDate <= T1.CreateDate and T0.ScheduleEndDate >= T1.CreateDate) or (T0.ReScheduleStartDate <= T1.CreateDate and T0.ReScheduleEndDate >= T1.CreateDate))
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 4
+
+		select @targetkpi = 70, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 6
+		set @analysisname = 'PM Planned Compliance'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1	
+		and T0.Cancelled = 0	
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+		and T0.PlanStartDate <= T1.CreateDate and T0.PlanEndDate >= T1.CreateDate
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 3
+		select @targetkpi = 95, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 7
+		set @analysisname = 'PM Overdue OLAFD'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+
+		--select @pg01total = sum(case when id = 3 then PG01 else PG01 * -1 end)
+		--,@pg02total = sum(case when id = 3 then PG02 else PG01 * -1 end)
+		--,@pg03total = sum(case when id = 3 then PG03 else PG01 * -1 end)
+		--,@pg04total = sum(case when id = 3 then PG04 else PG01 * -1 end)
+		--from @newtable
+		--where id in (3,5)
+
+		select @total = @pg01total + @pg02total + @pg03total + @pg04total
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done, @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 8
+		set @analysisname = 'PM Overdue OLAFD with Approved Deviation'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+		and T0.IsDeviationApproved = 1
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 7
+
+		select @targetkpi = 0, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 9
+		set @analysisname = 'PM Overdue OLAFD without Approved Deviation'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+		and T0.IsDeviationApproved = 0
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 7
+
+		select @targetkpi = 0, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+	end
+
+	begin -- CM
+		set @id = 100
+		set @analysisname = 'Corrective Maintenance'
+		set @analysisremarks = ''
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,0 , 0, 0, 0
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+
+		set @id = 101
+		set @analysisname = 'CM Planned Monthly'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.Cancelled = 0
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done , @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 102
+		set @analysisname = 'CM Planned Backlog'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.Cancelled = 0
+		and T0.IsClosed = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 103
+		set @analysisname = 'CM Planned Total'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01total = sum(PG01)
+		,@pg02total = sum(PG02)
+		,@pg03total = sum(PG03)
+		,@pg04total = sum(PG04)
+		from @newtable
+		where AnalysisName in ('CM Planned Monthly','CM Planned Backlog')
+
+		select @total = @pg01total + @pg02total + @pg03total + @pg04total
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done, @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 104
+		set @analysisname = 'CM Scheduled Total'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join ((select T5.WorkOrder_ID, T5.ID, T5.DocStatus from WorkOrderDocStatuses T5 inner join 
+(select WorkOrder_ID, ID, ROW_NUMBER() over (partition by WorkOrder_ID order by WorkOrder_ID, ID desc) as Rownum from WorkOrderDocStatuses) T6 
+on T5.WorkOrder_ID = T6.WorkOrder_ID and T5.ID = T6.ID and T6.Rownum = 1)) T1 on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.Cancelled = 0
+		and ((T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo) or (T0.ReScheduleStartDate >= @WODataFrom and T0.ReScheduleStartDate <= @WODataTo))
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done , @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 105
+		set @analysisname = 'CM Scheduled Compliance'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and ((T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo) or (T0.ReScheduleStartDate >= @WODataFrom and T0.ReScheduleStartDate <= @WODataTo))
+		and T0.ScheduleStartDate <= T1.CreateDate and T0.ScheduleEndDate >= T1.CreateDate
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 104
+
+		select @targetkpi = 70, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 106
+		set @analysisname = 'CM Planned Compliance'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1	
+		and T0.Cancelled = 0
+		and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+		and T0.PlanStartDate <= T1.CreateDate and T0.PlanEndDate >= T1.CreateDate
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 103
+		select @targetkpi = 95, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 107
+		set @analysisname = 'CM Overdue OLAFD'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+		--select @pg01total = sum(case when id = 103 then PG01 else PG01 * -1 end)
+		--,@pg02total = sum(case when id = 103 then PG02 else PG01 * -1 end)
+		--,@pg03total = sum(case when id = 103 then PG03 else PG01 * -1 end)
+		--,@pg04total = sum(case when id = 103 then PG04 else PG01 * -1 end)
+		--from @newtable
+		--where id in (103,105)
+
+		select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+		select @total = @pg01total + @pg02total + @pg03total + @pg04total
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		--,@pg01done, @pg02done, @pg03done, @pg04done
+		,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 108
+		set @analysisname = 'CM Overdue OLAFD with Approved Deviation'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+		and T0.IsDeviationApproved = 1
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 107
+
+		select @targetkpi = 0, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		set @id = 109
+		set @analysisname = 'CM Overdue OLAFD without Approved Deviation'
+		set @analysisremarks = '-'
+		select @total = 0, @targetkpi = 0, @achievekpi = 0
+
+		select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+		, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+		, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+		, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, CreateDate, DocStatus from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1
+		and T0.Cancelled = 0
+		and (T0.PlanEndDate is not null and T0.PlanEndDate <= @WODataTo)
+		and T1.CreateDate > T0.PlanEndDate
+		and T0.IsDeviationApproved = 0
+
+		select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+		select @total= @pg01done + @pg02done + @pg03done + @pg04done
+
+		select @temp = Total
+		from @newtable
+		where ID = 107
+
+		select @targetkpi = 0, @achievekpi = case when @temp = 0 then 0 else @total / @temp * 100 end
+
+		insert into @newtable
+		select @id, @analysisname, @analysisremarks
+		,@pg01done, @pg02done, @pg03done, @pg04done
+		--,@pg01total , @pg02total, @pg03total, @pg04total
+		,@total, @targetkpi, @achievekpi
+		--------------------------------------------------------
+
+		select @total = sum(Total)
+		from @newtable where ID in (108,109)
+
+		update @newtable set AchieveKPI = case when @total = 0 then 0 else Total / @total * 100 end
+		where ID = 108
+
+		update @newtable set AchieveKPI = case when @total = 0 then 0 else Total / @total * 100 end
+		where ID = 109
+
+	end
+
+	--select ID, AnalysisName, AnalysisRemarks, sum(PG01) as PG01, sum(PG02) as PG02, sum(PG03) as PG03, sum(PG04) as PG04
+	select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04, Total, TargetKPI, AchieveKPI
+	from @newtable
+	order by ID
+
+	return
+
+
+
+
+	--begin --PM-start
+	--	select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+	--	on T0.ID = T1.WorkOrder_ID
+	--	where T0.IsPreventiveMaintenance = 1
+	--	and T0.IsClosed = 1	
+	--	and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+	--	and T0.PlanStartDate <= T1.CreateDate and T0.PlanEndDate >= T1.CreateDate
+
+	--	set @id = 15
+	--	set @analysisname = 'PM Job Compliance'
+	--	set @analysisremarks = ''
+
+	--	select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	,@pg01done, @pg02done, @pg03done, @pg04done
+	--	--,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.IsPreventiveMaintenance = 1
+	--	and T0.PlanStartDate >= @WODataFrom and T0.PlanStartDate <= @WODataTo
+
+	--	set @id = 16
+	--	set @analysisname = 'PM All Job'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	set @id = 1
+	--	set @analysisname = 'PM Compliance'
+	--	set @analysisremarks = '>85%'
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 0) end
+	--	, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 0) end
+	--	, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 0) end
+	--	, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 0) end
+	--	,@total, @targetkpi, @achievekpi
+	--end --PM-end
+
+	
+	--begin --CM-start
+	--	select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+	--	on T0.ID = T1.WorkOrder_ID
+	--	where T0.IsPreventiveMaintenance = 0
+	--	and T0.IsClosed = 1	
+	--	and T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+	--	and T0.ScheduleStartDate <= T1.CreateDate and T0.ScheduleEndDate >= T1.CreateDate
+
+	--	set @id = 25
+	--	set @analysisname = 'CM Job Compliance'
+	--	set @analysisremarks = ''
+
+	--	select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	,@pg01done , @pg02done, @pg03done, @pg04done
+	--	--,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.IsPreventiveMaintenance = 0
+	--	and T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+
+	--	set @id = 26
+	--	set @analysisname = 'CM All Job'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	set @id = 2
+	--	set @analysisname = 'CM Compliance'
+	--	set @analysisremarks = '>85%'
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 0) end
+	--	, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 0) end
+	--	, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 0) end
+	--	, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 0) end
+	--	,@total, @targetkpi, @achievekpi
+	--end --CM-end
+
+
+	--begin --Schedule-start
+	--	select @pg01done = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02done = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03done = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04done = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+	--	and T0.ScheduleStartDate = T0.ActualStartDate
+	--	and T0.ScheduleStartDate <= T0.ActualEndDate and T0.ScheduleEndDate >= T0.ActualEndDate
+
+	--	set @id = 35
+	--	set @analysisname = 'Schedule Job Compliance'
+	--	set @analysisremarks = ''
+
+	--	select @pg01done = isnull(@pg01done,0), @pg02done = isnull(@pg02done,0), @pg03done = isnull(@pg03done,0), @pg04done = isnull(@pg04done,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	,@pg01done , @pg02done, @pg03done, @pg04done
+	--	--,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.ScheduleStartDate >= @WODataFrom and T0.ScheduleStartDate <= @WODataTo
+
+	--	set @id = 36
+	--	set @analysisname = 'Schedule All Job'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+	--	set @id = 3
+	--	set @analysisname = 'Schedule Compliance'
+	--	set @analysisremarks = '>70%'
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	, case when @pg01total = 0 then 0 else round(@pg01done * 100 / @pg01total, 0) end
+	--	, case when @pg02total = 0 then 0 else round(@pg02done * 100 / @pg02total, 0) end
+	--	, case when @pg03total = 0 then 0 else round(@pg03done * 100 / @pg03total, 0) end
+	--	, case when @pg04total = 0 then 0 else round(@pg04done * 100 / @pg04total, 0) end
+	--	,@total, @targetkpi, @achievekpi
+
+
+	--end --Schedule-end
+
+
+	--insert into @newtable
+	--select 9, '', '', null, null, null, null
+	--	,null, null, null
+
+	--insert into @newtable
+	--select 10, '', '', null, null, null, null
+	--	,null, null, null
+
+	--begin
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.IsPreventiveMaintenance = 1 and
+	--		T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo and
+	--		(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+	--	set @id = 45
+	--	set @analysisname = 'Non-schedule PM'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+
+
+	--	select @pg01total = sum(case when T11.BoCode = 'PG01' then 1 else 0 end)
+	--	, @pg02total = sum(case when T11.BoCode = 'PG02' then 1 else 0 end)
+	--	, @pg03total = sum(case when T11.BoCode = 'PG03' then 1 else 0 end)
+	--	, @pg04total = sum(case when T11.BoCode = 'PG04' then 1 else 0 end)
+	--	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	--	where T0.IsPreventiveMaintenance = 0 and
+	--		T0.DocDate >= @WODataFrom and T0.DocDate <= @WODataTo and
+	--		(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+	--	set @id = 46
+	--	set @analysisname = 'Non-schedule CM'
+	--	set @analysisremarks = ''
+
+	--	select @pg01total = isnull(@pg01total,0), @pg02total = isnull(@pg02total,0), @pg03total = isnull(@pg03total,0), @pg04total = isnull(@pg04total,0)
+
+	--	insert into @newtable
+	--	select @id, @analysisname, @analysisremarks
+	--	--,@pg01done , @pg02done, @pg03done, @pg04done
+	--	,@pg01total , @pg02total, @pg03total, @pg04total
+	--	,@total, @targetkpi, @achievekpi
+	--end
+
+	----select ID, AnalysisName, AnalysisRemarks, sum(PG01) as PG01, sum(PG02) as PG02, sum(PG03) as PG03, sum(PG04) as PG04
+	--select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04, Total, TargetKPI, AchieveKPI
+	--from @newtable
+	--order by ID
+end
+

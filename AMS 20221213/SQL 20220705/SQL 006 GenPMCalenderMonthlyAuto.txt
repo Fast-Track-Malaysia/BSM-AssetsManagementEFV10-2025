@@ -1,0 +1,21 @@
+
+create proc [dbo].[GenPMCalenderMonthlyAuto]
+
+@myyear int, @mymonth int, @username nvarchar(50)
+
+AS
+begin
+	declare @userid int
+	select @userid = 0
+	select @userid = ID from PermissionPolicyUsers where UserName = @username
+
+	if @userid = 0
+	begin
+		return
+	end
+
+	if not exists(select 1 from PMPatches where CreateUser_ID = @userid and BoCode like concat(convert(nvarchar, @myyear * 100 + @mymonth), '%'))
+	begin
+		exec GenPMCalenderMonthly @myyear, @mymonth, @userid
+	end
+end

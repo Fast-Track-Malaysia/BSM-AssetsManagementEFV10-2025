@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application Title="Assets Management System" Logo="Logo" Company="Fasttrack SBOi SDN BHD" Copyright="Fasttrack SBOi SDN BHD" Description="Brunei Shell Marketing Company Sendirian Berhad">
+  <Options>
+    <LayoutManagerOptions RequiredFieldMark="*" />
+  </Options>
+  <SchemaModules>
+    <SchemaModule Name="SchedulerModuleBase" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="17.1.4.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <ListView Id="KpiDefinition_ListView">
+      <Columns>
+        <ColumnInfo Id="Name" Width="297" SortOrder="Descending" />
+        <ColumnInfo Id="Active" Index="1" Width="80" />
+        <ColumnInfo Id="TargetObjectType" Index="2" Width="48" />
+        <ColumnInfo Id="Criteria" Width="48" />
+        <ColumnInfo Id="GreenZone" Index="3" Width="34" />
+        <ColumnInfo Id="Expression" Width="48" />
+        <ColumnInfo Id="RedZone" Index="4" Width="34" />
+        <ColumnInfo Id="Range" Index="5" Width="48" />
+        <ColumnInfo Id="Compare" Index="6" Width="34" />
+        <ColumnInfo Id="RangeToCompare" Index="7" Width="48" />
+        <ColumnInfo Id="MeasurementFrequency" Index="8" Width="48" />
+        <ColumnInfo Id="Direction" Index="9" Width="48" />
+        <ColumnInfo Id="Period" Index="10" Width="48" />
+      </Columns>
+    </ListView>
+    <DetailView Id="ReportDataV2_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="ReportDataV2">
+              <LayoutItem Id="DisplayName" ViewItem="DisplayName" Index="0" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="ParametersObjectType" ViewItem="ParametersObjectType" Index="1" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="DataTypeCaption" ViewItem="DataTypeCaption" Index="2" IsNewNode="True" Removed="True" />
+              <LayoutItem Id="IsInplaceReport" Index="3" ViewItem="IsInplaceReport" />
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="StateMachine_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="StateMachine">
+              <LayoutGroup Id="StateMachine_col1">
+                <LayoutItem Id="Name" Index="0" ViewItem="Name" />
+                <LayoutItem Id="TargetObjectType" Index="1" ViewItem="TargetObjectType" />
+              </LayoutGroup>
+              <LayoutGroup Id="StateMachine_col2">
+                <LayoutItem Id="StatePropertyName" Index="1" ViewItem="StatePropertyName" />
+                <LayoutItem Id="ExpandActionsInDetailView" Index="2" ViewItem="ExpandActionsInDetailView" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="States_Group">
+            <LayoutItem Id="States" ViewItem="States" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="StateMachine_ListView">
+      <Columns>
+        <ColumnInfo Id="Active" Index="1" />
+        <ColumnInfo Id="TargetObjectType" Index="2" />
+        <ColumnInfo Id="StatePropertyName" Index="3" />
+        <ColumnInfo Id="StartState" Index="4" />
+        <ColumnInfo Id="ExpandActionsInDetailView" Index="5" />
+      </Columns>
+    </ListView>
+    <DetailView Id="StateMachineAppearance_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="StateMachineAppearance">
+              <LayoutGroup Id="StateMachineAppearance_col1">
+                <LayoutItem Id="AppearanceItemType" Index="0" ViewItem="AppearanceItemType" />
+                <LayoutItem Id="Context" Index="1" ViewItem="Context" />
+                <LayoutItem Id="TargetItems" Index="2" ViewItem="TargetItems" />
+                <LayoutItem Id="Priority" ViewItem="Priority" Index="3" IsNewNode="True" />
+                <LayoutItem Id="FontColor" Index="4" ViewItem="FontColor" />
+                <LayoutItem Id="BackColor" ViewItem="BackColor" Removed="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="StateMachineAppearance_col2">
+                <LayoutItem Id="BackColor" ViewItem="BackColor" Index="0" IsNewNode="True" />
+                <LayoutItem Id="FontStyle" Index="1" ViewItem="FontStyle" />
+                <LayoutItem Id="Enabled" Index="2" ViewItem="Enabled" />
+                <LayoutItem Id="Visibility" Index="3" ViewItem="Visibility" />
+                <LayoutItem Id="Priority" ViewItem="Priority" Removed="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="StateMachineState_Appearances_ListView">
+      <Columns>
+        <ColumnInfo Id="AppearanceItemType" Index="0" />
+        <ColumnInfo Id="Context" Index="1" />
+        <ColumnInfo Id="TargetItems" Index="2" />
+        <ColumnInfo Id="Priority" Index="3" />
+        <ColumnInfo Id="FontColor" Index="4" />
+        <ColumnInfo Id="BackColor" Index="5" />
+        <ColumnInfo Id="Enabled" Index="7" />
+        <ColumnInfo Id="Visibility" Index="8" />
+      </Columns>
+    </ListView>
+    <DetailView Id="StateMachineState_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main">
+          <LayoutGroup Id="SimpleEditors">
+            <LayoutGroup Id="StateMachineState">
+              <LayoutItem Id="Caption" Index="0" ViewItem="Caption" />
+              <LayoutItem Id="Marker" Index="1" ViewItem="Marker" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs">
+            <LayoutGroup Id="Transitions" TextAlignMode="AlignLocal" Index="0">
+              <LayoutItem Id="Transitions" TextAlignMode="AutoSize" ViewItem="Transitions" />
+            </LayoutGroup>
+            <LayoutGroup Id="Appearances" TextAlignMode="AlignLocal" Index="1">
+              <LayoutItem Id="Appearances" TextAlignMode="AutoSize" ViewItem="Appearances" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="StateMachineState_Transitions_ListView">
+      <Columns>
+        <ColumnInfo Id="TargetState" Index="1" />
+        <ColumnInfo Id="Index" Index="2" />
+        <ColumnInfo Id="SaveAndCloseView" Index="3" />
+      </Columns>
+    </ListView>
+  </Views>
+</Application>

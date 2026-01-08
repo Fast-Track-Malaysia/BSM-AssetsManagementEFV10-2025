@@ -1,0 +1,108 @@
+
+/****** Object:  StoredProcedure [dbo].[GetWOPRCntByEquipmentGroup]    Script Date: 15/12/2020 3:44:23 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+ALTER proc [dbo].[GetWOPRCntByEquipmentGroup]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+	-- Bad Actor
+
+	DECLARE @newtable TABLE
+	(
+	  EquipmentGroup nvarchar(50), 
+	  WOCount int, 
+	  PRAmount numeric(20,6)
+	)
+
+	CREATE TABLE #TempTable
+	(
+	  EquipmentGroup nvarchar(50), 
+	  WOID nvarchar(50), 
+	  EqCount int, 
+	  PRCount int, 
+	  PRAmount numeric(20,6)
+	)
+
+	insert into #TempTable
+	( EquipmentGroup, WOID, EqCount, PRAmount)
+	select T1.BoCode, T3.ID, count(T2.ID), 0
+	from Equipments T0 inner join EqGroups T1 on T0.EqGroup_ID = T1.ID
+	inner join WorkOrderEquipments T2 on T0.ID = T2.Equipment_ID
+	inner join WorkOrders T3 on T2.WorkOrder_ID = T3.ID and T3.Cancelled = 0 and T3.IsPreventiveMaintenance = 0
+	where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+	group by T1.BoCode, T3.ID
+
+	update T0 set T0.PRAmount = isnull(T2.PRAmount,0)
+	from #TempTable T0
+	left join 
+	(
+	select T3.ID, sum(isnull(T5.QTY,0) * isnull(T5.Price,0)) as PRAmount
+	from WorkOrders T3 
+	inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	inner join PurchaseRequestDtls T5 on T4.ID = T5.PurchaseRequest_ID
+	where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+		and T4.Cancelled = 0
+	group by T3.ID
+	) T2 on T0.WOID = T2.ID
+	 
+	update T0 set T0.PRCount = T2.PRCount
+	from #TempTable T0
+	left join 
+	(
+	select T3.ID, count(T4.ID) as PRCount
+	from WorkOrders T3 
+	inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+		and T4.Cancelled = 0
+	group by T3.ID
+	) T2 on T0.WOID = T2.ID
+
+	update #TempTable set PRCount = 1
+	where isnull(PRCount,0) = 0
+	update #TempTable set EqCount = 1
+	where isnull(EqCount,0) = 0
+
+	insert into @newtable
+	( EquipmentGroup, WOCount, PRAmount)
+	select EquipmentGroup, count(EquipmentGroup), sum(PRAmount / EqCount / PRCount)
+	from #TempTable
+	group by EquipmentGroup
+
+	DROP TABLE #TempTable
+
+	--insert into @newtable
+	--( EquipmentGroup, WOCount, PRAmount)
+	--select T1.BoCode, count(T3.ID), sum(isnull(PRAmount,0))
+	--from Equipments T0 inner join EqGroups T1 on T0.EqGroup_ID = T1.ID
+	--inner join WorkOrderEquipments T2 on T0.ID = T2.Equipment_ID
+	--inner join WorkOrders T3 on T2.WorkOrder_ID = T3.ID and T3.Cancelled = 0 and T3.IsPreventiveMaintenance = 0
+	--left join
+	--(
+	--select T3.ID, sum(isnull(T5.QTY,0) * isnull(T5.Price,0)) as PRAmount
+	--from WorkOrders T3 
+	--inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	--inner join PurchaseRequestDtls T5 on T4.ID = T5.PurchaseRequest_ID
+	--where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+	--group by T3.ID
+	--) T5 on T3.ID = T5.ID
+	--where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+	--group by T1.BoCode
+
+	select EquipmentGroup, WOCount, PRAmount
+	from @newtable
+	order by EquipmentGroup
+end
+
+
+

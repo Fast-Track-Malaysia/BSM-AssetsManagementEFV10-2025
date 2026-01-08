@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <SchemaModules>
+    <SchemaModule Name="SchedulerAspNetModule" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SchedulerModuleBase" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemAspNetModule" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="17.1.4.0" IsNewNode="True" />
+  </SchemaModules>
+  <Views>
+    <DashboardView Id="Spreadsheet" IsNewNode="True">
+      <Items IsNewNode="True">
+        <CustomUserControlViewItemWeb Id="SpreadsheetPM" CustomControlPath="SpreadSheetPM.aspx" IsNewNode="True" />
+      </Items>
+      <Layout IsNewNode="True">
+        <LayoutGroup Id="Main" IsNewNode="True">
+          <LayoutItem Id="SpreadsheetPM" ViewItem="SpreadsheetPM" Index="0" IsNewNode="True" />
+        </LayoutGroup>
+      </Layout>
+    </DashboardView>
+  </Views>
+</Application>

@@ -1,0 +1,33 @@
+ALTER view [dbo].[vw_SAP_pr]
+as
+(
+SELECT DISTINCT convert(nvarchar,T10.DocNum) + convert(nvarchar,isnull(T0.DocNum,0)) + convert(nvarchar,isnull(T4.DocNum,0)) as keycolumn, 
+T0.CreateDate as [CreationDate],T0.DocDate as [PRDate],isnull(T0.DocNum,0) as [PRNo],T4.CardCode,T4.CardName,
+T0.DocCur as [Currency],isnull(T0.DocTotal,0) as [PRTotal],T4.DocDate as [PODate] ,T4.DocNum as [PONo],
+isnull(T4.DocTotal,0) as [POTotal], T9.USER_CODE as [POCreateUser]
+, T0.U_FT_AMS_PRNo as [AMSPRNo], T10.ID as [AMSPRID], T0.U_FT_AMS_WONo as [AMSWONo]
+, T10.AMSWRNo, T10.AMSPG, convert(numeric(20,6),T10.AMSPRTotal) as AMSPRTotal
+, T10.AMSCardCode, T10.AMSCardName
+FROM 
+(
+select P0.ID, P0.DocNum, isnull(P1.linetotal,0) as AMSPRTotal, isnull(W1.DocNum,'') as AMSWRNo, G0.BoCode as AMSPG
+, C0.BoCode as AMSCardCode, C0.BoName as AMSCardName
+from
+PurchaseRequests P0
+inner join WorkOrders W0 on P0.WorkOrder_ID = W0.ID
+inner join PlannerGroups G0 on W0.AssignPlannerGroup_ID = G0.ID
+left join Contractors C0 on P0.Contractor_ID = C0.ID
+left join WorkRequests W1 on W0.WorkRequest_ID = W1.ID
+left join (select PurchaseRequest_ID, sum(QTY * Price) as linetotal from PurchaseRequestDtls group by PurchaseRequest_ID) P1 on P0.ID = P1.PurchaseRequest_ID
+) T10 
+left join [BSM_LIVE]..OPRQ T0 on T0.U_FT_AMS_PRNo collate database_default = T10.DocNum collate database_default
+left JOIN [BSM_LIVE]..PRQ1 T1 ON T0.DocEntry = T1.DocEntry 
+LEFT OUTER JOIN [BSM_LIVE]..POR1 T3 ON T3.BaseLine=T1.LineNum AND T3.BaseEntry=T1.DocEntry AND T3.BaseType=T1.ObjType 
+LEFT OUTER JOIN [BSM_LIVE]..OPOR T4 ON T4.DOCENTRY=T3.DOCENTRY
+LEFT OUTER join [BSM_LIVE]..OUSR T9 ON T4.UserSign = T9.USERID
+LEFT OUTER JOIN [BSM_LIVE]..OCRD T2 ON T2.CardCode = T4.CardCode
+where T0.U_FT_AMS_PR = 'Y'
+)
+
+GO
+

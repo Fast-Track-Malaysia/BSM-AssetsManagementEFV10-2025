@@ -1,0 +1,764 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5F15837D-D1E5-44DC-92F0-4F2EBE9C3F8D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AssetsManagementEF.Module</RootNamespace>
+    <AssemblyName>AssetsManagementEF.Module</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'EasyTest|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\EasyTest\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;EASYTEST</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'EasyTest|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\EasyTest\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;EASYTEST</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.DataAccess.v17.1.UI, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Dashboard.v17.1.Core, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.DataAccess.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.ExpressApp.Chart.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.ConditionalAppearance.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Dashboards.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.EF.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Kpi.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Notifications.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Objects.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.PivotChart.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.PivotGrid.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.ReportsV2.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Scheduler.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.ScriptRecorder.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Security.EF.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Security.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.StateMachine.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.TreeListEditors.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Validation.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.ViewVariantsModule.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.Workflow.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Persistent.BaseImpl.EF.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.PivotGrid.v17.1.Core, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Printing.v17.1.Core">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Data.v17.1">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.ExpressApp.v17.1">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Persistent.Base.v17.1">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Utils.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Workflow.Activities.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="DevExpress.Charts.v17.1.Core, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v17.1.Wizard, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Sparkline.v17.1.Core, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.CodeParser.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v17.1.UI, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v17.1.Extensions, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraScheduler.v17.1.Core, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.DurableInstancing" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Runtime.DurableInstancing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Activities" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BusinessObjects\DeviationFrequencies.cs" />
+    <Compile Include="BusinessObjects\DeviationLocations.cs" />
+    <Compile Include="BusinessObjects\DeviationDocStatus.cs" />
+    <Compile Include="BusinessObjects\DeviationReviewers.cs" />
+    <Compile Include="BusinessObjects\DeviationStatus.cs" />
+    <Compile Include="BusinessObjects\Deviation2025.cs" />
+    <Compile Include="BusinessObjects\DeviationDiscipline.cs" />
+    <Compile Include="BusinessObjects\DeviationTypes.cs" />
+    <Compile Include="BusinessObjects\DeviationMitigations.cs" />
+    <Compile Include="BusinessObjects\DeviationWRTypes.cs" />
+    <Compile Include="BusinessObjects\RiskAssets.cs" />
+    <Compile Include="BusinessObjects\RiskCommunities.cs" />
+    <Compile Include="BusinessObjects\RiskEnvironments.cs" />
+    <Compile Include="BusinessObjects\RiskPeoples.cs" />
+    <Compile Include="BusinessObjects\Risks.cs" />
+    <Compile Include="BusinessObjects\SCESubCategories.cs" />
+    <Compile Include="BusinessObjects\SCECategories.cs" />
+    <Compile Include="BusinessObjects\PMPatches.cs" />
+    <Compile Include="BusinessObjects\PMClassDocs.cs" />
+    <Compile Include="BusinessObjects\EquipmentPhotos.cs" />
+    <Compile Include="BusinessObjects\PlannerGroups.cs" />
+    <Compile Include="BusinessObjects\EqComponentClassDocs.cs" />
+    <Compile Include="BusinessObjects\EqClassDocs.cs" />
+    <Compile Include="BusinessObjects\ContractDocDtls.cs" />
+    <Compile Include="BusinessObjects\ContractDocs.cs" />
+    <Compile Include="BusinessObjects\CompanyDocs.cs" />
+    <Compile Include="BusinessObjects\JobStatuses.cs" />
+    <Compile Include="BusinessObjects\PMClasses.cs" />
+    <Compile Include="BusinessObjects\PMDepartments.cs" />
+    <Compile Include="BusinessObjects\EqComponentGroups.cs" />
+    <Compile Include="BusinessObjects\ItemMasters.cs" />
+    <Compile Include="BusinessObjects\PMScheduleCalenders.cs" />
+    <Compile Include="BusinessObjects\PMScheduleChecklists.cs" />
+    <Compile Include="BusinessObjects\Priorities.cs" />
+    <Compile Include="BusinessObjects\PurchaseRequestDtls.cs" />
+    <Compile Include="BusinessObjects\PurchaseRequests.cs" />
+    <Compile Include="BusinessObjects\Technicians.cs" />
+    <Compile Include="BusinessObjects\PurchaseRequestDocStatuses.cs" />
+    <Compile Include="BusinessObjects\PMScheduleEquipments.cs" />
+    <Compile Include="BusinessObjects\PMScheduleEqComponents.cs" />
+    <Compile Include="BusinessObjects\PurchaseRequestAttachments.cs" />
+    <Compile Include="BusinessObjects\DeviationWOTypes.cs" />
+    <Compile Include="BusinessObjects\vw_SAP_pr.cs" />
+    <Compile Include="BusinessObjects\DeviationWorkOrders.cs" />
+    <Compile Include="BusinessObjects\DeviationAttachments.cs" />
+    <Compile Include="BusinessObjects\WorkOrderDocPGs.cs" />
+    <Compile Include="BusinessObjects\WorkOrderManHours.cs" />
+    <Compile Include="BusinessObjects\WorkOrderPhotos.cs" />
+    <Compile Include="BusinessObjects\EquipmentAttachments.cs" />
+    <Compile Include="BusinessObjects\DeviationWorkRequests.cs" />
+    <Compile Include="BusinessObjects\WorkRequestDocPGs.cs" />
+    <Compile Include="BusinessObjects\WorkRequestPhotos.cs" />
+    <Compile Include="BusinessObjects\WorkRequestAttachments.cs" />
+    <Compile Include="BusinessObjects\WorkOrderAttachments.cs" />
+    <Compile Include="BusinessObjects\WorkRequestDocStatuses.cs" />
+    <Compile Include="BusinessObjects\WorkOrderDocStatuses.cs" />
+    <Compile Include="BusinessObjects\WorkOrderJobStatuses.cs" />
+    <Compile Include="BusinessObjects\WorkRequestEqComponents.cs" />
+    <Compile Include="BusinessObjects\WorkOrderEquipmentOps.cs" />
+    <Compile Include="BusinessObjects\WorkOrderEqComponentOps.cs" />
+    <Compile Include="BusinessObjects\WorkRequestEquipments.cs" />
+    <Compile Include="BusinessObjects\WorkOrderEquipments.cs" />
+    <Compile Include="BusinessObjects\WorkOrderEqComponents.cs" />
+    <Compile Include="BusinessObjects\WorkRequests.cs" />
+    <Compile Include="BusinessObjects\WorkOrders.cs" />
+    <Compile Include="BusinessObjects\WorkOrderOpTypes.cs" />
+    <Compile Include="BusinessObjects\DocTypes.cs" />
+    <Compile Include="BusinessObjects\Criticalities.cs" />
+    <Compile Include="BusinessObjects\CheckLists.cs" />
+    <Compile Include="BusinessObjects\EqGroups.cs" />
+    <Compile Include="BusinessObjects\NonPersistentObjects.cs" />
+    <Compile Include="BusinessObjects\PMSchedules.cs" />
+    <Compile Include="BusinessObjects\PMFrequencies.cs" />
+    <Compile Include="BusinessObjects\EqComponentClasses.cs" />
+    <Compile Include="BusinessObjects\EquipmentProperties.cs" />
+    <Compile Include="BusinessObjects\EquipmentComponents.cs" />
+    <Compile Include="BusinessObjects\Equipments.cs" />
+    <Compile Include="BusinessObjects\Tasks.cs" />
+    <Compile Include="BusinessObjects\EqClasses.cs" />
+    <Compile Include="BusinessObjects\EqClassProperties.cs" />
+    <Compile Include="BusinessObjects\Locations.cs" />
+    <Compile Include="BusinessObjects\Areas.cs" />
+    <Compile Include="BusinessObjects\AssetsManagementEFDbContext.cs" />
+    <Compile Include="BusinessObjects\Companies.cs" />
+    <Compile Include="BusinessObjects\Contractors.cs" />
+    <Compile Include="BusinessObjects\Positions.cs" />
+    <Compile Include="BusinessObjects\DocumentEnums.cs" />
+    <Compile Include="BusinessObjects\PurchaseQuotationDtls.cs" />
+    <Compile Include="BusinessObjects\PurchaseQuotations.cs" />
+    <Compile Include="BusinessObjects\SubLocations.cs" />
+    <Compile Include="BusinessObjects\SystemUsers.cs" />
+    <Compile Include="BusinessObjects\WOLongDescription.cs" />
+    <Compile Include="BusinessObjects\WRLongDescription.cs" />
+    <Compile Include="Controllers\EquipmentOVControllers.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controllers\EquipmentOVControllers.Designer.cs">
+      <DependentUpon>EquipmentOVControllers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DatabaseUpdate\Updater.cs" />
+    <Compile Include="GeneralSettings.cs" />
+    <Compile Include="Migrations\201707140956369_InitialCreate.cs" />
+    <Compile Include="Migrations\201707140956369_InitialCreate.Designer.cs">
+      <DependentUpon>201707140956369_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712100859201_Initial.cs" />
+    <Compile Include="Migrations\201712100859201_Initial.Designer.cs">
+      <DependentUpon>201712100859201_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130112538_update_database01.cs" />
+    <Compile Include="Migrations\201712130112538_update_database01.Designer.cs">
+      <DependentUpon>201712130112538_update_database01.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130214092_update_database02.cs" />
+    <Compile Include="Migrations\201712130214092_update_database02.Designer.cs">
+      <DependentUpon>201712130214092_update_database02.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130219327_update_database03.cs" />
+    <Compile Include="Migrations\201712130219327_update_database03.Designer.cs">
+      <DependentUpon>201712130219327_update_database03.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130221189_update_database04.cs" />
+    <Compile Include="Migrations\201712130221189_update_database04.Designer.cs">
+      <DependentUpon>201712130221189_update_database04.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130229276_update_database05.cs" />
+    <Compile Include="Migrations\201712130229276_update_database05.Designer.cs">
+      <DependentUpon>201712130229276_update_database05.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712130239380_update_database06.cs" />
+    <Compile Include="Migrations\201712130239380_update_database06.Designer.cs">
+      <DependentUpon>201712130239380_update_database06.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712190937007_update_database07.cs" />
+    <Compile Include="Migrations\201712190937007_update_database07.Designer.cs">
+      <DependentUpon>201712190937007_update_database07.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712190939205_update_database08.cs" />
+    <Compile Include="Migrations\201712190939205_update_database08.Designer.cs">
+      <DependentUpon>201712190939205_update_database08.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712200717512_update_database09.cs" />
+    <Compile Include="Migrations\201712200717512_update_database09.Designer.cs">
+      <DependentUpon>201712200717512_update_database09.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712200739423_update_database10.cs" />
+    <Compile Include="Migrations\201712200739423_update_database10.Designer.cs">
+      <DependentUpon>201712200739423_update_database10.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712220404381_update_database11.cs" />
+    <Compile Include="Migrations\201712220404381_update_database11.Designer.cs">
+      <DependentUpon>201712220404381_update_database11.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712260913595_update_database12.cs" />
+    <Compile Include="Migrations\201712260913595_update_database12.Designer.cs">
+      <DependentUpon>201712260913595_update_database12.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712280816286_update_database13.cs" />
+    <Compile Include="Migrations\201712280816286_update_database13.Designer.cs">
+      <DependentUpon>201712280816286_update_database13.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712300433073_update_database14.cs" />
+    <Compile Include="Migrations\201712300433073_update_database14.Designer.cs">
+      <DependentUpon>201712300433073_update_database14.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712300449230_update_database15.cs" />
+    <Compile Include="Migrations\201712300449230_update_database15.Designer.cs">
+      <DependentUpon>201712300449230_update_database15.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712300521568_update_database16.cs" />
+    <Compile Include="Migrations\201712300521568_update_database16.Designer.cs">
+      <DependentUpon>201712300521568_update_database16.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712300600551_update_database17.cs" />
+    <Compile Include="Migrations\201712300600551_update_database17.Designer.cs">
+      <DependentUpon>201712300600551_update_database17.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712300714032_update_database18.cs" />
+    <Compile Include="Migrations\201712300714032_update_database18.Designer.cs">
+      <DependentUpon>201712300714032_update_database18.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801030337560_update_database19.cs" />
+    <Compile Include="Migrations\201801030337560_update_database19.Designer.cs">
+      <DependentUpon>201801030337560_update_database19.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801060237328_update_database20.cs" />
+    <Compile Include="Migrations\201801060237328_update_database20.Designer.cs">
+      <DependentUpon>201801060237328_update_database20.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801071155050_update_database21.cs" />
+    <Compile Include="Migrations\201801071155050_update_database21.Designer.cs">
+      <DependentUpon>201801071155050_update_database21.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801160942029_update_database22.cs" />
+    <Compile Include="Migrations\201801160942029_update_database22.Designer.cs">
+      <DependentUpon>201801160942029_update_database22.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801190718010_update_database23.cs" />
+    <Compile Include="Migrations\201801190718010_update_database23.Designer.cs">
+      <DependentUpon>201801190718010_update_database23.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802060654291_update_database24.cs" />
+    <Compile Include="Migrations\201802060654291_update_database24.Designer.cs">
+      <DependentUpon>201802060654291_update_database24.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905130720583_update_database25.cs" />
+    <Compile Include="Migrations\201905130720583_update_database25.Designer.cs">
+      <DependentUpon>201905130720583_update_database25.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905130722339_update_database26.cs" />
+    <Compile Include="Migrations\201905130722339_update_database26.Designer.cs">
+      <DependentUpon>201905130722339_update_database26.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905131331395_update_database27.cs" />
+    <Compile Include="Migrations\201905131331395_update_database27.Designer.cs">
+      <DependentUpon>201905131331395_update_database27.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201905251411012_update_database28.cs" />
+    <Compile Include="Migrations\201905251411012_update_database28.Designer.cs">
+      <DependentUpon>201905251411012_update_database28.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201906250647525_update_database29.cs" />
+    <Compile Include="Migrations\201906250647525_update_database29.Designer.cs">
+      <DependentUpon>201906250647525_update_database29.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201907150253505_update_database30.cs" />
+    <Compile Include="Migrations\201907150253505_update_database30.Designer.cs">
+      <DependentUpon>201907150253505_update_database30.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101060918408_update_database31.cs" />
+    <Compile Include="Migrations\202101060918408_update_database31.Designer.cs">
+      <DependentUpon>202101060918408_update_database31.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101080726396_update_database32.cs" />
+    <Compile Include="Migrations\202101080726396_update_database32.Designer.cs">
+      <DependentUpon>202101080726396_update_database32.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101080813373_update_database33.cs" />
+    <Compile Include="Migrations\202101080813373_update_database33.Designer.cs">
+      <DependentUpon>202101080813373_update_database33.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202101080843070_update_database34.cs" />
+    <Compile Include="Migrations\202101080843070_update_database34.Designer.cs">
+      <DependentUpon>202101080843070_update_database34.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207050940105_add_deviationtables.cs" />
+    <Compile Include="Migrations\202207050940105_add_deviationtables.Designer.cs">
+      <DependentUpon>202207050940105_add_deviationtables.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207120501344_addscecategory.cs" />
+    <Compile Include="Migrations\202207120501344_addscecategory.Designer.cs">
+      <DependentUpon>202207120501344_addscecategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202207120603199_addlinkcriticalities_scecategories.cs" />
+    <Compile Include="Migrations\202207120603199_addlinkcriticalities_scecategories.Designer.cs">
+      <DependentUpon>202207120603199_addlinkcriticalities_scecategories.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202209260738379_add_deviation_cancelcloseuser.cs" />
+    <Compile Include="Migrations\202209260738379_add_deviation_cancelcloseuser.Designer.cs">
+      <DependentUpon>202209260738379_add_deviation_cancelcloseuser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202211250724338_add_ContractorID.cs" />
+    <Compile Include="Migrations\202211250724338_add_ContractorID.Designer.cs">
+      <DependentUpon>202211250724338_add_ContractorID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202304060339316_add_wo_contractor.cs" />
+    <Compile Include="Migrations\202304060339316_add_wo_contractor.Designer.cs">
+      <DependentUpon>202304060339316_add_wo_contractor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202311090739361_add_Contractor_DocFullCode.cs" />
+    <Compile Include="Migrations\202311090739361_add_Contractor_DocFullCode.Designer.cs">
+      <DependentUpon>202311090739361_add_Contractor_DocFullCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202312050807589_add_contractor_currency.cs" />
+    <Compile Include="Migrations\202312050807589_add_contractor_currency.Designer.cs">
+      <DependentUpon>202312050807589_add_contractor_currency.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202312050818575_add_contractordtl_currency.cs" />
+    <Compile Include="Migrations\202312050818575_add_contractordtl_currency.Designer.cs">
+      <DependentUpon>202312050818575_add_contractordtl_currency.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202508110813043_add_eviation2025.cs" />
+    <Compile Include="Migrations\202508110813043_add_eviation2025.Designer.cs">
+      <DependentUpon>202508110813043_add_eviation2025.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202508120802168_add_deviation_eq.cs" />
+    <Compile Include="Migrations\202508120802168_add_deviation_eq.Designer.cs">
+      <DependentUpon>202508120802168_add_deviation_eq.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202508220429467_add_lastdeviationno.cs" />
+    <Compile Include="Migrations\202508220429467_add_lastdeviationno.Designer.cs">
+      <DependentUpon>202508220429467_add_lastdeviationno.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509080818017_add_reviewer.cs" />
+    <Compile Include="Migrations\202509080818017_add_reviewer.Designer.cs">
+      <DependentUpon>202509080818017_add_reviewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509080842394_add_MitigationUser.cs" />
+    <Compile Include="Migrations\202509080842394_add_MitigationUser.Designer.cs">
+      <DependentUpon>202509080842394_add_MitigationUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509180914029_null_reviewdate.cs" />
+    <Compile Include="Migrations\202509180914029_null_reviewdate.Designer.cs">
+      <DependentUpon>202509180914029_null_reviewdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202509220648268_add_deviation2025_persistent_cols.cs" />
+    <Compile Include="Migrations\202509220648268_add_deviation2025_persistent_cols.Designer.cs">
+      <DependentUpon>202509220648268_add_deviation2025_persistent_cols.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202510040803370_add_DeviationFrequencies.cs" />
+    <Compile Include="Migrations\202510040803370_add_DeviationFrequencies.Designer.cs">
+      <DependentUpon>202510040803370_add_DeviationFrequencies.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202510070718364_add_environments.cs" />
+    <Compile Include="Migrations\202510070718364_add_environments.Designer.cs">
+      <DependentUpon>202510070718364_add_environments.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202510210855325_update_mitigation_user_pos.cs" />
+    <Compile Include="Migrations\202510210855325_update_mitigation_user_pos.Designer.cs">
+      <DependentUpon>202510210855325_update_mitigation_user_pos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511050748045_add_back_KeyReviewer.cs" />
+    <Compile Include="Migrations\202511050748045_add_back_KeyReviewer.Designer.cs">
+      <DependentUpon>202511050748045_add_back_KeyReviewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202511240407268_add_workorder_LAFD.cs" />
+    <Compile Include="Migrations\202511240407268_add_workorder_LAFD.Designer.cs">
+      <DependentUpon>202511240407268_add_workorder_LAFD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Module.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Module.Designer.cs">
+      <DependentUpon>Module.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201707140956369_InitialCreate.resx">
+      <DependentUpon>201707140956369_InitialCreate.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712100859201_Initial.resx">
+      <DependentUpon>201712100859201_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130112538_update_database01.resx">
+      <DependentUpon>201712130112538_update_database01.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130214092_update_database02.resx">
+      <DependentUpon>201712130214092_update_database02.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130219327_update_database03.resx">
+      <DependentUpon>201712130219327_update_database03.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130221189_update_database04.resx">
+      <DependentUpon>201712130221189_update_database04.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130229276_update_database05.resx">
+      <DependentUpon>201712130229276_update_database05.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712130239380_update_database06.resx">
+      <DependentUpon>201712130239380_update_database06.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712190937007_update_database07.resx">
+      <DependentUpon>201712190937007_update_database07.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712190939205_update_database08.resx">
+      <DependentUpon>201712190939205_update_database08.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712200717512_update_database09.resx">
+      <DependentUpon>201712200717512_update_database09.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712200739423_update_database10.resx">
+      <DependentUpon>201712200739423_update_database10.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712220404381_update_database11.resx">
+      <DependentUpon>201712220404381_update_database11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712260913595_update_database12.resx">
+      <DependentUpon>201712260913595_update_database12.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712280816286_update_database13.resx">
+      <DependentUpon>201712280816286_update_database13.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712300433073_update_database14.resx">
+      <DependentUpon>201712300433073_update_database14.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712300449230_update_database15.resx">
+      <DependentUpon>201712300449230_update_database15.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712300521568_update_database16.resx">
+      <DependentUpon>201712300521568_update_database16.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712300600551_update_database17.resx">
+      <DependentUpon>201712300600551_update_database17.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712300714032_update_database18.resx">
+      <DependentUpon>201712300714032_update_database18.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801030337560_update_database19.resx">
+      <DependentUpon>201801030337560_update_database19.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801060237328_update_database20.resx">
+      <DependentUpon>201801060237328_update_database20.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801071155050_update_database21.resx">
+      <DependentUpon>201801071155050_update_database21.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801160942029_update_database22.resx">
+      <DependentUpon>201801160942029_update_database22.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801190718010_update_database23.resx">
+      <DependentUpon>201801190718010_update_database23.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802060654291_update_database24.resx">
+      <DependentUpon>201802060654291_update_database24.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905130720583_update_database25.resx">
+      <DependentUpon>201905130720583_update_database25.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905130722339_update_database26.resx">
+      <DependentUpon>201905130722339_update_database26.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905131331395_update_database27.resx">
+      <DependentUpon>201905131331395_update_database27.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201905251411012_update_database28.resx">
+      <DependentUpon>201905251411012_update_database28.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201906250647525_update_database29.resx">
+      <DependentUpon>201906250647525_update_database29.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907150253505_update_database30.resx">
+      <DependentUpon>201907150253505_update_database30.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101060918408_update_database31.resx">
+      <DependentUpon>202101060918408_update_database31.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101080726396_update_database32.resx">
+      <DependentUpon>202101080726396_update_database32.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101080813373_update_database33.resx">
+      <DependentUpon>202101080813373_update_database33.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202101080843070_update_database34.resx">
+      <DependentUpon>202101080843070_update_database34.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207050940105_add_deviationtables.resx">
+      <DependentUpon>202207050940105_add_deviationtables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207120501344_addscecategory.resx">
+      <DependentUpon>202207120501344_addscecategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202207120603199_addlinkcriticalities_scecategories.resx">
+      <DependentUpon>202207120603199_addlinkcriticalities_scecategories.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202209260738379_add_deviation_cancelcloseuser.resx">
+      <DependentUpon>202209260738379_add_deviation_cancelcloseuser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202211250724338_add_ContractorID.resx">
+      <DependentUpon>202211250724338_add_ContractorID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202304060339316_add_wo_contractor.resx">
+      <DependentUpon>202304060339316_add_wo_contractor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202311090739361_add_Contractor_DocFullCode.resx">
+      <DependentUpon>202311090739361_add_Contractor_DocFullCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202312050807589_add_contractor_currency.resx">
+      <DependentUpon>202312050807589_add_contractor_currency.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202312050818575_add_contractordtl_currency.resx">
+      <DependentUpon>202312050818575_add_contractordtl_currency.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202508110813043_add_eviation2025.resx">
+      <DependentUpon>202508110813043_add_eviation2025.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202508120802168_add_deviation_eq.resx">
+      <DependentUpon>202508120802168_add_deviation_eq.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202508220429467_add_lastdeviationno.resx">
+      <DependentUpon>202508220429467_add_lastdeviationno.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509080818017_add_reviewer.resx">
+      <DependentUpon>202509080818017_add_reviewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509080842394_add_MitigationUser.resx">
+      <DependentUpon>202509080842394_add_MitigationUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509180914029_null_reviewdate.resx">
+      <DependentUpon>202509180914029_null_reviewdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202509220648268_add_deviation2025_persistent_cols.resx">
+      <DependentUpon>202509220648268_add_deviation2025_persistent_cols.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510040803370_add_DeviationFrequencies.resx">
+      <DependentUpon>202510040803370_add_DeviationFrequencies.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510070718364_add_environments.resx">
+      <DependentUpon>202510070718364_add_environments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202510210855325_update_mitigation_user_pos.resx">
+      <DependentUpon>202510210855325_update_mitigation_user_pos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511050748045_add_back_KeyReviewer.resx">
+      <DependentUpon>202511050748045_add_back_KeyReviewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202511240407268_add_workorder_LAFD.resx">
+      <DependentUpon>202511240407268_add_workorder_LAFD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
+    <EmbeddedResource Include="Module.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Module.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DatabaseUpdate\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="BusinessObjects\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Controllers\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FunctionalTests\ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FunctionalTests\sample.ets" />
+    <None Include="Images\ReadMe.txt" />
+    <None Include="packages.config" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FunctionalTests\config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\Logo.png" />
+    <Content Include="Welcome.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="SAPbobsCOM">
+      <Guid>{FC8030BE-F5D2-4B8E-8F92-44228FE30100}</Guid>
+      <VersionMajor>10</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

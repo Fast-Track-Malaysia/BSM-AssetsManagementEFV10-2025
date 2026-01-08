@@ -1,0 +1,808 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetEQComCalenderNew]    Script Date: 06/02/2018 11:14:25 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- Batch submitted through debugger: SQLQuery7.sql|7|0|C:\Users\PHAN\AppData\Local\Temp\~vs4D3F.sql
+ALTER proc [dbo].[GetEQComCalenderNew]
+
+@myyear int
+
+AS
+
+begin
+	--IF OBJECT_ID('tempdb..#Calender') IS NOT NULL DROP TABLE #Calender
+
+	DECLARE @Equipment int
+	DECLARE @EquipmentComponent int
+	DECLARE @PMSchedule int
+	DECLARE @IsNested int
+	DECLARE @PMSchedule101 nvarchar(10)
+	DECLARE @PMSchedule102 nvarchar(10)
+	DECLARE @PMSchedule103 nvarchar(10)
+	DECLARE @PMSchedule104 nvarchar(10)
+	DECLARE @PMSchedule105 nvarchar(10)
+	DECLARE @PMSchedule106 nvarchar(10)
+	DECLARE @PMSchedule107 nvarchar(10)
+	DECLARE @PMSchedule108 nvarchar(10)
+	DECLARE @PMSchedule109 nvarchar(10)
+	DECLARE @PMSchedule110 nvarchar(10)
+	DECLARE @PMSchedule111 nvarchar(10)
+	DECLARE @PMSchedule112 nvarchar(10)
+	DECLARE @PMSchedule201 nvarchar(10)
+	DECLARE @PMSchedule202 nvarchar(10)
+	DECLARE @PMSchedule203 nvarchar(10)
+	DECLARE @PMSchedule204 nvarchar(10)
+	DECLARE @PMSchedule205 nvarchar(10)
+	DECLARE @PMSchedule206 nvarchar(10)
+	DECLARE @PMSchedule207 nvarchar(10)
+	DECLARE @PMSchedule208 nvarchar(10)
+	DECLARE @PMSchedule209 nvarchar(10)
+	DECLARE @PMSchedule210 nvarchar(10)
+	DECLARE @PMSchedule211 nvarchar(10)
+	DECLARE @PMSchedule212 nvarchar(10)
+
+	declare @isweek int
+	declare @cyclecount int
+	declare @pmtemp nvarchar(10)
+	declare @id int
+	declare @frequencyseq int
+	DECLARE @year int
+	DECLARE @startdate datetime
+	DECLARE @yearString nvarchar(50)
+	declare @found int
+
+	set @yearString = CONVERT(nvarchar, @myyear) + ' To ' + CONVERT(nvarchar, @myyear + 1)
+	set @id = 0
+
+	--SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, 0 as EquipmentComponent, T2.ID as PMSchedule
+	--INTO #newtable
+	--FROM Equipments T0 inner join PMScheduleEquipments T1 on T0.ID = T1.Equipment_ID and T1.IsActive = 1
+	--	inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	--	left join PMScheduleEqComponents T9 on T9.PMSchedule_ID = T2.ID and T9.Equipment_ID = T1.Equipment_ID and T9.IsActive = 1
+	--WHERE T0.IsActive = 1 and T0.IsApproved = 1
+	--	and T2.IsActive = 1 and T2.IsApproved = 1
+	--	and YEAR(T2.FromDate) <= @myyear + 1
+	--	and ((T9.ID is null) or (T9.ID > 0 and T1.IsCombine = 1))
+	--GROUP BY T0.ID, T2.IsNested, T2.ID
+
+	SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, 0 as EquipmentComponent, T2.ID as PMSchedule
+	INTO #newtable
+	FROM Equipments T0 inner join PMScheduleEquipments T1 on T0.ID = T1.Equipment_ID and T1.IsActive = 1
+		inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	WHERE T0.IsActive = 1 and T0.IsApproved = 1
+		and T2.IsActive = 1 and T2.IsApproved = 1
+		and YEAR(T2.FromDate) <= @myyear + 1
+	GROUP BY T0.ID, T2.IsNested, T2.ID
+
+	INSERT INTO #newtable
+	SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, T9.ID as EquipmentComponent, T2.ID as PMSchedule
+	FROM EquipmentComponents T9 inner join Equipments T0 on T0.ID = T9.Equipment_ID
+		inner join PMScheduleEqComponents T1 on T9.ID = T1.EquipmentComponent_ID and T1.IsActive = 1
+		inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	WHERE T0.IsActive = 1 and T0.IsApproved = 1
+		and T2.IsActive = 1 and T2.IsApproved = 1
+		and YEAR(T2.FromDate) <= @myyear + 1
+	GROUP BY T0.ID, T2.IsNested, T9.ID, T2.ID
+
+	UPDATE #newtable SET @id = ID = @id + 1
+
+	SELECT 0 as FrequencySeq, 0 as ID, 0 as Equipment_ID, 0 as EquipmentComponent_ID, 0 as PMSchedule_ID, 0 as IsNested, '000000000000' as PMYear
+	,
+	'000' as PMSchedule101, '000' as PMSchedule102, '000' as PMSchedule103, '000' as PMSchedule104, '000' as PMSchedule105, '000' as PMSchedule106, 
+	'000' as PMSchedule107, '000' as PMSchedule108, '000' as PMSchedule109, '000' as PMSchedule110, '000' as PMSchedule111, '000' as PMSchedule112, 
+	'000' as PMSchedule201, '000' as PMSchedule202, '000' as PMSchedule203, '000' as PMSchedule204, '000' as PMSchedule205, '000' as PMSchedule206, 
+	'000' as PMSchedule207, '000' as PMSchedule208, '000' as PMSchedule209, '000' as PMSchedule210, '000' as PMSchedule211, '000' as PMSchedule212 
+	INTO #pmcalender
+
+
+	DECLARE eq_cursor CURSOR FOR   
+	select T0.ID, T0.Equipment, T0.IsNested, T0.EquipmentComponent, T0.PMSchedule from #newtable T0
+	inner join Equipments T1 on T0.Equipment = T1.ID
+	order by T1.Area_ID, T1.Location_ID, T1.SubLocation_ID, T1.EqClass_ID, T0.Equipment, EquipmentComponent, ID
+	--order by Equipment, EquipmentComponent, ID
+
+	OPEN eq_cursor  
+
+	FETCH NEXT FROM eq_cursor   
+	INTO @id, @Equipment, @IsNested, @EquipmentComponent, @PMSchedule
+
+	WHILE @@FETCH_STATUS = 0  
+	begin
+		set @found = 0
+		select @PMSchedule101 = '', @PMSchedule102 = '', @PMSchedule103 = '', @PMSchedule104 = '', @PMSchedule105 = '', @PMSchedule106 = ''
+		select @PMSchedule107 = '', @PMSchedule108 = '', @PMSchedule109 = '', @PMSchedule110 = '', @PMSchedule111 = '', @PMSchedule112 = ''
+		select @PMSchedule201 = '', @PMSchedule202 = '', @PMSchedule203 = '', @PMSchedule204 = '', @PMSchedule205 = '', @PMSchedule206 = ''
+		select @PMSchedule207 = '', @PMSchedule208 = '', @PMSchedule209 = '', @PMSchedule210 = '', @PMSchedule211 = '', @PMSchedule212 = ''
+		
+		if @EquipmentComponent > 0
+		begin
+			select top 1 @frequencyseq = T2.ID * 1000 + T2.CycleCount, @startdate = T1.FromDate, @pmtemp = T2.BoShortName, @cyclecount = T2.CycleCount, @isweek = (case when T2.Frequency = 0 then 1 else 0 end) 
+			from PMScheduleEqComponents T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			where T1.IsNested = @IsNested and T0.EquipmentComponent_ID = @EquipmentComponent and T2.Frequency in (0,1)
+			and T1.ID = @PMSchedule
+			
+		end
+		else
+		begin
+			--select top 1 @frequencyseq = T2.ID * 1000 + T2.CycleCount, @startdate = T1.FromDate, @pmtemp = T2.BoShortName, @cyclecount = T2.CycleCount, @isweek = (case when T2.Frequency = 0 then 1 else 0 end) 
+			--from PMScheduleEquipments T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			--inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			--left join PMScheduleEqComponents T9 on T9.PMSchedule_ID = T1.ID and T9.Equipment_ID = T0.Equipment_ID and T9.IsActive = 1
+			--where T1.IsNested = @IsNested and T0.Equipment_ID = @Equipment and T2.Frequency in (0,1)
+			--and ((T9.ID is null) or (T9.ID > 0 and T0.IsCombine = 1))
+			--and T1.ID = @PMSchedule
+			select top 1 @frequencyseq = T2.ID * 1000 + T2.CycleCount, @startdate = T1.FromDate, @pmtemp = T2.BoShortName, @cyclecount = T2.CycleCount, @isweek = (case when T2.Frequency = 0 then 1 else 0 end) 
+			from PMScheduleEquipments T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			where T1.IsNested = @IsNested and T0.Equipment_ID = @Equipment and T2.Frequency in (0,1)
+			and T1.ID = @PMSchedule
+			
+		end
+		if (@isweek = 1) set @cyclecount = 1
+
+		while year(@startdate) <= @myyear + 1
+		begin
+			SELECT @startdate = DATEADD(mm, @cyclecount, @startdate)
+				
+			if year(@startdate) = @myyear
+			begin
+				set @found = 1
+				if month(@startdate) = 1 set @PMSchedule101 = @pmtemp
+				if month(@startdate) = 2 set @PMSchedule102 = @pmtemp
+				if month(@startdate) = 3 set @PMSchedule103 = @pmtemp
+				if month(@startdate) = 4 set @PMSchedule104 = @pmtemp
+				if month(@startdate) = 5 set @PMSchedule105 = @pmtemp
+				if month(@startdate) = 6 set @PMSchedule106 = @pmtemp
+				if month(@startdate) = 7 set @PMSchedule107 = @pmtemp
+				if month(@startdate) = 8 set @PMSchedule108 = @pmtemp
+				if month(@startdate) = 9 set @PMSchedule109 = @pmtemp
+				if month(@startdate) = 10 set @PMSchedule110 = @pmtemp
+				if month(@startdate) = 11 set @PMSchedule111 = @pmtemp
+				if month(@startdate) = 12 set @PMSchedule112 = @pmtemp
+			end
+			if year(@startdate) = @myyear + 1
+			begin
+				set @found = 1
+				if month(@startdate) = 1 set @PMSchedule201 = @pmtemp
+				if month(@startdate) = 2 set @PMSchedule202 = @pmtemp
+				if month(@startdate) = 3 set @PMSchedule203 = @pmtemp
+				if month(@startdate) = 4 set @PMSchedule204 = @pmtemp
+				if month(@startdate) = 5 set @PMSchedule205 = @pmtemp
+				if month(@startdate) = 6 set @PMSchedule206 = @pmtemp
+				if month(@startdate) = 7 set @PMSchedule207 = @pmtemp
+				if month(@startdate) = 8 set @PMSchedule208 = @pmtemp
+				if month(@startdate) = 9 set @PMSchedule209 = @pmtemp
+				if month(@startdate) = 10 set @PMSchedule210 = @pmtemp
+				if month(@startdate) = 11 set @PMSchedule211 = @pmtemp
+				if month(@startdate) = 12 set @PMSchedule212 = @pmtemp
+			end
+
+		end
+
+		if @found = 1
+		begin
+			insert into #pmcalender
+			values
+			(@frequencyseq, @id, @Equipment, @EquipmentComponent, @PMSchedule, @IsNested, @yearString		
+			,
+			@PMSchedule101, @PMSchedule102, @PMSchedule103, @PMSchedule104, @PMSchedule105, @PMSchedule106,
+			@PMSchedule107, @PMSchedule108, @PMSchedule109, @PMSchedule110, @PMSchedule111, @PMSchedule112,
+			@PMSchedule201, @PMSchedule202, @PMSchedule203, @PMSchedule204, @PMSchedule205, @PMSchedule206,
+			@PMSchedule207, @PMSchedule208, @PMSchedule209, @PMSchedule210, @PMSchedule211, @PMSchedule212)
+		end
+
+		FETCH NEXT FROM eq_cursor   
+		INTO @id, @Equipment, @IsNested, @EquipmentComponent, @PMSchedule
+	end
+
+	CLOSE eq_cursor
+	DEALLOCATE eq_cursor
+
+	DROP TABLE #newtable
+
+	delete from #pmcalender where Equipment_ID = 0
+
+		update T0 set PMSchedule101 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule101 <> ''
+
+		update T0 set PMSchedule102 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule102 <> ''
+
+		update T0 set PMSchedule103 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule103 <> ''
+
+		update T0 set PMSchedule104 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule104 <> ''
+
+		update T0 set PMSchedule105 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule105 <> ''
+
+		update T0 set PMSchedule106 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule106 <> ''
+
+		update T0 set PMSchedule107 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule107 <> ''
+
+		update T0 set PMSchedule108 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule108 <> ''
+
+		update T0 set PMSchedule109 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule109 <> ''
+
+		update T0 set PMSchedule110 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule110 <> ''
+
+		update T0 set PMSchedule111 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule111 <> ''
+
+		update T0 set PMSchedule112 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule112 <> ''
+
+				update T0 set PMSchedule201 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule201 <> ''
+
+		update T0 set PMSchedule202 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule202 <> ''
+
+		update T0 set PMSchedule203 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule203 <> ''
+
+		update T0 set PMSchedule204 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule204 <> ''
+
+		update T0 set PMSchedule205 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule205 <> ''
+
+		update T0 set PMSchedule206 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule206 <> ''
+
+		update T0 set PMSchedule207 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule207 <> ''
+
+		update T0 set PMSchedule208 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule208 <> ''
+
+		update T0 set PMSchedule209 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule209 <> ''
+
+		update T0 set PMSchedule210 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule210 <> ''
+
+		update T0 set PMSchedule211 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule211 <> ''
+
+		update T0 set PMSchedule212 = ''
+		from #pmcalender T0 inner join #pmcalender T1 on T0.Equipment_ID = T1.Equipment_ID 
+		and T0.EquipmentComponent_ID = T1.EquipmentComponent_ID 
+		and T0.IsNested = T1.IsNested and T0.IsNested = 0
+		and T0.FrequencySeq < T1.FrequencySeq
+		and T1.PMSchedule212 <> ''
+
+
+	select T0.ID
+	, (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T8.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T8.BoCode end) as Equipment
+	, T8.BoName as EquipmentName
+	, T8.BoFullCode as BoFullCode
+	, (case when isnull(T9.ID,0) > 0 then isnull(EqComponentClasses.BoShortName,'') + T9.BoCode else '' end) as EquipmentComponent
+	, (case when isnull(T9.ID,0) > 0 then T9.BoName else '' end) as EquipmentComponentName
+	, (case when isnull(T9.ID,0) > 0 then T9.BoFullCode else '' end) as ComBoFullCode
+	, (PMClasses.BoShortName + T10.BoCode) as PMSchedule
+	, isnull(ComCriticalities.BoName, Criticalities.BoName) as Criticality
+	, PlannerGroups.BoCode as PlannerGroup
+	, T10.CheckListName as ChecklistNV
+	, T10.BoName as PMName
+	, T10.BoFullCode as PMBoFullCode
+	, T0.IsNested
+	, T0.PMYear
+	, T0.PMSchedule101
+	, T0.PMSchedule102
+	, T0.PMSchedule103
+	, T0.PMSchedule104
+	, T0.PMSchedule105
+	, T0.PMSchedule106
+	, T0.PMSchedule107
+	, T0.PMSchedule108
+	, T0.PMSchedule109
+	, T0.PMSchedule110
+	, T0.PMSchedule111
+	, T0.PMSchedule112
+	, T0.PMSchedule201
+	, T0.PMSchedule202
+	, T0.PMSchedule203
+	, T0.PMSchedule204
+	, T0.PMSchedule205
+	, T0.PMSchedule206
+	, T0.PMSchedule207
+	, T0.PMSchedule208
+	, T0.PMSchedule209
+	, T0.PMSchedule210
+	, T0.PMSchedule211
+	, T0.PMSchedule212
+	from #pmcalender T0 inner join Equipments T8 on T0.Equipment_ID = T8.ID
+	inner join Areas on Areas.ID = T8.Area_ID
+	inner join Locations on Locations.ID = T8.Location_ID
+	inner join SubLocations on SubLocations.ID = T8.SubLocation_ID
+	inner join EqClasses on EqClasses.ID = T8.EqClass_ID
+	inner join Criticalities on Criticalities.ID = T8.Criticality_ID
+	inner join PMSchedules T10 on T0.PMSchedule_ID = T10.ID
+	inner join PMClasses on PMClasses.ID = T10.PMClass_ID
+	inner join PlannerGroups on PlannerGroups.ID = T10.PlannerGroup_ID
+	left join EquipmentComponents T9 on T0.EquipmentComponent_ID = T9.ID
+	left join EqComponentClasses on T9.EqComponentClass_ID = EqComponentClasses.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID
+
+	DROP TABLE #pmcalender
+
+end
+
+go
+
+
+/****** Object:  StoredProcedure [dbo].[GenPMCalenderMonthly]    Script Date: 06/02/2018 11:16:14 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- Batch submitted through debugger: SQLQuery7.sql|7|0|C:\Users\PHAN\AppData\Local\Temp\~vs4D3F.sql
+ALTER proc [dbo].[GenPMCalenderMonthly]
+
+@myyear int, @mymonth int, @userid int
+
+AS
+
+begin
+	declare @pmcalender table
+	( ID int,
+	EquipmentID int,
+	EquipmentComponentID int,
+	PMScheduleID int,
+	IsNested int,
+	PMYear nvarchar(10),
+	LastPMDate datetime,
+	PMDate datetime,
+	DocDate datetime
+	)
+
+	--IF OBJECT_ID('tempdb..#Calender') IS NOT NULL DROP TABLE #Calender 
+	DECLARE @Equipment int
+	DECLARE @EquipmentComponent int
+	DECLARE @PMSchedule_ID int
+	DECLARE @IsNested int
+	DECLARE @DocDate datetime
+	DECLARE @PMDate datetime
+	DECLARE @LastPMDate datetime
+	DECLARE @templastdate datetime
+	DECLARE @temppmdate datetime
+	DECLARE @tempdocdate datetime
+
+	declare @isweek int
+	declare @cyclecount int
+	declare @pmtemp nvarchar(10)
+	declare @id int
+	declare @frequencyseq int
+	declare @pmid int
+	DECLARE @year int
+	DECLARE @startdate datetime
+	declare @found int
+	declare @buffer int
+
+	set @id = 0
+
+	--SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, 0 as EquipmentComponent
+	--INTO #newtable
+	--FROM Equipments T0 inner join PMScheduleEquipments T1 on T0.ID = T1.Equipment_ID and T1.IsActive = 1
+	--	inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	--	left join PMScheduleEqComponents T9 on T9.PMSchedule_ID = T2.ID and T9.Equipment_ID = T1.Equipment_ID and T9.IsActive = 1
+	--WHERE T0.IsActive = 1 and T0.IsApproved = 1
+	--	and T2.IsActive = 1 and T2.IsApproved = 1
+	--	and YEAR(T2.FromDate) <= @myyear + 1
+	--	and (T9.ID is null)
+	--GROUP BY T0.ID, T2.IsNested
+
+	SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, 0 as EquipmentComponent
+	INTO #newtable
+	FROM Equipments T0 inner join PMScheduleEquipments T1 on T0.ID = T1.Equipment_ID and T1.IsActive = 1
+		inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	WHERE T0.IsActive = 1 and T0.IsApproved = 1
+		and T2.IsActive = 1 and T2.IsApproved = 1
+		and YEAR(T2.FromDate) <= @myyear + 1
+	GROUP BY T0.ID, T2.IsNested
+
+	INSERT INTO #newtable
+	SELECT 0 as ID, T0.ID as Equipment, T2.IsNested as IsNested, T9.ID as EquipmentComponent
+	FROM EquipmentComponents T9 inner join Equipments T0 on T0.ID = T9.Equipment_ID
+		inner join PMScheduleEqComponents T1 on T9.ID = T1.EquipmentComponent_ID and T1.IsActive = 1
+		inner join PMSchedules T2 on T1.PMSchedule_ID = T2.ID 
+	WHERE T0.IsActive = 1 and T0.IsApproved = 1
+		and T2.IsActive = 1 and T2.IsApproved = 1
+		and YEAR(T2.FromDate) <= @myyear + 1
+	GROUP BY T0.ID, T2.IsNested, T9.ID
+
+	UPDATE #newtable SET @id = ID = @id + 1
+
+	--SELECT 0 as FrequencySeq, 0 as ID, 0 as Equipment_ID, 0 as EquipmentComponent_ID, 0 as PMSchedule_ID, 0 as IsNested,
+	--@LastPMDate as LastPMDate, @PMDate as PMDate, @DocDate as DocDate
+	--INTO #pmcalender
+
+	DECLARE eq_cursor CURSOR FOR   
+	select T0.ID, T0.Equipment, T0.IsNested, T0.EquipmentComponent from #newtable T0
+	inner join Equipments T1 on T0.Equipment = T1.ID
+	order by T1.Area_ID, T1.Location_ID, T1.SubLocation_ID, T1.EqClass_ID, T0.Equipment, EquipmentComponent, ID
+	--order by Equipment, EquipmentComponent, ID
+
+	OPEN eq_cursor  
+
+	FETCH NEXT FROM eq_cursor   
+	INTO @id, @Equipment, @IsNested, @EquipmentComponent
+
+	WHILE @@FETCH_STATUS = 0  
+	begin
+		set @PMSchedule_ID = 0
+
+		DECLARE @PM_cursor CURSOR
+		if @EquipmentComponent > 0
+		begin
+			set @PM_cursor = CURSOR FOR   
+			select T2.ID * 1000 + T2.CycleCount as FrequencySeq, T1.ID, T1.FromDate, T2.BoShortName, T2.CycleCount, (case when T2.Frequency = 0 then 1 else 0 end), T1.BufferMonth
+			from PMScheduleEqComponents T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			where T1.IsNested = @IsNested and T0.EquipmentComponent_ID = @EquipmentComponent and T2.Frequency in (0,1)
+			order by T2.ID * 1000 + T2.CycleCount
+		end
+		else
+		begin
+			--set @PM_cursor = CURSOR FOR   
+			--select T2.ID * 1000 + T2.CycleCount as FrequencySeq, T1.ID, T1.FromDate, T2.BoShortName, T2.CycleCount, (case when T2.Frequency = 0 then 1 else 0 end) , T1.BufferMonth
+			--from PMScheduleEquipments T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			--inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			--left join PMScheduleEqComponents T9 on T9.PMSchedule_ID = T1.ID and T9.Equipment_ID = T0.Equipment_ID and T9.IsActive = 1
+			--where T1.IsNested = @IsNested and T0.Equipment_ID = @Equipment and T2.Frequency in (0,1)
+			--and ((T9.ID is null) or (T9.ID > 0 and T0.IsCombine = 1))
+			--order by T2.ID * 1000 + T2.CycleCount
+			set @PM_cursor = CURSOR FOR   
+			select T2.ID * 1000 + T2.CycleCount as FrequencySeq, T1.ID, T1.FromDate, T2.BoShortName, T2.CycleCount, (case when T2.Frequency = 0 then 1 else 0 end) , T1.BufferMonth
+			from PMScheduleEquipments T0 inner join PMSchedules T1 on T1.ID = T0.PMSchedule_ID and T0.IsActive = 1
+			inner join PMFrequencies T2 on T1.PMFrequency_ID = T2.ID
+			where T1.IsNested = @IsNested and T0.Equipment_ID = @Equipment and T2.Frequency in (0,1)
+			order by T2.ID * 1000 + T2.CycleCount
+
+		end
+		OPEN @PM_cursor  
+
+		FETCH NEXT FROM @PM_cursor   
+		INTO @frequencyseq, @pmid, @startdate, @pmtemp, @cyclecount, @isweek, @buffer
+		WHILE @@FETCH_STATUS = 0  
+		begin
+			if (@isweek = 1) set @cyclecount = 1
+
+			if @IsNested = 1
+			begin
+				set @PMSchedule_ID = 0
+			end
+
+
+			while year(@startdate) * 100 + month(@startdate) <= @myyear * 100 + @mymonth
+			begin
+				select @templastdate = @startdate
+				SELECT @startdate = DATEADD(mm, @cyclecount, @startdate)
+				select @temppmdate = @startdate
+				select @tempdocdate = DATEADD(mm, @buffer * -1, @startdate)
+
+				if year(@tempdocdate) = @myyear and month(@tempdocdate) = @mymonth
+				begin
+					select @PMDate = @temppmdate
+					select @DocDate = @tempdocdate
+					select @LastPMDate = @templastdate
+					select @PMSchedule_ID = @pmid
+				end
+
+			end
+
+			if @IsNested = 1 and @PMSchedule_ID > 0
+			begin
+				if not exists(select top 1 ID from WorkOrders where IsPreventiveMaintenance = 1 and PMSchedule_ID = @PMSchedule_ID and year(PMDate) = year(@PMDate) and month(PMDate) = month(@PMDate))
+				begin
+					insert into @pmcalender
+					values
+					(@id, @Equipment, @EquipmentComponent, @PMSchedule_ID, @IsNested, convert(nvarchar, @myyear * 100 + @mymonth),
+					@LastPMDate, @PMDate, @DocDate)
+				end
+			end
+
+			FETCH NEXT FROM @PM_cursor   
+			INTO @frequencyseq, @pmid, @startdate, @pmtemp, @cyclecount, @isweek, @buffer
+		end
+
+		CLOSE @PM_cursor
+		DEALLOCATE @PM_cursor
+
+		if @IsNested = 0 and @PMSchedule_ID > 0
+		begin
+			if not exists(select top 1 ID from WorkOrders where IsPreventiveMaintenance = 1 and PMSchedule_ID = @PMSchedule_ID and year(PMDate) = year(@PMDate) and month(PMDate) = month(@PMDate))
+			begin
+				insert into @pmcalender
+				values
+				(@id, @Equipment, @EquipmentComponent, @PMSchedule_ID, @IsNested, convert(nvarchar, @myyear * 100 + @mymonth),
+				@LastPMDate, @PMDate, @DocDate)
+			end
+		end
+
+		FETCH NEXT FROM eq_cursor   
+		INTO @id, @Equipment, @IsNested, @EquipmentComponent
+	end
+
+	CLOSE eq_cursor
+	DEALLOCATE eq_cursor
+
+	DROP TABLE #newtable
+
+	if exists(select 1 from @pmcalender)
+	begin
+		BEGIN TRANSACTION; 
+
+		declare @todaytime datetime
+		declare @NextSeq int
+		declare @Remarks nvarchar(max)
+		declare @PlanManCount int
+		declare @CheckListName nvarchar(max)
+		declare @CheckListLink nvarchar(max)
+		declare @WorkInstruction nvarchar(max)
+		declare @PlannerGroup_ID int
+		declare @PMClass_ID int
+		declare @Priority_ID int
+		declare @PMFrequency_ID int
+		declare @temp int
+		declare @cnt int
+		declare @tempstring nvarchar(50)
+
+		select @todaytime = GETDATE()
+
+		declare @Company_ID int
+		select @Company_ID = Company_ID from PermissionPolicyUsers where ID = @userid
+
+		DECLARE @DocType_ID int
+		select @DocType_ID = ID from DocTypes where BoCode = 'PM'
+
+		declare @JobStatus_ID int
+		select @JobStatus_ID = ID from JobStatuses where BoCode = 'AA'
+
+		declare @NewWOID int
+		declare @PMPatch_ID int
+		set @PMPatch_ID = 0
+
+		insert into PMPatches
+		( BoCode, BoName, CreateUser_ID, CreateDate )
+		values
+		( @myyear * 100 + @mymonth, @myyear * 100 + @mymonth, @userid, @todaytime)
+
+		SELECT @PMPatch_ID = IDENT_CURRENT('PMPatches')
+
+		DECLARE pm_cursor CURSOR FOR   
+		select PMScheduleID, PMDate, DocDate
+		from @pmcalender
+		group by PMScheduleID, PMDate, DocDate
+
+		OPEN pm_cursor  
+
+		FETCH NEXT FROM pm_cursor   
+		INTO @PMSchedule_ID, @PMDate, @DocDate
+	
+		WHILE @@FETCH_STATUS = 0  
+		begin
+
+			select @Remarks = BoName,
+			@PlanManCount = PlanManCount,
+			@CheckListName = CheckListName,
+			@CheckListLink = CheckListLink,
+			@WorkInstruction = WorkInstruction,
+			@PlannerGroup_ID = PlannerGroup_ID,
+			@PMClass_ID = PMClass_ID,
+			@Priority_ID = Priority_ID,
+			@PMFrequency_ID = PMFrequency_ID
+			from PMSchedules
+			where ID = @PMSchedule_ID
+
+			set @temp = 1
+
+			if @PMFrequency_ID = 1
+			begin
+				set @temp = 4
+			end
+
+			set @cnt = 1
+
+			while (@cnt <= @temp)
+			begin
+				set @NewWOID = 0
+
+				set @tempstring = ''
+				if @PMFrequency_ID = 1
+				begin
+					set @tempstring = ' for week no ' + CONVERT(nvarchar,@cnt)
+				end
+
+				if not exists(select 1 from CompanyDocs where Company_ID = @Company_ID and DocType_ID = @DocType_ID)
+				begin
+					insert into CompanyDocs
+					( NextDocNo, Company_ID, DocType_ID)
+					values
+					( 1, @Company_ID, @DocType_ID)
+				end
+
+				select @NextSeq = NextDocNo from CompanyDocs where Company_ID = @Company_ID and DocType_ID = @DocType_ID
+
+				insert into WorkOrders
+				( CreateDate, UpdateDate, DocNumSeq, DocNum, DocDate, PMDate, RefNo, Remarks, PlanManCount, CheckListName, CheckListLink, WorkInstruction, DocPassed, Approved, Cancelled, IsClosed, IsPreventiveMaintenance, AssignPlannerGroup_ID, Company_ID, CreateUser_ID, UpdateUser_ID, DocType_ID, JobStatus_ID, PMClass_ID, PMSchedule_ID, Priority_ID, PMPatch_ID, Rejected )
+				values
+				( @todaytime, @todaytime, @NextSeq, @nextseq, @DocDate, @PMDate, '', @Remarks + @tempstring, @PlanManCount, @CheckListName, @CheckListLink, @WorkInstruction, 0, 0, 0, 0, 1, @PlannerGroup_ID, @Company_ID, @userid, @userid, @DocType_ID, @JobStatus_ID, @PMClass_ID, @PMSchedule_ID, @Priority_ID, @PMPatch_ID, 0 )
+
+				update CompanyDocs set NextDocNo = @NextSeq + 1
+				where Company_ID = @Company_ID and DocType_ID = @DocType_ID
+
+				SELECT @NewWOID = IDENT_CURRENT('WorkOrders')
+
+				insert into WorkOrderJobStatuses
+				( CreateDate, UpdateDate, JobRemarks, CreateUser_ID, JobStatus_ID, UpdateUser_ID, WorkOrder_ID )
+				values
+				( @todaytime, @todaytime, '', @userid, @JobStatus_ID, @userid, @NewWOID )
+
+				insert into WorkOrderDocStatuses
+				( CreateDate, UpdateDate, DocStatus, DocRemarks, IsReverse, CreateUser_ID, UpdateUser_ID, WorkOrder_ID )
+				values
+				( @todaytime, @todaytime, 0, 'PM Monthly Generation', 0, @userid, @userid, @NewWOID )
+
+				insert into WorkOrderEquipments
+				( CreateDate, UpdateDate, CreateUser_ID, Equipment_ID, UpdateUser_ID, WorkOrder_ID )			
+				select @todaytime, @todaytime, @userid, T0.EquipmentID, @userid, @NewWOID
+				from @pmcalender T0 where T0.PMScheduleID = @PMSchedule_ID
+				group by T0.EquipmentID
+
+				insert into WorkOrderEqComponents
+				( CreateDate, UpdateDate, CreateUser_ID, Equipment_ID, EquipmentComponent_ID, UpdateUser_ID, WorkOrder_ID )			
+				select @todaytime, @todaytime, @userid, T0.EquipmentID, T0.EquipmentComponentID, @userid, @NewWOID
+				from @pmcalender T0 where T0.PMScheduleID = @PMSchedule_ID and T0.EquipmentComponentID > 0
+
+				set @cnt = @cnt + 1
+			end
+
+			FETCH NEXT FROM pm_cursor   
+			INTO @PMSchedule_ID, @PMDate, @DocDate
+		end
+
+		CLOSE pm_cursor
+		DEALLOCATE pm_cursor
+
+		COMMIT;
+	end
+
+	--select T0.ID
+	--, (case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T8.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T8.BoCode end) as Equipment
+	--, T8.BoName as EquipmentName
+	--, T8.BoFullCode as BoFullCode
+	--, (case when isnull(T9.ID,0) > 0 then isnull(EqComponentClasses.BoShortName,'') + T9.BoCode else '' end) as EquipmentComponent
+	--, (case when isnull(T9.ID,0) > 0 then T9.BoName else '' end) as EquipmentComponentName
+	--, (case when isnull(T9.ID,0) > 0 then T9.BoFullCode else '' end) as ComBoFullCode
+	--, (PMClasses.BoShortName + T10.BoCode) as PMSchedule
+	--, isnull(ComCriticalities.BoName, Criticalities.BoName) as Criticality
+	--, PlannerGroups.BoCode as PlannerGroup
+	--, T10.CheckListName as ChecklistNV
+	--, T10.BoName as PMName
+	--, T10.BoFullCode as PMBoFullCode
+	--, T0.IsNested
+	--, T0.PMYear
+	--, T0.LastPMDate
+	--, T0.PMDate
+	--, T0.DocDate
+	--from @pmcalender T0 inner join Equipments T8 on T0.EquipmentID = T8.ID
+	--inner join Areas on Areas.ID = T8.Area_ID
+	--inner join Locations on Locations.ID = T8.Location_ID
+	--inner join SubLocations on SubLocations.ID = T8.SubLocation_ID
+	--inner join EqClasses on EqClasses.ID = T8.EqClass_ID
+	--inner join Criticalities on Criticalities.ID = T8.Criticality_ID
+	--inner join PMSchedules T10 on T0.PMScheduleID = T10.ID
+	--inner join PMClasses on PMClasses.ID = T10.PMClass_ID
+	--inner join PlannerGroups on PlannerGroups.ID = T10.PlannerGroup_ID
+	--left join EquipmentComponents T9 on T0.EquipmentComponentID = T9.ID
+	--left join EqComponentClasses on T9.EqComponentClass_ID = EqComponentClasses.ID
+	--left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID
+
+	select isnull(@PMPatch_ID,0)
+
+end

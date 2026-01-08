@@ -1,0 +1,41 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWOPRCntByEquipmentGroup]    Script Date: 26/01/2018 2:17:39 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+Create proc [dbo].[GetWOPRCntByEquipmentGroup]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+
+	DECLARE @newtable TABLE
+	(
+	  EquipmentGroup nvarchar(50), 
+	  WOCount int, 
+	  PRCount int
+	)
+
+	insert into @newtable
+	( EquipmentGroup, WOCount, PRCount)
+	select T1.BoCode, count(T3.ID), count(T4.ID)
+	from Equipments T0 inner join EqGroups T1 on T0.EqGroup_ID = T1.ID
+	inner join WorkOrderEquipments T2 on T0.ID = T2.Equipment_ID
+	inner join WorkOrders T3 on T2.WorkOrder_ID = T3.ID and T3.Cancelled = 0
+	inner join PurchaseRequests T4 on T3.ID = T4.WorkOrder_ID
+	where T3.DocDate >= @WODataFrom and T3.DocDate <= @WODataTo
+	group by T1.BoCode
+
+	select EquipmentGroup, WOCount, PRCount
+	from @newtable
+	order by EquipmentGroup
+end
+

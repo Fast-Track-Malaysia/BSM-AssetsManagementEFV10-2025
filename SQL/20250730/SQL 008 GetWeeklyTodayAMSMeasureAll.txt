@@ -1,0 +1,1076 @@
+
+
+create proc [dbo].[GetWeeklyTodayAMSMeasureAll]
+
+@myyear int,
+@mymonth int,
+@type int -- 1 = all, 2 = retail (PG03), 3 = terminal (PG01,02,04), 4 = Facility (PG05)
+
+AS
+
+begin
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(max), 
+	  AnalysisRemarks nvarchar(max), 
+	  W1PG01 int, 
+	  W1PG02 int,
+	  W1PG03 int,
+	  W1PG04 int,
+	  W1PG05 int,
+	  W2PG01 int, 
+	  W2PG02 int,
+	  W2PG03 int,
+	  W2PG04 int,
+	  W2PG05 int,
+	  W3PG01 int, 
+	  W3PG02 int,
+	  W3PG03 int,
+	  W3PG04 int,
+	  W3PG05 int,
+	  W4PG01 int, 
+	  W4PG02 int,
+	  W4PG03 int,
+	  W4PG04 int,
+	  W4PG05 int
+	)
+
+	declare @scheduletable table(
+		PMScheduleID int
+		, FromDate date
+		, CycleCount int
+		, PeriodStart date
+		, ScheduleDate date
+		, pggroup nvarchar(100)
+		, bufferdate date
+	)
+	declare @groupscheduletable table(
+		PMScheduleID int
+		, FromDate date
+		, pggroup nvarchar(100)
+		, bufferdate date
+	)
+
+	declare @id int
+	declare @tolerentday int
+	declare @AnalysisName nvarchar(255)
+	declare @AnalysisRemarks nvarchar(255)
+	declare @today datetime
+	select @today = CONVERT (date, GETDATE())
+	declare @last1stdate datetime 
+	declare @1stdate datetime 
+	declare @w1date datetime 
+	declare @w2date datetime 
+	declare @w3date datetime 
+	declare @w4date datetime 
+	
+	select @1stdate = cast(cast(@myyear as varchar) + RIGHT('0' + CAST(@mymonth AS VARCHAR(2)), 2)  + '01' as datetime)
+	select @w1date = cast(cast(@myyear as varchar) + RIGHT('0' + CAST(@mymonth AS VARCHAR(2)), 2)  + '07' as datetime)
+	select @w2date = cast(cast(@myyear as varchar) + RIGHT('0' + CAST(@mymonth AS VARCHAR(2)), 2)  + '14' as datetime)
+	select @w3date = cast(cast(@myyear as varchar) + RIGHT('0' + CAST(@mymonth AS VARCHAR(2)), 2)  + '21' as datetime)
+	SELECT @w4date = DATEADD(d, -1, DATEADD(m, DATEDIFF(m, 0, @w1date) + 1, 0))
+
+	select @last1stdate = DATEADD(DAY, 1, EOMONTH(DATEADD(MONTH, -2, @1stdate)))
+
+	--------------------------------------------------------
+	select @tolerentday = 0
+	select @id = 0
+	select @AnalysisName = 'Preventive Maintenance'
+	select @AnalysisRemarks = ''
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,0,0,0,0,0
+	,0,0,0,0,0
+	,0,0,0,0,0
+	,0,0,0,0,0
+
+	--------------------------------------------------------
+
+	select @tolerentday = 10
+	select @id = 1
+	select @AnalysisName = 'WO Awaiting Acknowledge'
+	select @AnalysisRemarks = '>10 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	left join (select WorkOrder_ID as ID, min(CreateDate) as CrDate from WorkOrderJobStatuses inner join JobStatuses on WorkOrderJobStatuses.JobStatus_ID = JobStatuses.ID where JobStatuses.BoCode not in ('AA') group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1
+	and DATEDIFF(dd, T0.CreateDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 30
+	select @id = 2
+	select @AnalysisName = 'WO Awaiting Planning'
+	select @AnalysisRemarks = '>30 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join (select WorkOrder_ID as ID, min(CreateDate) as CrDate from WorkOrderJobStatuses inner join JobStatuses on WorkOrderJobStatuses.JobStatus_ID = JobStatuses.ID where JobStatuses.BoCode = 'AA' group by WorkOrder_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkOrder_ID as ID, min(CreateDate) as CrDate from WorkOrderJobStatuses inner join JobStatuses on WorkOrderJobStatuses.JobStatus_ID = JobStatuses.ID where JobStatuses.BoCode = 'AP' group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 2
+	select @id = 3
+	select @AnalysisName = 'WO Pending Approval'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 1 group by WorkOrder_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 2 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 7
+	select @id = 4
+	select @AnalysisName = 'WO Rejected'
+	select @AnalysisRemarks = '>7 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 4 group by WorkOrder_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 1 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+	select @tolerentday = 90
+	select @id = 5
+	select @AnalysisName = 'Open WO'
+	select @AnalysisRemarks = '>90 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 1 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1
+	and DATEDIFF(dd, T0.DocDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+	select @tolerentday = 2
+	select @id = 6
+	select @AnalysisName = 'Open PR'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	left join (select PurchaseRequest_ID as ID, min(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus > 0 group by PurchaseRequest_ID) T5
+	on T2.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1 and T0.Approved = 1
+	and T2.Cancelled = 0
+	and DATEDIFF(dd, T2.CreateDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+
+	select @tolerentday = 2
+	select @id = 7
+	select @AnalysisName = 'PR Requestor Passed'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	left join (select PurchaseRequest_ID as ID, max(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus = 7 group by PurchaseRequest_ID) T5
+	on T2.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 1 and T0.Approved = 1
+	and T2.Cancelled = 0 
+	and DATEDIFF(dd, T2.DocDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 0
+	select @id = 100
+	select @AnalysisName = 'Corrective Maintenance'
+	select @AnalysisRemarks = ''
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,0,0,0,0,0
+	,0,0,0,0,0
+	,0,0,0,0,0
+	,0,0,0,0,0
+
+	--------------------------------------------------------
+
+	select @tolerentday = 2
+	select @id = 101
+	select @AnalysisName = 'WR Requestor Pending'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	left join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 1 group by WorkRequest_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0
+	and DATEDIFF(dd, T0.DocDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+
+	select @tolerentday = 2
+	select @id = 102
+	select @AnalysisName = 'WR Passed'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	inner join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 1 group by WorkRequest_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 0 group by WorkRequest_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+
+	select @tolerentday = 7
+	select @id = 103
+	select @AnalysisName = 'WR Rejected'
+	select @AnalysisRemarks = '>7 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	inner join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 4 group by WorkRequest_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 1 group by WorkRequest_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+
+	select @tolerentday = 2
+	select @id = 104
+	select @AnalysisName = 'WR pending for approval'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	inner join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 1 group by WorkRequest_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkRequest_ID as ID, max(CreateDate) as CrDate from WorkRequestDocStatuses where DocStatus = 2 group by WorkRequest_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 30
+	select @id = 105
+	select @AnalysisName = 'WO Awaiting Planning'
+	select @AnalysisRemarks = '>30 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join (select WorkOrder_ID as ID, min(CreateDate) as CrDate from WorkOrderJobStatuses inner join JobStatuses on WorkOrderJobStatuses.JobStatus_ID = JobStatuses.ID where JobStatuses.BoCode = 'AA' group by WorkOrder_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkOrder_ID as ID, min(CreateDate) as CrDate from WorkOrderJobStatuses inner join JobStatuses on WorkOrderJobStatuses.JobStatus_ID = JobStatuses.ID where JobStatuses.BoCode = 'AP' group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 2
+	select @id = 106
+	select @AnalysisName = 'WO Planner Pending'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 2 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0
+	and DATEDIFF(dd, T0.CreateDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--------------------------------------------------------
+	select @tolerentday = 7
+	select @id = 107
+	select @AnalysisName = 'WO Rejected'
+	select @AnalysisRemarks = '>7 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 4 group by WorkOrder_ID) T4
+	on T0.ID = T4.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 1 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID and T5.CrDate >= T4.CrDate
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0
+	and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+	select @tolerentday = 90
+	select @id = 108
+	select @AnalysisName = 'Open WO'
+	select @AnalysisRemarks = '>90 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	left join (select WorkOrder_ID as ID, max(CreateDate) as CrDate from WorkOrderDocStatuses where DocStatus = 1 group by WorkOrder_ID) T5
+	on T0.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0
+	and DATEDIFF(dd, T0.DocDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T0.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+	select @tolerentday = 2
+	select @id = 109
+	select @AnalysisName = 'Open PR'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	left join (select PurchaseRequest_ID as ID, min(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus > 0 group by PurchaseRequest_ID) T5
+	on T2.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0 and T0.Approved = 1
+	and T2.Cancelled = 0
+	and DATEDIFF(dd, T2.CreateDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+	--------------------------------------------------------
+
+	select @tolerentday = 2
+	select @id = 110
+	select @AnalysisName = 'PR Requestor Passed'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	left join (select PurchaseRequest_ID as ID, max(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus = 7 group by PurchaseRequest_ID) T5
+	on T2.ID = T5.ID
+	where T0.Cancelled = 0 and T0.IsPreventiveMaintenance = 0 and T0.Approved = 1
+	and T2.Cancelled = 0
+	and DATEDIFF(dd, T2.DocDate, isnull(T5.CrDate,@today)) > @tolerentday
+	and DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date
+	and isnull(T5.CrDate,@today) >= @1stdate
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+		,0,0,0,0,0
+	end
+
+	--select @tolerentday = 7
+	--select @id = 10
+	--select @AnalysisName = 'Rejected PR'
+	--select @AnalysisRemarks = '>7 days'
+	--insert into @newtable
+	--select @id, @AnalysisName, @AnalysisRemarks
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w1date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) >= @1stdate then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w2date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w1date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w3date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w2date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG01' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG02' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG03' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG04' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	--,sum((case when DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date and T1.BoCode = 'PG05' then (case when isnull(T5.CrDate,@today) > @w3date then 1 else 0 end) else 0 end))
+	--from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	--inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	--inner join (select PurchaseRequest_ID as ID, max(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus = 4 group by PurchaseRequest_ID) T4
+	--on T2.ID = T4.ID
+	--left join (select PurchaseRequest_ID as ID, max(CreateDate) as CrDate from PurchaseRequestDocStatuses where DocStatus = 1 group by PurchaseRequest_ID) T5
+	--on T2.ID = T5.ID and T5.CrDate >= T4.CrDate
+	--where T2.Cancelled = 0 and T0.Approved = 1 and T0.Cancelled = 0
+	--and DATEDIFF(dd, T4.CrDate, isnull(T5.CrDate,@today)) > @tolerentday
+	--and DATEADD(dd, @tolerentday, T2.DocDate) <= @w4date
+	--and isnull(T5.CrDate,@today) >= @1stdate
+
+	--if not exists(select 1 from @newtable where ID = @id)
+	--begin
+	--	insert into @newtable
+	--	select @id, @AnalysisName, @AnalysisRemarks
+	--	,0,0,0,0,0
+	--	,0,0,0,0,0
+	--	,0,0,0,0,0
+	--	,0,0,0,0,0
+	--end
+
+
+
+
+	update @newtable set W1PG01 = 0 where W1PG01 is null
+	update @newtable set W1PG02 = 0 where W1PG02 is null
+	update @newtable set W1PG03 = 0 where W1PG03 is null
+	update @newtable set W1PG04 = 0 where W1PG04 is null
+	update @newtable set W1PG05 = 0 where W1PG05 is null
+	update @newtable set W2PG01 = 0 where W2PG01 is null
+	update @newtable set W2PG02 = 0 where W2PG02 is null
+	update @newtable set W2PG03 = 0 where W2PG03 is null
+	update @newtable set W2PG04 = 0 where W2PG04 is null
+	update @newtable set W2PG05 = 0 where W2PG05 is null
+	update @newtable set W3PG01 = 0 where W3PG01 is null
+	update @newtable set W3PG02 = 0 where W3PG02 is null
+	update @newtable set W3PG03 = 0 where W3PG03 is null
+	update @newtable set W3PG04 = 0 where W3PG04 is null
+	update @newtable set W3PG05 = 0 where W3PG05 is null
+	update @newtable set W4PG01 = 0 where W4PG01 is null
+	update @newtable set W4PG02 = 0 where W4PG02 is null
+	update @newtable set W4PG03 = 0 where W4PG03 is null
+	update @newtable set W4PG04 = 0 where W4PG04 is null
+	update @newtable set W4PG05 = 0 where W4PG05 is null
+
+
+	if @today <= @w4date
+	begin
+		update @newtable set W4PG01 = null
+		update @newtable set W4PG02 = null
+		update @newtable set W4PG03 = null
+		update @newtable set W4PG04 = null
+		update @newtable set W4PG05 = null
+	end
+	if @today <= @w3date
+	begin
+		update @newtable set W3PG01 = null
+		update @newtable set W3PG02 = null
+		update @newtable set W3PG03 = null
+		update @newtable set W3PG04 = null
+		update @newtable set W3PG05 = null
+	end
+	if @today <= @w2date
+	begin
+		update @newtable set W2PG01 = null
+		update @newtable set W2PG02 = null
+		update @newtable set W2PG03 = null
+		update @newtable set W2PG04 = null
+		update @newtable set W2PG05 = null
+	end
+	if @today <= @w1date
+	begin
+		update @newtable set W1PG01 = null
+		update @newtable set W1PG02 = null
+		update @newtable set W1PG03 = null
+		update @newtable set W1PG04 = null
+		update @newtable set W1PG05 = null
+	end
+
+	if @type = 2 -- retail PG03
+	begin
+		update @newtable set 
+			W1PG01 = 0
+			,W1PG02 = 0
+			,W1PG04 = 0
+			,W1PG05 = 0
+			,W2PG01 = 0
+			,W2PG02 = 0
+			,W2PG04 = 0
+			,W2PG05 = 0
+			,W3PG01 = 0
+			,W3PG02 = 0
+			,W3PG04 = 0
+			,W3PG05 = 0
+			,W4PG01 = 0
+			,W4PG02 = 0
+			,W4PG04 = 0
+			,W4PG05 = 0
+
+	end
+	else if @type = 3 -- terminal PG01,PG02,PG04
+	begin
+		update @newtable set 
+			W1PG03 = 0
+			,W1PG05 = 0
+			,W2PG03 = 0
+			,W2PG05 = 0
+			,W3PG03 = 0
+			,W3PG05 = 0
+			,W4PG03 = 0
+			,W4PG05 = 0
+
+	end
+	else if @type = 4 -- facility PG05
+	begin
+		update @newtable set 
+			W1PG01 = 0
+			,W1PG02 = 0
+			,W1PG03 = 0
+			,W1PG04 = 0
+			,W2PG01 = 0
+			,W2PG02 = 0
+			,W2PG03 = 0
+			,W2PG04 = 0
+			,W3PG01 = 0
+			,W3PG02 = 0
+			,W3PG03 = 0
+			,W3PG04 = 0
+			,W4PG01 = 0
+			,W4PG02 = 0
+			,W4PG03 = 0
+			,W4PG04 = 0
+
+	end
+
+
+	select ID, AnalysisName, AnalysisRemarks,
+	  W1PG01, 
+	  W1PG02,
+	  W1PG03,
+	  W1PG04,
+	  W1PG05,
+	  W2PG01, 
+	  W2PG02,
+	  W2PG03,
+	  W2PG04,
+	  W2PG05,
+	  W3PG01, 
+	  W3PG02,
+	  W3PG03,
+	  W3PG04,
+	  W3PG05,
+	  W4PG01, 
+	  W4PG02,
+	  W4PG03,
+	  W4PG04,
+	  W4PG05 
+	from @newtable
+
+end
+
+

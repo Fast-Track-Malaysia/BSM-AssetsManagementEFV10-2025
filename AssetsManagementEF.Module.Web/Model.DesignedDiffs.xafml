@@ -1,0 +1,1334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <NavigationItems>
+    <Items>
+      <Item Id="Default" Index="0">
+        <Items>
+          <Item Id="Event_ListView" Visible="False" />
+        </Items>
+      </Item>
+      <Item Id="System Setup" Index="10" />
+      <Item Id="Location" Index="20" />
+      <Item Id="Equipment Setup" Index="30" />
+      <Item Id="Equipments" Index="40">
+        <Items>
+          <Item Id="Equipments_ListView" Index="0" />
+          <Item Id="EquipmentComponents_ListView_Copy" Index="1" ViewId="EquipmentComponents_ListView_Copy" IsNewNode="True" />
+        </Items>
+      </Item>
+      <Item Id="Deviation">
+        <Items>
+          <Item Id="Deviation2025_ListView" ViewId="Deviation2025_ListView" Caption="Deviation (All Status)" Index="0" IsNewNode="True" Removed="True" />
+          <Item Id="Deviation2025_ListView_UnderReview" Caption="Deviation (Under Review)" Index="1" ViewId="Deviation2025_ListView_UnderReview" IsNewNode="True" />
+          <Item Id="Deviation2025_ListView_UnderReview_Done" ViewId="Deviation2025_ListView_UnderReview_Done" Caption="Deviation (Acknowledged)" Index="2" IsNewNode="True" />
+          <Item Id="Deviation2025_ListView_PendingApp" Caption="Deviation (Pending Approval)" Index="3" ViewId="Deviation2025_ListView_PendingApp" IsNewNode="True" />
+          <Item Id="Deviation2025_ListView_App" Caption="Deviation (Approved)" Index="4" ViewId="Deviation2025_ListView_App" IsNewNode="True" />
+          <Item Id="Deviation2025_ListView_Appext" Caption="Deviation (Approved Extension)" ViewId="Deviation2025_ListView_Appext" IsNewNode="True" />
+        </Items>
+      </Item>
+      <Item Id="KPI" Visible="False" />
+      <Item Id="PM Schedule Setup">
+        <Items>
+          <Item Id="PMScheduleEqComponents_ListView_Copy" Caption="PM Schedule Component" ViewId="PMScheduleEqComponents_ListView_Copy" Visible="True" IsNewNode="True" />
+          <Item Id="PMScheduleEquipments_ListView_Copy" Caption="PM Schedule Equipment" ViewId="PMScheduleEquipments_ListView_Copy" Visible="True" IsNewNode="True" />
+        </Items>
+      </Item>
+      <Item Id="Purchase Requests">
+        <Items>
+          <Item Id="PurchaseRequests_ListView" Index="0" />
+          <Item Id="PR Cancel Log" ViewId="PurchaseRequestDocStatuses_ListView_Copy" Caption="PR Cancel Log" Index="1" IsNewNode="True" />
+          <Item Id="vw_SAP_pr_ListView" Index="2" />
+        </Items>
+      </Item>
+      <Item Id="Quotation" Visible="False" />
+      <Item Id="State Machine" Visible="False" />
+      <Item Id="Work Orders">
+        <Items>
+          <Item Id="WorkOrders_ListView" Caption="CM Work Order" Index="0" />
+          <Item Id="WorkOrders_ListView_PMACK" ViewId="WorkOrders_ListView_PMACK" Caption="Acknowledge PM Work Order" Index="1" IsNewNode="True" />
+          <Item Id="WorkOrders_ListView_PM" Caption="PM Work Order" Index="2" ViewId="WorkOrders_ListView_PM" IsNewNode="True" />
+          <Item Id="WorkOrderEqComponents_ListView_Copy" Caption="Work Order Component" ViewId="WorkOrderEqComponents_ListView_Copy" Visible="True" IsNewNode="True" />
+          <Item Id="WorkOrderEquipments_ListView_Copy" Caption="Work Order Equipment" ViewId="WorkOrderEquipments_ListView_Copy" Visible="True" IsNewNode="True" />
+        </Items>
+      </Item>
+      <Item Id="Work Requests">
+        <Items>
+          <Item Id="WorkRequests_ListView" Index="0" />
+          <Item Id="WR Cancel Log" Index="1" ViewId="WorkRequestDocStatuses_ListView_Copy" Caption="WR Cancel Log" IsNewNode="True" />
+          <Item Id="WorkRequestEqComponents_ListView_Copy" Caption="Work Request Component" ViewId="WorkRequestEqComponents_ListView_Copy" Visible="True" IsNewNode="True" />
+          <Item Id="WorkRequestEquipments_ListView_Copy" Caption="Work Request Equipment" ViewId="WorkRequestEquipments_ListView_Copy" Visible="True" IsNewNode="True" />
+        </Items>
+      </Item>
+    </Items>
+  </NavigationItems>
+  <Options CollectionsEditMode="Edit" DataAccessMode="Server" />
+  <SchemaModules>
+    <SchemaModule Name="SchedulerAspNetModule" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SchedulerModuleBase" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemAspNetModule" Version="17.1.4.0" IsNewNode="True" />
+    <SchemaModule Name="SystemModule" Version="17.1.4.0" IsNewNode="True" />
+  </SchemaModules>
+  <ViewItems>
+    <PropertyEditor Name="PropertyEditors">
+      <RegisteredPropertyEditor PropertyType="System.Drawing.Color" EditorType="DevExpress.ExpressApp.Web.Editors.ASPx.ASPxColorPickerPropertyEditor" />
+    </PropertyEditor>
+  </ViewItems>
+  <Views>
+    <ListView Id="BadActorDetails_ListView" DataAccessMode="Client" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <DetailView Id="Companies_DetailView" AllowNew="False" />
+    <ListView Id="Companies_ListView" AllowNew="False" />
+    <DetailView Id="ContractDocDtls_DetailView" AllowNew="False" />
+    <ListView Id="ContractDocDtls_ListView" AllowNew="False" />
+    <ListView Id="ContractDocs_Detail_ListView" AllowNew="False" />
+    <DetailView Id="ContractDocs_DetailView" AllowNew="False" />
+    <ListView Id="ContractDocs_ListView" AllowNew="False" />
+    <DetailView Id="Contractors_DetailView" AllowNew="False" />
+    <ListView Id="Contractors_ListView" AllowNew="False" />
+    <ListView Id="Criticalities_LookupListView">
+      <Sorting>
+        <SortProperty Id="SortLevel" PropertyName="LevelOfCriticality" IsNewNode="True" />
+      </Sorting>
+    </ListView>
+    <DetailView Id="Deviation2025_DetailView">
+      <Items>
+        <PropertyEditor Id="DscriptionNote" RowCount="10" />
+        <PropertyEditor Id="EscalationCommentNote" RowCount="10" />
+        <PropertyEditor Id="RiskAssessment" RowCount="6" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="50.767414403778041">
+            <LayoutGroup Id="Deviation2025" Caption="Deviation" RelativeSize="100" Direction="Vertical">
+              <LayoutGroup Id="Deviation2025_col1" RelativeSize="100">
+                <LayoutGroup Id="Autocc682a6a-3c08-4caf-b597-abde0d0016e2" ShowCaption="False" Caption="Autocc682a6a-3c08-4caf-b597-abde0d0016e2(5)" Direction="Vertical" Index="0" RelativeSize="20.626631853785902" IsNewNode="True">
+                  <LayoutGroup Id="Autobe9d7ccc-607b-4a9a-828d-6c762c79d2b9" ShowCaption="False" Caption="Autobe9d7ccc-607b-4a9a-828d-6c762c79d2b9(6)" Direction="Horizontal" Index="0" RelativeSize="50.632911392405063" IsNewNode="True">
+                    <LayoutItem Id="DocNum" ViewItem="DocNum" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                    <LayoutItem Id="dummy05" ViewItem="dummy05" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                    <LayoutItem Id="dummy06" ViewItem="dummy06" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                  </LayoutGroup>
+                  <LayoutGroup Id="Autobcfe68df-6c9e-4922-a0da-f38300befdc4" ShowCaption="False" Caption="Autobcfe68df-6c9e-4922-a0da-f38300befdc4(7)" Direction="Horizontal" Index="1" RelativeSize="49.367088607594937" IsNewNode="True">
+                    <LayoutItem Id="DeviationRank" ViewItem="DeviationRank" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                    <LayoutItem Id="LastDeviationNo" ViewItem="LastDeviationNo" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                    <LayoutItem Id="ApprovedValidDate" ViewItem="ApprovedValidDate" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                  </LayoutGroup>
+                </LayoutGroup>
+                <LayoutItem Id="ApprovedValidDate" RelativeSize="5.3892215568862278" Index="1" Removed="True" />
+                <LayoutGroup Id="Auto240798ee-395d-4735-b589-8f433e14746e" ShowCaption="False" Caption="Auto240798ee-395d-4735-b589-8f433e14746e(9)" Index="1" RelativeSize="19.06005221932115" IsNewNode="True">
+                  <LayoutItem Id="DeviationTitle" ViewItem="DeviationTitle" Index="0" RelativeSize="41.0958904109589" IsNewNode="True" />
+                  <LayoutGroup Id="Auto49d71596-8e4f-4362-817d-83706df38de0" ShowCaption="False" Caption="Auto49d71596-8e4f-4362-817d-83706df38de0(11)" Direction="Horizontal" Index="1" RelativeSize="58.9041095890411" IsNewNode="True">
+                    <LayoutItem Id="DeviationType" ViewItem="DeviationType" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                    <LayoutItem Id="DeviationStatus" ViewItem="DeviationStatus" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                    <LayoutItem Id="dummy01" ViewItem="dummy01" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                  </LayoutGroup>
+                </LayoutGroup>
+                <LayoutItem Id="DeviationTitle" RelativeSize="5.4852320675105481" Index="1" Removed="True" />
+                <LayoutGroup Id="Autoff051d6c-1810-4e5f-97ae-e8b4eaa61cb9" ShowCaption="False" Caption="Autoff051d6c-1810-4e5f-97ae-e8b4eaa61cb9(15)" Direction="Horizontal" Index="2" RelativeSize="9.1383812010443872" IsNewNode="True">
+                  <LayoutItem Id="OriginalOLAFD" ViewItem="OriginalOLAFD" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                  <LayoutItem Id="ProposedLAFDValidDate" ViewItem="ProposedLAFDValidDate" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                  <LayoutItem Id="dummy02" ViewItem="dummy02" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                </LayoutGroup>
+                <LayoutItem Id="DeviationType" RelativeSize="5.69620253164557" Index="2" Removed="True" />
+                <LayoutItem Id="OriginalOLAFD" RelativeSize="6.0402684563758386" Index="2" Removed="True" />
+                <LayoutGroup Id="Auto65cab5b5-0bed-45be-8779-b30682b557a7" ShowCaption="False" Caption="Auto65cab5b5-0bed-45be-8779-b30682b557a7(19)" Index="3" RelativeSize="50.913838120104437" IsNewNode="True">
+                  <LayoutGroup Id="Auto3151aec7-26f3-4957-93e6-dfe1b2732bec" ShowCaption="False" Caption="Auto3151aec7-26f3-4957-93e6-dfe1b2732bec(20)" Direction="Horizontal" Index="0" RelativeSize="20" IsNewNode="True">
+                    <LayoutItem Id="Criticality" ViewItem="Criticality" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                    <LayoutItem Id="SCECategory" ViewItem="SCECategory" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                    <LayoutItem Id="SCESubCategory" ViewItem="SCESubCategory" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                  </LayoutGroup>
+                  <LayoutGroup Id="Autofa7318a6-e9f7-48ed-81f9-31cb3c9ee978" ShowCaption="False" Caption="Autofa7318a6-e9f7-48ed-81f9-31cb3c9ee978(24)" Index="1" RelativeSize="80" IsNewNode="True">
+                    <LayoutGroup Id="Autoceec9d08-7c70-4477-802e-cbfa1097f799" ShowCaption="False" Caption="Autoceec9d08-7c70-4477-802e-cbfa1097f799(26)" Direction="Horizontal" Index="0" RelativeSize="25" IsNewNode="True">
+                      <LayoutItem Id="DeviationDiscipline" ViewItem="DeviationDiscipline" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                      <LayoutItem Id="PlannerGroup" ViewItem="PlannerGroup" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                      <LayoutItem Id="WorkOrderType" ViewItem="WorkOrderType" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                    </LayoutGroup>
+                    <LayoutGroup Id="Auto63d98cb5-f257-46d5-bb77-cda7587cb306" ShowCaption="False" Caption="Auto63d98cb5-f257-46d5-bb77-cda7587cb306(30)" Index="1" RelativeSize="75" IsNewNode="True">
+                      <LayoutGroup Id="Auto5cc5e2f1-7c30-4692-bb85-bd64a95aace0" ShowCaption="False" Caption="Auto5cc5e2f1-7c30-4692-bb85-bd64a95aace0(31)" Direction="Horizontal" Index="0" RelativeSize="33.333333333333336" IsNewNode="True">
+                        <LayoutItem Id="WorkOrderPriority" ViewItem="WorkOrderPriority" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                        <LayoutItem Id="Location" ViewItem="Location" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                        <LayoutItem Id="WorkOrder" ViewItem="WorkOrder" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                      </LayoutGroup>
+                      <LayoutGroup Id="Auto79685eff-212e-4e7a-bce1-51f18a54b313" ShowCaption="False" Caption="Auto79685eff-212e-4e7a-bce1-51f18a54b313(35)" Index="1" RelativeSize="66.666666666666671" IsNewNode="True">
+                        <LayoutGroup Id="Autod19505ce-1b67-479e-9dc5-9c33ef93c8eb" ShowCaption="False" Caption="Autod19505ce-1b67-479e-9dc5-9c33ef93c8eb(36)" Direction="Horizontal" Index="0" RelativeSize="50" IsNewNode="True">
+                          <LayoutItem Id="CreateUser" ViewItem="CreateUser" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                          <LayoutItem Id="CreateDate" ViewItem="CreateDate" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                          <LayoutItem Id="dummy03" ViewItem="dummy03" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                        </LayoutGroup>
+                        <LayoutGroup Id="Auto221884cc-3661-4c94-a266-494999ae2d41" ShowCaption="False" Caption="Auto221884cc-3661-4c94-a266-494999ae2d41(40)" Direction="Horizontal" Index="1" RelativeSize="50" IsNewNode="True">
+                          <LayoutItem Id="Equipment" ViewItem="Equipment" Index="0" RelativeSize="33.5195530726257" IsNewNode="True" />
+                          <LayoutItem Id="Component" ViewItem="Component" Index="1" RelativeSize="33.016759776536311" IsNewNode="True" />
+                          <LayoutItem Id="dummy04" ViewItem="dummy04" Index="2" RelativeSize="33.463687150837991" IsNewNode="True" />
+                        </LayoutGroup>
+                      </LayoutGroup>
+                    </LayoutGroup>
+                  </LayoutGroup>
+                </LayoutGroup>
+                <LayoutItem Id="Criticality" RelativeSize="6.0810810810810807" Index="3" Removed="True" />
+                <LayoutItem Id="DeviationStatus" RelativeSize="5.69620253164557" Index="3" Removed="True" />
+                <LayoutItem Id="LastDeviationNo" Index="3" RelativeSize="6.2801932367149762" Removed="True" />
+                <LayoutItem Id="ProposedLAFDValidDate" RelativeSize="6.0402684563758386" Index="3" Removed="True" />
+                <LayoutItem Id="CreateDate" RelativeSize="12.982456140350877" Index="4" Removed="True" />
+                <LayoutItem Id="DocNum" RelativeSize="6.666666666666667" Index="4" Removed="True" />
+                <LayoutItem Id="Dscription" Index="4" RelativeSize="8.61244019138756" Removed="True" />
+                <LayoutItem Id="Equipment" Index="4" RelativeSize="0.26109660574412535" Removed="True" />
+                <LayoutItem Id="SCECategory" RelativeSize="6.0810810810810807" Index="4" Removed="True" />
+                <LayoutItem Id="WorkOrder" RelativeSize="8.6538461538461533" Index="4" Removed="True" />
+                <LayoutItem Id="WorkOrderPriority" RelativeSize="7.60233918128655" Index="4" Removed="True" />
+                <LayoutItem Id="WorkOrderType" RelativeSize="7.1428571428571432" Index="4" Removed="True" />
+                <LayoutItem Id="DeviationDiscipline" RelativeSize="6.9230769230769234" Index="5" Removed="True" />
+                <LayoutItem Id="Location" RelativeSize="7.8947368421052628" Index="5" Removed="True" />
+                <LayoutItem Id="SCESubCategory" RelativeSize="6.4748201438848918" Index="5" Removed="True" />
+                <LayoutItem Id="PlannerGroup" RelativeSize="6.666666666666667" Index="6" Removed="True" />
+                <LayoutItem Id="DeviationRank" RelativeSize="7.0075757575757578" Removed="True" />
+                <LayoutItem Id="LastDeviationRank" RelativeSize="5.1136363636363633" Removed="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="Deviation2025_col2" RelativeSize="67.628205128205124" Caption="Deviation2025_col2" Direction="Horizontal" Removed="True">
+                <LayoutItem Id="Assets" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="Community" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="Company" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="Component" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="CreateUser" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="dummy01" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="dummy02" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="dummy03" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="dummy04" RelativeSize="100" Index="0" Removed="True" />
+                <LayoutItem Id="Equipment" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="OverallRisk" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="People1" RelativeSize="7.0075757575757578" Index="0" Removed="True" />
+                <LayoutItem Id="RiskActionPlan" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="RiskAssessment" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="RiskComment" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="RiskIsolationID" RelativeSize="6.8181818181818183" Index="0" Removed="True" />
+                <LayoutItem Id="Dscription" RelativeSize="6.8181818181818183" Removed="True" />
+                <LayoutItem Id="EscalationComment" RelativeSize="6.8181818181818183" Removed="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs" RelativeSize="49.232585596221959">
+            <LayoutGroup Id="Item1" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="0" Caption="Description" RelativeSize="100" IsNewNode="True">
+              <LayoutItem Id="Dscription" ViewItem="Dscription" Index="0" RelativeSize="15.591397849462366" CaptionLocation="Top" IsNewNode="True" />
+              <LayoutGroup Id="Autoe9ddba03-dbf3-4eff-b5ba-bd5dc71c3f4d" ShowCaption="False" Caption="Autoe9ddba03-dbf3-4eff-b5ba-bd5dc71c3f4d(52)" Direction="Vertical" Index="1" RelativeSize="84.408602150537632" IsNewNode="True">
+                <LayoutItem Id="DscriptionNote" ShowCaption="False" ViewItem="DscriptionNote" CaptionLocation="Top" Index="0" RelativeSize="100" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+            <LayoutGroup Id="Item2" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="1" Caption="Risk Assessment" RelativeSize="100" IsNewNode="True">
+              <LayoutGroup Id="Auto506f2f83-15f0-42f5-b105-b8b718281233" ShowCaption="False" Caption="Auto506f2f83-15f0-42f5-b105-b8b718281233(52)" Direction="Horizontal" Index="0" RelativeSize="18.010752688172044" IsNewNode="True">
+                <LayoutItem Id="OverallRisk" ViewItem="OverallRisk" CaptionLocation="Top" Index="0" RelativeSize="20.156774916013436" IsNewNode="True" />
+                <LayoutItem Id="People1" ViewItem="People1" CaptionLocation="Top" Index="1" RelativeSize="19.820828667413213" IsNewNode="True" />
+                <LayoutItem Id="Assets" ViewItem="Assets" CaptionLocation="Top" Index="2" RelativeSize="19.820828667413213" IsNewNode="True" />
+                <LayoutItem Id="Community" ViewItem="Community" Index="3" RelativeSize="19.820828667413213" CaptionLocation="Top" IsNewNode="True" />
+                <LayoutItem Id="Environment" ViewItem="Environment" Index="4" RelativeSize="19.820828667413213" CaptionLocation="Top" IsNewNode="True" />
+                <LayoutItem Id="Item4" Index="5" RelativeSize="0.55991041433370659" IsNewNode="True" />
+              </LayoutGroup>
+              <LayoutItem Id="Item5" Index="1" RelativeSize="3.4946236559139785" IsNewNode="True" />
+              <LayoutItem Id="RiskAssessment" ViewItem="RiskAssessment" Index="2" RelativeSize="8.064516129032258" CaptionLocation="Top" IsNewNode="True" />
+              <LayoutItem Id="RiskComment" ViewItem="RiskComment" CaptionLocation="Top" Index="3" RelativeSize="12.903225806451612" IsNewNode="True" />
+              <LayoutItem Id="Item6" Index="4" RelativeSize="3.4946236559139785" IsNewNode="True" />
+              <LayoutGroup Id="Detail" ShowCaption="True" Caption="Mitigations" Index="5" RelativeSize="54.032258064516128" IsNewNode="True">
+                <LayoutItem Id="Detail" ViewItem="Detail" Index="0" RelativeSize="100" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+            <LayoutGroup Id="Item3" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="2" Caption="Risk Escalation" RelativeSize="100" IsNewNode="True">
+              <LayoutGroup Id="Auto7a40ac70-8bbd-4221-bf90-9ba098ab0f8e" ShowCaption="False" Caption="Auto7a40ac70-8bbd-4221-bf90-9ba098ab0f8e(67)" Direction="Vertical" Index="0" RelativeSize="77.41935483870968" IsNewNode="True">
+                <LayoutGroup Id="Auto4a8285ab-c698-48ed-aa60-45184a42e7b9" ShowCaption="False" Caption="Auto4a8285ab-c698-48ed-aa60-45184a42e7b9(71)" Index="0" RelativeSize="100" IsNewNode="True">
+                  <LayoutItem Id="EscalationComment" ViewItem="EscalationComment" CaptionLocation="Top" Index="0" RelativeSize="20.138888888888889" IsNewNode="True" />
+                  <LayoutItem Id="EscalationCommentNote" ShowCaption="False" ViewItem="EscalationCommentNote" CaptionLocation="Top" Index="1" RelativeSize="79.861111111111114" IsNewNode="True" />
+                </LayoutGroup>
+              </LayoutGroup>
+              <LayoutItem Id="RiskIsolationID" ViewItem="RiskIsolationID" Index="1" RelativeSize="6.989247311827957" IsNewNode="True" />
+              <LayoutItem Id="RiskActionPlan" ViewItem="RiskActionPlan" Index="2" RelativeSize="15.591397849462366" CaptionLocation="Top" IsNewNode="True" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail" RelativeSize="100" Index="3" Removed="True">
+              <LayoutItem Id="Detail" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail2" RelativeSize="100" Index="3">
+              <LayoutItem Id="Detail2" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail3" RelativeSize="100" Index="4">
+              <LayoutItem Id="Detail3" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail4" RelativeSize="100" Index="5">
+              <LayoutItem Id="Detail4" RelativeSize="100" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="Deviation2025_ListView_App" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Approved'" Caption="Deviation (Approved)" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_Appext" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Approved Extension'" Caption="Deviation (Approved Extension)" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_Cancel" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Cancel'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_Close" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Closed'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_Draft" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Draft'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_DraftExt" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Draft Extension'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationNo" PropertyName="LastDeviationNo" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="10" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="11" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="23" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="24" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_PendingApp" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Pending Approval'" Caption="Deviation (Pending Approval)" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_UnderReview" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Under Review' And [Detail2][[Reviewer.ID] = CurrentUserId() And [ActReviewer] = False]" Caption="Deviation (Under Review)" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_UnderReview_Done" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] In ('Under Review', 'Pending Approval') And [Detail2][[Reviewer.ID] = CurrentUserId() And [ActReviewer] = True]" Caption="Deviation (Acknowledged)" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="Deviation2025_ListView_Withdrawn" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Withdrawn'" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy01" PropertyName="dummy01" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy02" PropertyName="dummy02" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy03" PropertyName="dummy03" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy04" PropertyName="dummy04" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy05" PropertyName="dummy05" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="dummy06" PropertyName="dummy06" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="OverallRisk" PropertyName="OverallRisk" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="People1" PropertyName="People1" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskActionPlan" PropertyName="RiskActionPlan" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskAssessment" PropertyName="RiskAssessment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskComment" PropertyName="RiskComment" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RiskIsolationID" PropertyName="RiskIsolationID" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DeviationRank" PropertyName="DeviationRank" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="LastDeviationRank" PropertyName="LastDeviationRank" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="ApprovedValidDate" PropertyName="ApprovedValidDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="DeviationTitle" PropertyName="DeviationTitle" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="DeviationType" PropertyName="DeviationType" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="DeviationStatus" PropertyName="DeviationStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="OriginalOLAFD" PropertyName="OriginalOLAFD" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="ProposedLAFDValidDate" PropertyName="ProposedLAFDValidDate" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="SCECategory" PropertyName="SCECategory" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="70" Index="10" SortOrder="Ascending" IsNewNode="True" />
+        <ColumnInfo Id="SCESubCategory" PropertyName="SCESubCategory" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="DeviationDiscipline" PropertyName="DeviationDiscipline" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderType" PropertyName="WorkOrderType" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="PlannerGroup" PropertyName="PlannerGroup" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderPriority" PropertyName="WorkOrderPriority" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="Location" PropertyName="Location" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="18" IsNewNode="True" />
+        <ColumnInfo Id="Dscription" PropertyName="Dscription" Width="70" Index="19" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="Component" PropertyName="Component" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <DetailView Id="DeviationMitigations_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="DeviationMitigations" RelativeSize="100" Direction="Vertical">
+              <LayoutGroup Id="DeviationMitigations_col1" RelativeSize="100" Caption="DeviationMitigations_col1">
+                <LayoutGroup Id="Auto23a35bf1-2660-494c-bdb6-bcf449f13044" ShowCaption="False" Caption="Auto23a35bf1-2660-494c-bdb6-bcf449f13044(5)" Direction="Horizontal" Index="0" RelativeSize="9.433962264150944" IsNewNode="True">
+                  <LayoutItem Id="RowNumber" ViewItem="RowNumber" Index="0" RelativeSize="50" IsNewNode="True" />
+                  <LayoutItem Id="dummy01" ViewItem="dummy01" Index="1" RelativeSize="50" IsNewNode="True" />
+                </LayoutGroup>
+                <LayoutGroup Id="Autof730ed65-c57e-4bb6-9ac9-d6f9a9cb80a8" ShowCaption="False" Caption="Autof730ed65-c57e-4bb6-9ac9-d6f9a9cb80a8(8)" Index="1" RelativeSize="90.566037735849051" IsNewNode="True">
+                  <LayoutGroup Id="Autod47db060-170a-41a9-97f9-4efab460a6fc" ShowCaption="False" Caption="Autod47db060-170a-41a9-97f9-4efab460a6fc(9)" Direction="Horizontal" Index="0" RelativeSize="9.8958333333333339" IsNewNode="True">
+                    <LayoutItem Id="MitigationUser" ViewItem="MitigationUser" Index="0" RelativeSize="50" IsNewNode="True" />
+                    <LayoutItem Id="Position" ViewItem="Position" Index="1" RelativeSize="50" IsNewNode="True" />
+                  </LayoutGroup>
+                  <LayoutGroup Id="Auto4e157697-12ec-467d-ba49-ff9a296a2f20" ShowCaption="False" Caption="Auto4e157697-12ec-467d-ba49-ff9a296a2f20(12)" Index="1" RelativeSize="90.104166666666671" IsNewNode="True">
+                    <LayoutItem Id="Dscription" ViewItem="Dscription" Index="0" RelativeSize="8.6705202312138727" IsNewNode="True" />
+                    <LayoutItem Id="Reason" ViewItem="Reason" Index="1" RelativeSize="7.5144508670520231" IsNewNode="True" />
+                    <LayoutItem Id="AcceptanceCriteria" ViewItem="AcceptanceCriteria" Index="2" RelativeSize="7.5144508670520231" IsNewNode="True" />
+                    <LayoutGroup Id="Auto86628c61-1347-46ee-aedc-8f5adc5c955a" ShowCaption="False" Caption="Auto86628c61-1347-46ee-aedc-8f5adc5c955a(16)" Direction="Vertical" Index="3" RelativeSize="76.300578034682076" IsNewNode="True">
+                      <LayoutGroup Id="Autoac15e0eb-eaf2-4995-84ba-c6eb41f47daa" ShowCaption="False" Caption="Autoac15e0eb-eaf2-4995-84ba-c6eb41f47daa(17)" Index="0" RelativeSize="100" Direction="Horizontal" IsNewNode="True">
+                        <LayoutGroup Id="Auto4d6b4c00-d8ac-4445-a983-aedd51d5a753" ShowCaption="False" Caption="" Index="0" RelativeSize="50" IsNewNode="True">
+                          <LayoutItem Id="DeviationFrequency" ViewItem="DeviationFrequency" Index="0" RelativeSize="13.257575757575758" IsNewNode="True" />
+                          <LayoutItem Id="dummy02" ViewItem="dummy02" Index="1" RelativeSize="86.742424242424249" IsNewNode="True" />
+                        </LayoutGroup>
+                        <LayoutGroup Id="Autoe643b796-d984-4fe7-9c58-f73f0bf73c55" ShowCaption="False" Caption="" Index="1" RelativeSize="50" IsNewNode="True">
+                          <LayoutItem Id="DueDate" ViewItem="DueDate" Index="0" RelativeSize="13.257575757575758" IsNewNode="True" />
+                          <LayoutItem Id="CloseDate" ViewItem="CloseDate" Index="1" RelativeSize="86.742424242424249" IsNewNode="True" />
+                        </LayoutGroup>
+                      </LayoutGroup>
+                    </LayoutGroup>
+                  </LayoutGroup>
+                </LayoutGroup>
+                <LayoutItem Id="Dscription" RelativeSize="6.132075471698113" Index="1" Removed="True" />
+                <LayoutItem Id="Reason" RelativeSize="6.132075471698113" Index="2" Removed="True" />
+                <LayoutItem Id="AcceptanceCriteria" RelativeSize="6.132075471698113" Index="3" Removed="True" />
+                <LayoutItem Id="MitigationUser" RelativeSize="6.132075471698113" Removed="True" />
+                <LayoutItem Id="Position" RelativeSize="6.132075471698113" Removed="True" />
+                <LayoutItem Id="RowNumber" RelativeSize="8.49056603773585" Removed="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="DeviationMitigations_col2" RelativeSize="50" Caption="DeviationMitigations_col2" Direction="Horizontal" Removed="True">
+                <LayoutItem Id="CloseDate" Index="0" RelativeSize="8.7264150943396235" Removed="True" />
+                <LayoutItem Id="DueDate" Index="0" RelativeSize="8.7264150943396235" Removed="True" />
+                <LayoutItem Id="dummy01" Index="0" RelativeSize="8.49056603773585" Removed="True" />
+                <LayoutItem Id="dummy02" Index="0" RelativeSize="100" Removed="True" />
+                <LayoutItem Id="DeviationFrequency" Removed="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="DeviationWorkOrders_DetailView">
+      <Items>
+        <ActionContainerViewItem Id="DeviationWorkOrdersAction" ActionContainer="ListView" Caption="DeviationWorkOrdersAction(15)" IsNewNode="True" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="DeviationWorkOrders" RelativeSize="100">
+              <LayoutGroup Id="DeviationWorkOrders_col1" RelativeSize="59.589041095890408">
+                <LayoutItem Id="RowNumber" RelativeSize="7.5" />
+                <LayoutItem Id="DeviationNo" RelativeSize="5.416666666666667" />
+                <LayoutItem Id="DueDate" RelativeSize="87.083333333333329" />
+                <LayoutItem Id="DeviationType" RelativeSize="81.458333333333329" Removed="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="DeviationWorkOrders_col2" RelativeSize="40.410958904109592">
+                <LayoutItem Id="DeviationType" ViewItem="DeviationType" Index="0" RelativeSize="7.708333333333333" IsNewNode="True" />
+                <LayoutItem Id="DeviationStatus" RelativeSize="5.625" Index="1" />
+                <LayoutItem Id="UpdateStatusInfo" RelativeSize="5.416666666666667" Index="1" Removed="True" />
+                <LayoutItem Id="DeviationWorkOrdersAction" ViewItem="DeviationWorkOrdersAction" Index="2" RelativeSize="86.666666666666671" IsNewNode="True" />
+                <LayoutItem Id="CreateStatusInfo" Removed="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="DeviationWorkRequests_DetailView">
+      <Items>
+        <ActionContainerViewItem Id="DeviationWorkRequestsAction" ActionContainer="ListView" Caption="DeviationWorkRequestsAction(15)" IsNewNode="True" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="100">
+            <LayoutGroup Id="DeviationWorkRequests" RelativeSize="100">
+              <LayoutGroup Id="DeviationWorkRequests_col1" RelativeSize="55.708390646492433">
+                <LayoutItem Id="RowNumber" RelativeSize="7.7087794432548176" />
+                <LayoutItem Id="DeviationNo" RelativeSize="5.56745182012848" />
+                <LayoutItem Id="DueDate" RelativeSize="5.7815845824411136" />
+              </LayoutGroup>
+              <LayoutGroup Id="DeviationWorkRequests_col2" RelativeSize="44.291609353507567">
+                <LayoutItem Id="DeviationType" RelativeSize="5.7815845824411136" />
+                <LayoutItem Id="DeviationStatus" RelativeSize="5.7815845824411136" />
+                <LayoutItem Id="DeviationWorkRequestsAction" ViewItem="DeviationWorkRequestsAction" Index="3" RelativeSize="80.728051391862948" IsNewNode="True" />
+              </LayoutGroup>
+            </LayoutGroup>
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <DetailView Id="EqClassProperties_DetailView">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="13.304721030042918">
+            <LayoutGroup Id="EqClassProperties" RelativeSize="100">
+              <LayoutItem Id="BoCode" RelativeSize="51.612903225806448" />
+              <LayoutItem Id="BoName" RelativeSize="48.387096774193552" />
+            </LayoutGroup>
+          </LayoutGroup>
+          <LayoutGroup Id="EqClass_Group" ShowCaption="False" Direction="Horizontal" RelativeSize="86.695278969957087" Caption="Eq Class">
+            <LayoutItem Id="EqClass" RelativeSize="100" Removed="True" />
+          </LayoutGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="EquipmentComponents_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.EquipmentComponents" AllowEdit="False" AllowDelete="False" AllowNew="False" AllowLink="False" AllowUnlink="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="BoCode" PropertyName="BoCode" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="BoFullCode" PropertyName="BoFullCode" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Caption="Equipment Code" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.BoName" PropertyName="Equipment.BoName" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.Area" PropertyName="Equipment.Area" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.Location" PropertyName="Equipment.Location" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.SubLocation" PropertyName="Equipment.SubLocation" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.EqClass" PropertyName="Equipment.EqClass" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.EqGroup" PropertyName="Equipment.EqGroup" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.Criticality" PropertyName="Equipment.Criticality" Index="8" Caption="Equipment Criticality" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.IsActive" PropertyName="Equipment.IsActive" Index="9" Caption="Equipment Active" IsNewNode="True" />
+        <ColumnInfo Id="ComponentFullCode" PropertyName="ComponentFullCode" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="FullCode" PropertyName="FullCode" Width="400" SortIndex="0" SortOrder="Ascending" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="BoName" PropertyName="BoName" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="EqComponentClass" PropertyName="EqComponentClass" Width="70" Index="23" IsNewNode="True" />
+        <ColumnInfo Id="EqComponentGroup" PropertyName="EqComponentGroup" Width="70" Index="24" IsNewNode="True" />
+        <ColumnInfo Id="Legacy" PropertyName="Legacy" Width="70" Index="25" IsNewNode="True" />
+        <ColumnInfo Id="Model" PropertyName="Model" Width="70" Index="26" IsNewNode="True" />
+        <ColumnInfo Id="SerialNo" PropertyName="SerialNo" Width="70" Index="27" IsNewNode="True" />
+        <ColumnInfo Id="Make" PropertyName="Make" Width="70" Index="28" IsNewNode="True" />
+        <ColumnInfo Id="LifeSpan" PropertyName="LifeSpan" Width="70" Index="29" IsNewNode="True" />
+        <ColumnInfo Id="Manufacture" PropertyName="Manufacture" Width="70" Index="30" IsNewNode="True" />
+        <ColumnInfo Id="Remarks" PropertyName="Remarks" Width="70" Index="31" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="32" IsNewNode="True" />
+        <ColumnInfo Id="IsActive" PropertyName="IsActive" Width="50" Index="33" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="IAMonthlyKPIMeasuresDetails_ListView" DataAccessMode="Client" AllowUnlink="False" AllowNew="False" AllowDelete="False" AllowLink="False" />
+    <DetailView Id="ItemMasters_DetailView" AllowNew="False" />
+    <ListView Id="ItemMasters_ListView" AllowNew="False" />
+    <ListView Id="MEMonthlyKPIMeasuresDetails_ListView" AllowDelete="False" AllowLink="False" AllowNew="False" DataAccessMode="Client" />
+    <ListView Id="PMCalenderTemp_ListView" AllowDelete="False" AllowNew="False" DataAccessMode="Client" />
+    <DetailView Id="PMPatches_DetailView" AllowNew="False" AllowEdit="False" AllowDelete="False" />
+    <ListView Id="PMPatches_ListView" AllowNew="False" AllowDelete="False" />
+    <ListView Id="PMScheduleEqComponents_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.PMScheduleEqComponents" AllowDelete="False" AllowLink="False" AllowNew="False" AllowEdit="False" AllowUnlink="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="MasterBoName" PropertyName="PMSchedule.BoName" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponent" PropertyName="EquipmentComponent" Width="400" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="MasterBoFullCode" PropertyName="PMSchedule.BoFullCode" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="EqComponentName" PropertyName="EquipmentComponent.BoName" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="IsActive" PropertyName="IsActive" Width="50" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule" PropertyName="PMSchedule" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule.BoName" PropertyName="PMSchedule.BoName" IsNewNode="True" />
+        <ColumnInfo Id="PMScheduleEquipment" PropertyName="PMScheduleEquipment" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="PMScheduleEquipments_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.PMScheduleEquipments" DataAccessMode="Server" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowNew="False" AllowUnlink="False" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule" PropertyName="PMSchedule" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="400" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="PMFrequencyShortName" PropertyName="PMSchedule.PMFrequency.BoShortName" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="FrequencyIsNested" PropertyName="PMSchedule.IsNested" Width="50" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="MasterBoName" PropertyName="PMSchedule.BoName" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="MasterBoFullCode" PropertyName="PMSchedule.BoName" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="IsActive" PropertyName="IsActive" Width="50" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="IsCombine" PropertyName="IsCombine" Width="50" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule.BoName" PropertyName="PMSchedule.BoName" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <DetailView Id="PurchaseRequestDocStatuses_DetailView" AllowDelete="False" AllowEdit="False" AllowNew="False" />
+    <ListView Id="PurchaseRequestDocStatuses_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.PurchaseRequestDocStatuses" AllowDelete="False" AllowNew="False" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="StatusInfo" PropertyName="StatusInfo" Width="400" SortIndex="0" SortOrder="Ascending" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="DocStatus" PropertyName="DocStatus" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="DocRemarks" PropertyName="DocRemarks" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="IsReverse" PropertyName="IsReverse" Width="50" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="PurchaseRequest" PropertyName="PurchaseRequest" Width="70" Index="4" IsNewNode="True" />
+      </Columns>
+      <Filters CurrentFilterId="Cancelled" IsNewNode="True">
+        <Filter Id="Cancelled" Criteria="[DocStatus] = ##ToString#Cancelled#" IsNewNode="True" />
+      </Filters>
+    </ListView>
+    <DetailView Id="PurchaseRequests_DetailView" AllowNew="False" />
+    <ListView Id="PurchaseRequests_ListView" AllowNew="False">
+      <Columns>
+        <ColumnInfo Id="ContractDoc.DocNum" PropertyName="ContractDoc.DocNum" Caption="Contract No" IsNewNode="True" />
+        <ColumnInfo Id="ContractDoc.EndDate" PropertyName="ContractDoc.EndDate" IsNewNode="True" />
+        <ColumnInfo Id="ContractDoc.StartDate" PropertyName="ContractDoc.StartDate" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="vw_SAP_pr_ListView">
+      <Columns>
+        <ColumnInfo Id="AMSWRNo" Index="1" />
+        <ColumnInfo Id="AMSWONo" Index="2" />
+        <ColumnInfo Id="AMSPG" Index="3" />
+        <ColumnInfo Id="AMSPRNo" Index="4" />
+        <ColumnInfo Id="AMSCardCode" Index="5" />
+        <ColumnInfo Id="AMSCardName" Index="6" />
+        <ColumnInfo Id="AMSPRTotal" Index="7" DisplayFormat="{0:n2}" EditMask="n2" />
+        <ColumnInfo Id="PRNoS" Index="51" />
+        <ColumnInfo Id="CardCode" Index="52" />
+        <ColumnInfo Id="CardName" Index="53" />
+        <ColumnInfo Id="PRDate" Index="54" />
+        <ColumnInfo Id="PRTotal" Index="55" DisplayFormat="{0:n2}" EditMask="n2" />
+        <ColumnInfo Id="PONoS" Index="56" />
+        <ColumnInfo Id="PODate" Index="57" />
+        <ColumnInfo Id="Currency" Index="58" />
+        <ColumnInfo Id="POTotal" Index="59" EditMask="n2" DisplayFormat="{0:n2}" />
+      </Columns>
+    </ListView>
+    <ListView Id="WeeklyTodayAMSMeasure_ListView" AllowDelete="False" AllowNew="False" />
+    <ListView Id="WODeviationList_ListView" DataAccessMode="Client" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <ListView Id="WorkOrderEqComponents_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkOrderEqComponents" AllowUnlink="False" AllowNew="False" AllowLink="False" AllowEdit="False" AllowDelete="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponent" PropertyName="EquipmentComponent" Width="400" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponentName" PropertyName="EquipmentComponent.BoName" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderStatus" PropertyName="WorkOrder.DocStatus" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponent.Criticality" PropertyName="EquipmentComponent.Criticality" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.AssignPlannerGroup" PropertyName="WorkOrder.AssignPlannerGroup" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.CreateDate" PropertyName="WorkOrder.CreateDate" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.CreateUser" PropertyName="WorkOrder.CreateUser" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.DocTarget" PropertyName="WorkOrder.DocTarget" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.Priority" PropertyName="WorkOrder.Priority" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.Remarks" PropertyName="WorkOrder.Remarks" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.WorkRequest.Remarks" PropertyName="WorkOrder.WorkRequest.Remarks" Caption="WR Short Description" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="WorkOrderEquipments_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkOrderEquipments" AllowUnlink="False" AllowNew="False" AllowLink="False" AllowEdit="False" AllowDelete="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="400" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder" PropertyName="WorkOrder" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrderStatus" PropertyName="WorkOrder.DocStatus" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.Criticality" PropertyName="Equipment.Criticality" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.AssignPlannerGroup" PropertyName="WorkOrder.AssignPlannerGroup" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.CreateDate" PropertyName="WorkOrder.CreateDate" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.CreateUser" PropertyName="WorkOrder.CreateUser" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.DocTarget" PropertyName="WorkOrder.DocTarget" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.Priority" PropertyName="WorkOrder.Priority" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.Remarks" PropertyName="WorkOrder.Remarks" IsNewNode="True" />
+        <ColumnInfo Id="WorkOrder.WorkRequest.Remarks" PropertyName="WorkOrder.WorkRequest.Remarks" Caption="WR Short Description" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="WorkOrders_DetailDeviation_ListView">
+      <Columns>
+        <ColumnInfo Id="Company" Index="-1" />
+        <ColumnInfo Id="Component" Index="-1" />
+        <ColumnInfo Id="DeviationDiscipline" Index="-1" />
+        <ColumnInfo Id="Equipment" Index="-1" />
+        <ColumnInfo Id="Location" Index="-1" />
+        <ColumnInfo Id="PlannerGroup" Index="-1" />
+        <ColumnInfo Id="SCECategory" Index="-1" />
+        <ColumnInfo Id="SCESubCategory" Index="-1" />
+        <ColumnInfo Id="WorkOrder" Index="-1" />
+        <ColumnInfo Id="WorkOrderPriority" Index="-1" />
+        <ColumnInfo Id="WorkOrderType" Index="-1" />
+      </Columns>
+    </ListView>
+    <DetailView Id="WorkOrders_DetailView" AllowNew="False">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="50.290135396518373">
+            <TabbedGroup Id="Item1" CaptionLocation="Top" Index="0" RelativeSize="100" IsNewNode="True">
+              <LayoutGroup Id="WorkOrders" ShowCaption="True" Caption="Work Orders" Direction="Horizontal" Index="0" RelativeSize="100" IsNewNode="True">
+                <LayoutGroup Id="WorkOrders_col1" ShowCaption="False" Index="0" RelativeSize="34.581772784019975" IsNewNode="True">
+                  <LayoutItem Id="DocTarget" ViewItem="DocTarget" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                  <LayoutItem Id="WorkRequest" ViewItem="WorkRequest" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="DocNum" ViewItem="DocNum" Index="2" RelativeSize="12.560386473429952" IsNewNode="True" />
+                  <LayoutItem Id="DocDate" ViewItem="DocDate" Index="3" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="Priority" ViewItem="Priority" Index="4" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="Contractor" ViewItem="Contractor" Index="5" RelativeSize="30.917874396135264" IsNewNode="True" />
+                </LayoutGroup>
+                <LayoutGroup Id="WorkOrders_col2" ShowCaption="False" Index="1" RelativeSize="65.418227215980025" IsNewNode="True">
+                  <LayoutItem Id="Remarks" ViewItem="Remarks" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                  <LayoutItem Id="JobStatus" ViewItem="JobStatus" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="AssignPlannerGroup" ViewItem="AssignPlannerGroup" Index="2" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="DocStatus" ViewItem="DocStatus" Index="3" RelativeSize="12.560386473429952" IsNewNode="True" />
+                  <LayoutItem Id="PMPatch" ViewItem="PMPatch" Index="4" RelativeSize="13.043478260869565" IsNewNode="True" />
+                  <LayoutItem Id="IsDeviationApproved" ViewItem="IsDeviationApproved" Index="5" RelativeSize="11.594202898550725" IsNewNode="True" />
+                  <LayoutItem Id="IsDeviationNotApproved" ViewItem="IsDeviationNotApproved" Index="6" RelativeSize="19.323671497584542" IsNewNode="True" />
+                </LayoutGroup>
+              </LayoutGroup>
+              <LayoutGroup Id="Item2" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="1" Caption="WR Information" RelativeSize="100" IsNewNode="True">
+                <LayoutItem Id="WRTargetDate" ViewItem="WRTargetDate" Index="0" RelativeSize="17.8743961352657" IsNewNode="True" />
+                <LayoutItem Id="WRRemarks" ViewItem="WRRemarks" Index="1" RelativeSize="12.560386473429952" IsNewNode="True" />
+                <LayoutItem Id="WRLongDescription" ViewItem="WRLongDescription" Index="2" RelativeSize="69.565217391304344" IsNewNode="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="Item3" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="2" Caption="Work History" RelativeSize="100" IsNewNode="True">
+                <LayoutItem Id="WorkDescription" ViewItem="WorkDescription" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                <LayoutItem Id="DescDetail" ViewItem="DescDetail" Index="1" RelativeSize="82.6086956521739" IsNewNode="True" />
+              </LayoutGroup>
+              <LayoutGroup Id="Item4" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="3" Caption="Planning" RelativeSize="100" IsNewNode="True">
+                <LayoutGroup Id="Autoe6bea667-2167-414f-8afc-58bc8fc48cc6" ShowCaption="False" Caption="Autoe6bea667-2167-414f-8afc-58bc8fc48cc6(25)" Index="0" RelativeSize="100" Direction="Horizontal" IsNewNode="True">
+                  <LayoutGroup Id="Auto967a2728-9261-4c63-b602-f81d12472525" ShowCaption="False" Caption="" Index="0" RelativeSize="50.686641697877654" IsNewNode="True">
+                    <LayoutItem Id="PlanManCount" ViewItem="PlanManCount" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                    <LayoutItem Id="PlanStartDate" ViewItem="PlanStartDate" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ScheduleStartDate" ViewItem="ScheduleStartDate" Index="2" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="RescheduleStartDate" ViewItem="RescheduleStartDate" Index="3" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ActualStartDate" ViewItem="ActualStartDate" Index="4" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ManCount" ViewItem="ManCount" Index="5" RelativeSize="12.560386473429952" IsNewNode="True" />
+                    <LayoutItem Id="OriginalOLAFD" ViewItem="OriginalOLAFD" Index="6" RelativeSize="17.8743961352657" IsNewNode="True" />
+                  </LayoutGroup>
+                  <LayoutGroup Id="Auto4a8e6cba-b529-4dce-b5d6-913bbbe771d1" ShowCaption="False" Caption="" Index="1" RelativeSize="49.313358302122346" IsNewNode="True">
+                    <LayoutItem Id="PlanManHour" ViewItem="PlanManHour" Index="0" RelativeSize="17.391304347826086" IsNewNode="True" />
+                    <LayoutItem Id="PlanEndDate" ViewItem="PlanEndDate" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ScheduleEndDate" ViewItem="ScheduleEndDate" Index="2" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="RescheduleEndDate" ViewItem="RescheduleEndDate" Index="3" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ActualEndDate" ViewItem="ActualEndDate" Index="4" RelativeSize="13.043478260869565" IsNewNode="True" />
+                    <LayoutItem Id="ManHours" ViewItem="ManHours" Index="5" RelativeSize="12.560386473429952" IsNewNode="True" />
+                    <LayoutItem Id="ProposedLAFDValidDate" ViewItem="ProposedLAFDValidDate" Index="6" RelativeSize="17.8743961352657" IsNewNode="True" />
+                  </LayoutGroup>
+                </LayoutGroup>
+              </LayoutGroup>
+              <LayoutGroup Id="Item5" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="4" Caption="Preventive" RelativeSize="100" IsNewNode="True">
+                <LayoutItem Id="PMSchedule" ViewItem="PMSchedule" Index="0" RelativeSize="17.8743961352657" IsNewNode="True" />
+                <LayoutItem Id="PMDate" ViewItem="PMDate" Index="1" RelativeSize="13.043478260869565" IsNewNode="True" />
+                <LayoutItem Id="WorkInstruction" ViewItem="WorkInstruction" Index="2" RelativeSize="12.560386473429952" IsNewNode="True" />
+                <LayoutItem Id="CheckListName" ViewItem="CheckListName" Index="3" RelativeSize="56.521739130434781" IsNewNode="True" />
+              </LayoutGroup>
+            </TabbedGroup>
+            <LayoutGroup Id="WorkOrders" Removed="True" />
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs" RelativeSize="49.709864603481627">
+            <LayoutGroup Id="DetailManHours" RelativeSize="100">
+              <LayoutItem Id="DetailManHours" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailAttachment" RelativeSize="100">
+              <LayoutItem Id="DetailAttachment" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailPhoto" RelativeSize="100">
+              <LayoutItem Id="DetailPhoto" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail" RelativeSize="100">
+              <LayoutItem Id="Detail" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail2" RelativeSize="100">
+              <LayoutItem Id="Detail2" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailRequest" RelativeSize="100">
+              <LayoutItem Id="DetailRequest" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailJobStatus" RelativeSize="100">
+              <LayoutItem Id="DetailJobStatus" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDocStatus" RelativeSize="100">
+              <LayoutItem Id="DetailDocStatus" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDocPG" RelativeSize="100">
+              <LayoutItem Id="DetailDocPG" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDeviation" RelativeSize="100">
+              <LayoutItem Id="DetailDeviation" RelativeSize="100" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="WorkOrders_ListView" AllowNew="False">
+      <Columns>
+        <ColumnInfo Id="WR WorkRequest.WRTargetDate" PropertyName="WorkRequest.WRTargetDate" Caption="WR Target Date" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="WorkOrders_ListView_PM" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkOrders" AllowNew="False" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Approved" PropertyName="Approved" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Cancelled" PropertyName="Cancelled" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckList" PropertyName="CheckList" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckListLink" PropertyName="CheckListLink" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckListName" PropertyName="CheckListName" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DescDetail" PropertyName="DescDetail" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocPassed" PropertyName="DocPassed" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocType" PropertyName="DocType" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsClosed" PropertyName="IsClosed" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsPR" PropertyName="IsPR" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="JobValid" PropertyName="JobValid" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ManHours" PropertyName="ManHours" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="PlanManCount" PropertyName="PlanManCount" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="PlanManHour" PropertyName="PlanManHour" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RefNo" PropertyName="RefNo" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Rejected" PropertyName="Rejected" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WorkDescription" PropertyName="WorkDescription" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest" PropertyName="WorkRequest" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WRLongDescription" PropertyName="WRLongDescription" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WRRemarks" PropertyName="WRRemarks" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocTarget" PropertyName="DocTarget" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="400" SortIndex="0" SortOrder="Ascending" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="DocDate" PropertyName="DocDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="PMDate" PropertyName="PMDate" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="EquipmentName" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Priority" PropertyName="Priority" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="Remarks" PropertyName="Remarks" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="PlanStartDate" PropertyName="PlanStartDate" Width="70" Index="10" IsNewNode="True" />
+        <ColumnInfo Id="PlanEndDate" PropertyName="PlanEndDate" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="ScheduleStartDate" PropertyName="ScheduleStartDate" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="ScheduleEndDate" PropertyName="ScheduleEndDate" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="JobStatus" PropertyName="JobStatus" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkInstruction" PropertyName="WorkInstruction" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="AssignPlannerGroup" PropertyName="AssignPlannerGroup" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule" PropertyName="PMSchedule" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="PMPatch" PropertyName="PMPatch" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="DocStatus" PropertyName="DocStatus" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="Contractor" PropertyName="Contractor" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.WRTargetDate" PropertyName="WorkRequest.WRTargetDate" Caption="WR Target Date" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="WorkOrders_ListView_PMACK" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkOrders" AllowNew="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="Approved" PropertyName="Approved" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Cancelled" PropertyName="Cancelled" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckList" PropertyName="CheckList" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckListLink" PropertyName="CheckListLink" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CheckListName" PropertyName="CheckListName" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DescDetail" PropertyName="DescDetail" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocPassed" PropertyName="DocPassed" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocType" PropertyName="DocType" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsClosed" PropertyName="IsClosed" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="IsPR" PropertyName="IsPR" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="JobValid" PropertyName="JobValid" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ManHours" PropertyName="ManHours" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="PlanManCount" PropertyName="PlanManCount" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="PlanManHour" PropertyName="PlanManHour" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="RefNo" PropertyName="RefNo" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Rejected" PropertyName="Rejected" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WorkDescription" PropertyName="WorkDescription" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest" PropertyName="WorkRequest" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WRLongDescription" PropertyName="WRLongDescription" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="WRRemarks" PropertyName="WRRemarks" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="DocTarget" PropertyName="DocTarget" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="DocNum" PropertyName="DocNum" Width="400" SortIndex="0" SortOrder="Ascending" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="DocDate" PropertyName="DocDate" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="PMDate" PropertyName="PMDate" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="EquipmentName" Width="70" Index="6" IsNewNode="True" />
+        <ColumnInfo Id="Criticality" PropertyName="Criticality" Width="70" Index="7" IsNewNode="True" />
+        <ColumnInfo Id="Priority" PropertyName="Priority" Width="70" Index="8" IsNewNode="True" />
+        <ColumnInfo Id="Remarks" PropertyName="Remarks" Width="70" Index="9" IsNewNode="True" />
+        <ColumnInfo Id="PlanStartDate" PropertyName="PlanStartDate" Width="70" Index="10" IsNewNode="True" />
+        <ColumnInfo Id="PlanEndDate" PropertyName="PlanEndDate" Width="70" Index="11" IsNewNode="True" />
+        <ColumnInfo Id="ScheduleStartDate" PropertyName="ScheduleStartDate" Width="70" Index="12" IsNewNode="True" />
+        <ColumnInfo Id="ScheduleEndDate" PropertyName="ScheduleEndDate" Width="70" Index="13" IsNewNode="True" />
+        <ColumnInfo Id="JobStatus" PropertyName="JobStatus" Width="70" Index="14" IsNewNode="True" />
+        <ColumnInfo Id="WorkInstruction" PropertyName="WorkInstruction" Width="70" Index="15" IsNewNode="True" />
+        <ColumnInfo Id="AssignPlannerGroup" PropertyName="AssignPlannerGroup" Width="70" Index="16" IsNewNode="True" />
+        <ColumnInfo Id="PMSchedule" PropertyName="PMSchedule" Width="70" Index="17" IsNewNode="True" />
+        <ColumnInfo Id="PMPatch" PropertyName="PMPatch" Width="70" Index="20" IsNewNode="True" />
+        <ColumnInfo Id="DocStatus" PropertyName="DocStatus" Width="70" Index="21" IsNewNode="True" />
+        <ColumnInfo Id="Contractor" PropertyName="Contractor" Width="70" Index="22" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.WRTargetDate" PropertyName="WorkRequest.WRTargetDate" Caption="WR Target Date" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <DetailView Id="WorkRequestDocStatuses_DetailView" AllowDelete="False" AllowEdit="False" AllowNew="False" />
+    <ListView Id="WorkRequestDocStatuses_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkRequestDocStatuses" AllowDelete="False" AllowNew="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="StatusInfo" PropertyName="StatusInfo" Width="400" SortIndex="0" SortOrder="Ascending" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="DocStatus" PropertyName="DocStatus" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="DocRemarks" PropertyName="DocRemarks" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="IsReverse" PropertyName="IsReverse" Width="50" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest" PropertyName="WorkRequest" Width="70" Index="4" IsNewNode="True" />
+      </Columns>
+      <Filters CurrentFilterId="Cancelled" IsNewNode="True">
+        <Filter Id="Cancelled" Criteria="[DocStatus] = ##ToString#Cancelled#" IsNewNode="True" />
+      </Filters>
+    </ListView>
+    <ListView Id="WorkRequestEqComponents_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkRequestEqComponents" AllowUnlink="False" AllowNew="False" AllowLink="False" AllowEdit="False" AllowDelete="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="70" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="400" SortIndex="0" SortOrder="Ascending" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponent" PropertyName="EquipmentComponent" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponentName" PropertyName="EquipmentComponent.BoName" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest" PropertyName="WorkRequest" Width="70" Index="4" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequestStatus" PropertyName="WorkRequest.DocStatus" Width="70" Index="5" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentComponent.Criticality" PropertyName="EquipmentComponent.Criticality" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.CreateDate" PropertyName="WorkRequest.CreateDate" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.CreateUser" PropertyName="WorkRequest.CreateUser" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.PlannerGroup" PropertyName="WorkRequest.PlannerGroup" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.Priority" PropertyName="WorkRequest.Priority" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.Remarks" PropertyName="WorkRequest.Remarks" Caption="WR Short Description" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="WorkRequestEquipments_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.WorkRequestEquipments" AllowUnlink="False" AllowNew="False" AllowLink="False" AllowEdit="False" AllowDelete="False" DataAccessMode="Server" IsNewNode="True">
+      <Columns IsNewNode="True">
+        <ColumnInfo Id="CreateDate" PropertyName="CreateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="CreateUser" PropertyName="CreateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="ID" PropertyName="ID" Width="50" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateDate" PropertyName="UpdateDate" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="UpdateUser" PropertyName="UpdateUser" Width="70" Index="-1" IsNewNode="True" />
+        <ColumnInfo Id="Equipment" PropertyName="Equipment" Width="400" Index="0" IsNewNode="True" />
+        <ColumnInfo Id="EquipmentName" PropertyName="Equipment.BoName" Width="70" Index="1" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest" PropertyName="WorkRequest" Width="70" Index="2" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequestStatus" PropertyName="WorkRequest.DocStatus" Width="70" Index="3" IsNewNode="True" />
+        <ColumnInfo Id="Equipment.Criticality" PropertyName="Equipment.Criticality" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.CreateDate" PropertyName="WorkRequest.CreateDate" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.CreateUser" PropertyName="WorkRequest.CreateUser" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.PlannerGroup" PropertyName="WorkRequest.PlannerGroup" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.Priority" PropertyName="WorkRequest.Priority" IsNewNode="True" />
+        <ColumnInfo Id="WorkRequest.Remarks" PropertyName="WorkRequest.Remarks" Caption="WR Short Description" IsNewNode="True" />
+      </Columns>
+    </ListView>
+    <DetailView Id="WorkRequests_DetailView" AllowNew="False">
+      <Layout>
+        <LayoutGroup Id="Main" RelativeSize="100">
+          <LayoutGroup Id="SimpleEditors" RelativeSize="37.959866220735783">
+            <TabbedGroup Id="Item1" CaptionLocation="Top" Index="0" RelativeSize="100" IsNewNode="True">
+              <LayoutGroup Id="WorkRequests" ShowCaption="True" Caption="Work Requests" Direction="Horizontal" Index="0" RelativeSize="100" IsNewNode="True">
+                <LayoutGroup Id="WorkRequests_col1" ShowCaption="False" Index="0" RelativeSize="45.664739884393065" IsNewNode="True">
+                  <LayoutItem Id="DocNum" ViewItem="DocNum" Index="0" RelativeSize="20.689655172413794" IsNewNode="True" />
+                  <LayoutItem Id="DocDate" ViewItem="DocDate" Index="1" RelativeSize="15.517241379310345" IsNewNode="True" />
+                  <LayoutItem Id="WRTargetDate" ViewItem="WRTargetDate" Index="2" RelativeSize="15.517241379310345" IsNewNode="True" />
+                  <LayoutItem Id="Remarks" ViewItem="Remarks" Index="3" RelativeSize="48.275862068965516" IsNewNode="True" />
+                </LayoutGroup>
+                <LayoutGroup Id="WorkRequests_col2" ShowCaption="False" Index="1" RelativeSize="54.335260115606935" IsNewNode="True">
+                  <LayoutItem Id="RefNo" ViewItem="RefNo" Index="0" RelativeSize="20.689655172413794" IsNewNode="True" />
+                  <LayoutItem Id="PlannerGroup" ViewItem="PlannerGroup" Index="1" RelativeSize="15.517241379310345" IsNewNode="True" />
+                  <LayoutItem Id="Priority" ViewItem="Priority" Index="2" RelativeSize="15.517241379310345" IsNewNode="True" />
+                  <LayoutItem Id="DocStatus" ViewItem="DocStatus" Index="3" RelativeSize="14.942528735632184" IsNewNode="True" />
+                  <LayoutItem Id="IsDeviationApproved" ViewItem="IsDeviationApproved" Index="4" RelativeSize="13.793103448275861" IsNewNode="True" />
+                  <LayoutItem Id="IsDeviationNotApproved" ViewItem="IsDeviationNotApproved" Index="5" RelativeSize="19.540229885057471" IsNewNode="True" />
+                </LayoutGroup>
+              </LayoutGroup>
+              <LayoutGroup Id="Item2" ShowCaption="True" CaptionLocation="Top" Direction="Vertical" Index="1" Caption="Description" RelativeSize="100" IsNewNode="True">
+                <LayoutItem Id="DetailDescription" ViewItem="DetailDescription" Index="0" RelativeSize="20.689655172413794" IsNewNode="True" />
+                <LayoutItem Id="DescDetail" ViewItem="DescDetail" Index="1" RelativeSize="79.3103448275862" IsNewNode="True" />
+              </LayoutGroup>
+            </TabbedGroup>
+            <LayoutGroup Id="WorkRequests" Removed="True" />
+          </LayoutGroup>
+          <TabbedGroup Id="Tabs" RelativeSize="62.040133779264217">
+            <LayoutGroup Id="Detail" RelativeSize="100">
+              <LayoutItem Id="Detail" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail2" RelativeSize="100">
+              <LayoutItem Id="Detail2" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="Detail3" RelativeSize="100">
+              <LayoutItem Id="Detail3" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailAttachment" RelativeSize="100">
+              <LayoutItem Id="DetailAttachment" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailPhoto" RelativeSize="100">
+              <LayoutItem Id="DetailPhoto" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDocStatus" RelativeSize="100">
+              <LayoutItem Id="DetailDocStatus" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDocPG" RelativeSize="100">
+              <LayoutItem Id="DetailDocPG" RelativeSize="100" />
+            </LayoutGroup>
+            <LayoutGroup Id="DetailDeviation" RelativeSize="100">
+              <LayoutItem Id="DetailDeviation" RelativeSize="100" />
+            </LayoutGroup>
+          </TabbedGroup>
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="WorkRequests_ListView" AllowNew="False" />
+    <ListView Id="WRDeviationList_ListView" DataAccessMode="Client" AllowDelete="False" AllowLink="False" AllowNew="False" />
+    <ListView Id="WRWOFullStatus_ListView" AllowNew="False" AllowDelete="False" DataAccessMode="Client" />
+  </Views>
+</Application>

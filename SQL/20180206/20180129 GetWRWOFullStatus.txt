@@ -1,0 +1,235 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWRWOFullStatus]    Script Date: 02/02/2018 5:25:57 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+create proc [dbo].[GetWRWOFullStatus]
+
+@DocDataFrom DateTime,
+@DocDataTo DateTime
+
+AS
+
+begin
+
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+	  ID int,
+	  TodayDate datetime, 
+	  WRNo nvarchar(50),
+	  WRDate datetime,
+	  EquipmentCode nvarchar(50),
+	  EquipmentName nvarchar(255),
+	  EqCritical nvarchar(50),
+	  ComponentCode nvarchar(50),
+	  ComponentName nvarchar(255),
+	  ComCritical nvarchar(50),
+	  WRStatus nvarchar(50),
+	  WONo nvarchar(50),
+	  WODate datetime,
+	  WOType nvarchar(50),
+	  WORemarks nvarchar(500),
+	  PlannerGroup nvarchar(50),
+	  WOStatus nvarchar(50),
+	  WOJobStatus nvarchar(50),
+	  WOApproveDate datetime,
+	  PRID integer,
+	  PRNo nvarchar(50),
+	  PRDate datetime,
+	  PRStatus nvarchar(50),
+	  PRAmount numeric(20,6)
+
+	)
+
+	declare @today datetime
+	select @today = CONVERT (date, GETDATE())
+
+	insert into @newtable
+	( ID,
+	  TodayDate, 
+	  WRNo,
+	  WRDate,
+	  EquipmentCode,
+	  EquipmentName,
+	  EqCritical,
+	  ComponentCode,
+	  ComponentName,
+	  ComCritical,
+	  WRStatus,
+	  WONo,
+	  WODate,
+	  WOType,
+	  WORemarks,
+	  PlannerGroup,
+	  WOStatus,
+	  WOJobStatus,
+	  WOApproveDate,
+	  PRID,
+	  PRNo,
+	  PRDate,
+	  PRStatus,
+	  PRAmount )
+	select 0
+	, @today
+	, T0.DocNum
+	, T0.DocDate
+	,(case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T8.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T8.BoCode end)
+	,T8.BoName
+	, Criticalities.BoName
+	,(case when isnull(T9.ID,0) > 0 then isnull(EqComponentClasses.BoShortName,'') + T9.BoCode else '' end)
+	,T9.BoName
+	, ComCriticalities.BoName
+	,(case when T0.DocPassed = 1 then 'DocPassed' when T0.Approved = 1 then 'Approved' when T0.Cancelled = 1 then 'Cancelled' when T0.Rejected = 1 then 'Rejected' when T0.ID is null then '' else 'Create' end) 
+	,T1.DocNum
+	, T1.DocDate
+	, (case when T1.IsPreventiveMaintenance = 1 then 'PM Work Order' else 'CM Work Order' end)
+	,T1.Remarks
+	, PlannerGroups.BoName
+	,(case when T1.DocPassed = 1 then 'DocPassed' when T1.Approved = 1 then 'Approved' when T1.Cancelled = 1 then 'Cancelled' when T1.Rejected = 1 then 'Rejected' when T1.ID is null then '' else 'Create' end) 
+	, T12.BoName
+	,WorkOrderDocStatuses.CreateDate
+	, isnull(T2.ID,0)
+	, T2.DocNum
+	, T2.DocDate
+	,(case when T2.DocPassed = 1 then 'DocPassed' when T2.Approved = 1 then 'Approved' when T2.Cancelled = 1 then 'Cancelled' when T2.Rejected = 1 then 'Rejected' when T2.ID is null then '' else 'Create' end)
+	, 0
+	from WorkRequests T0
+	inner join WorkRequestEquipments T10 on T0.ID = T10.WorkRequest_ID
+	inner join Equipments T8 on T8.ID = T10.Equipment_ID
+	inner join Areas on Areas.ID = T8.Area_ID
+	inner join Locations on Locations.ID = T8.Location_ID
+	inner join SubLocations on SubLocations.ID = T8.SubLocation_ID
+	inner join EqClasses on EqClasses.ID = T8.EqClass_ID
+	inner join Criticalities on Criticalities.ID = T8.Criticality_ID
+	left join WorkRequestEqComponents T11 on T0.ID = T11.WorkRequest_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join EqComponentClasses on T9.EqComponentClass_ID = EqComponentClasses.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID
+	left join WorkOrders T1 on T0.ID = T1.WorkRequest_ID
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	left join WorkOrderDocStatuses on T1.ID = WorkOrderDocStatuses.WorkOrder_ID and WorkOrderDocStatuses.IsReverse = 0 and WorkOrderDocStatuses.DocStatus = 2
+	left join JobStatuses T12 on T1.JobStatus_ID = T12.ID
+	left join PurchaseRequests T2 on T2.WorkOrder_ID = T1.ID and T2.Cancelled = 0
+	where T0.DocDate >= @DocDataFrom and T0.DocDate <= @DocDataTo
+
+	insert into @newtable
+	( 
+	  ID,
+	  TodayDate, 
+	  WRNo,
+	  WRDate,
+	  EquipmentCode,
+	  EquipmentName,
+	  EqCritical,
+	  ComponentCode,
+	  ComponentName,
+	  ComCritical,
+	  WRStatus,
+	  WONo,
+	  WODate,
+	  WOType,
+	  WORemarks,
+	  PlannerGroup,
+	  WOStatus,
+	  WOJobStatus,
+	  WOApproveDate,
+	  PRID,
+	  PRNo,
+	  PRDate,
+	  PRStatus,
+	  PRAmount )
+	select 0
+	, @today
+	, ''
+	, null
+	,(case when SubLocations.BoShortName = '' then Areas.BoShortName + '-' + Locations.BoShortName + '-' + EqClasses.BoShortName + '-' + T8.BoCode else Areas.BoShortName + '-' + Locations.BoShortName + '-' + SubLocations.BoShortName + '-' + EqClasses.BoShortName + '' + T8.BoCode end)
+	,T8.BoName
+	, Criticalities.BoName
+	,(case when isnull(T9.ID,0) > 0 then isnull(EqComponentClasses.BoShortName,'') + T9.BoCode else '' end)
+	,T9.BoName
+	, ComCriticalities.BoName
+	,''
+	,T1.DocNum
+	, T1.DocDate
+	, (case when T1.IsPreventiveMaintenance = 1 then 'PM Work Order' else 'CM Work Order' end)
+	,T1.Remarks
+	, PlannerGroups.BoName
+	,(case when T1.DocPassed = 1 then 'DocPassed' when T1.Approved = 1 then 'Approved' when T1.Cancelled = 1 then 'Cancelled' when T1.Rejected = 1 then 'Rejected' when T1.ID is null then '' else 'Create' end) 
+	, T12.BoName
+	,WorkOrderDocStatuses.CreateDate
+	, isnull(T2.ID,0)
+	, T2.DocNum
+	, T2.DocDate
+	,(case when T2.DocPassed = 1 then 'DocPassed' when T2.Approved = 1 then 'Approved' when T2.Cancelled = 1 then 'Cancelled' when T2.Rejected = 1 then 'Rejected' when T2.ID is null then '' else 'Create' end)
+	, 0
+	from WorkOrders T1
+	inner join WorkOrderEquipments T10 on T1.ID = T10.WorkOrder_ID
+	inner join Equipments T8 on T8.ID = T10.Equipment_ID
+	inner join Areas on Areas.ID = T8.Area_ID
+	inner join Locations on Locations.ID = T8.Location_ID
+	inner join SubLocations on SubLocations.ID = T8.SubLocation_ID
+	inner join EqClasses on EqClasses.ID = T8.EqClass_ID
+	inner join Criticalities on Criticalities.ID = T8.Criticality_ID
+	left join WorkOrderEqComponents T11 on T1.ID = T11.WorkOrder_ID and T10.Equipment_ID = T11.Equipment_ID
+	left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+	left join EqComponentClasses on T9.EqComponentClass_ID = EqComponentClasses.ID
+	left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID
+	left join PlannerGroups on T1.AssignPlannerGroup_ID = PlannerGroups.ID
+	left join WorkOrderDocStatuses on T1.ID = WorkOrderDocStatuses.WorkOrder_ID and WorkOrderDocStatuses.IsReverse = 0 and WorkOrderDocStatuses.DocStatus = 2
+	left join JobStatuses T12 on T1.JobStatus_ID = T12.ID
+	left join PurchaseRequests T2 on T2.WorkOrder_ID = T1.ID and T2.Cancelled = 0
+	where T1.IsPreventiveMaintenance = 1
+	and T1.DocDate >= @DocDataFrom and T1.DocDate <= @DocDataTo
+
+
+	update T
+	set T.PRAmount = S.amt
+	from @newtable T inner join (select PurchaseRequest_ID, sum(Price * QTY) as amt from PurchaseRequestDtls group by PurchaseRequest_ID) S on T.PRID = S.PurchaseRequest_ID
+
+	declare @id int
+	set @id = 0
+	UPDATE @newtable SET @id = ID = @id + 1
+
+	  select ID,
+	  TodayDate, 
+	  WRNo,
+	  WRDate,
+	  EquipmentCode,
+	  EquipmentName,
+	  EqCritical,
+	  ComponentCode,
+	  ComponentName,
+	  ComCritical,
+	  WRStatus,
+	  WONo,
+	  WODate,
+	  WOType,
+	  WORemarks,
+	  PlannerGroup,
+	  WOStatus,
+	  WOJobStatus,
+	  WOApproveDate,
+	  PRID,
+	  PRNo,
+	  PRDate,
+	  PRStatus,
+	  PRAmount
+	  from @newtable
+
+end
+
+

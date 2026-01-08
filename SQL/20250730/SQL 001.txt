@@ -1,0 +1,147 @@
+insert into DocTypes
+( BoCode, BoName, NextBoNo )
+select 'DE', 'Deviation', 0
+go
+
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationUser', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationManager', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationApprover', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationReopen', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationReviewer', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationApprover-R1', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationApprover-R2', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationApprover-R3', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+insert into PermissionPolicyRoleBases
+( [Name], IsAdministrative, CanEditModel, PermissionPolicy, IsAllowPermissionPriority, Discriminator )
+select 'DeviationApprover-R4', 0, 0, 0, 0, 'PermissionPolicyRole'
+go
+
+
+
+
+insert into PermissionPolicyTypePermissionObjects
+( TargetTypeFullName, ReadState, WriteState, CreateState, DeleteState, Role_ID )
+select 'AssetsManagementEF.Module.BusinessObjects.Deviation2025', 1, 1, 1, 1, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationAttachments', 1, 1, 1, 1, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationDiscipline', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationLocations', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationTypes', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationMitigations', 1, 1, 1, 1, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationReviewers', 1, 1, 1, 1, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationDocStatus', 1, 1, 1, 1, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.RiskAssets', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.RiskCommunities', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.RiskPeoples', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.Risks', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.RiskEnvironments', 1, 0, 0, 0, 1
+union all
+select 'AssetsManagementEF.Module.BusinessObjects.DeviationFrequencies', 1, 0, 0, 0, 1
+go
+
+
+
+
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationUser'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation Setup' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationManager'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation/Items/Deviation2025_ListView_App' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationApprover'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation/Items/Deviation2025_ListView_PendingApp' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationApprover'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation/Items/Deviation2025_ListView_Appext' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationApprover'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation/Items/Deviation2025_ListView_UnderReview' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationReviewer'
+go
+
+insert into PermissionPolicyNavigationPermissionObjects
+(ItemPath, NavigateState, Role_ID)
+select 'Application/NavigationItems/Items/Deviation/Items/Deviation2025_ListView_UnderReview_Done' 
+, 1
+, T0.ID
+from PermissionPolicyRoleBases T0
+where T0.Name = 'DeviationReviewer'
+go
+
+
+
+

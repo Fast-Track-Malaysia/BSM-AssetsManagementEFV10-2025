@@ -1,0 +1,105 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetOpenPRStatus]    Script Date: 23/01/2018 2:02:16 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER proc [dbo].[GetOpenPRStatus]
+
+@myplannergroup nvarchar(50)
+
+AS
+
+begin
+
+	declare @PRID int = 0
+	declare @PRDTLID int = 0
+	declare @PRNo nvarchar(50) = '', @WONo nvarchar(50) = '', @UserFullName nvarchar(50) = ''
+	declare @Requested int = 0
+	declare @PRCreated int = 0
+	declare @PRRejected int = 0
+	declare @POCreated int = 0
+	declare @ItemCode nvarchar(50) = '', @ItemDesc nvarchar(255) = ''
+	DECLARE @newtable TABLE
+	(
+	  PGGroup nvarchar(50), 
+	  PRNo nvarchar(50), 
+	  WONo nvarchar(50), 
+	  UserFullName nvarchar(50), 
+	  Requested int, 
+	  PRCreated int, 
+	  POCreated int, 
+	  PRRejected int,
+	  ItemCode nvarchar(50),
+	  ItemDesc nvarchar(255)
+	)
+
+	--select @PRNo as PRNo, 
+	--@WONo as WONo, 
+	--@UserFullName as serFullName, 
+	--@POCreated as POCreated, 
+	--@PRRejected as PRRejected
+	--into #newtable
+
+	declare prtable cursor for
+	select T0.DocNum as PRNo, T1.DocNum as WONo, T2.FullName as UserFullName, T0.ID, T4.ID, T5.BoCode, T4.ItemDesc, T4.QTY
+	from PurchaseRequests T0 inner join WorkOrders T1 on T0.WorkOrder_ID = T1.ID
+	inner join PermissionPolicyUsers T2 on T0.CreateUser_ID = T2.ID
+	inner join PlannerGroups T3 on T0.PlannerGroup_ID = T3.ID
+	inner join PurchaseRequestDtls T4 on T0.ID = T4.PurchaseRequest_ID
+	inner join ItemMasters T5 on T4.ItemMaster_ID = T5.ID
+	where T0.DocPosted = 1 and T1.Approved = 1 and
+	(T3.BoCode = @myplannergroup or @myplannergroup = '')
+
+	OPEN prtable
+
+	FETCH NEXT FROM prtable   
+	INTO @PRNo, @WONo, @UserFullName, @PRID, @PRDTLID, @ItemCode, @ItemDesc, @Requested
+	WHILE @@FETCH_STATUS = 0  
+	begin
+		select @PRCreated = 0
+		select @POCreated = 0
+		select @PRRejected = 0
+
+		select @PRCreated = count(T11.Quantity)
+		from PurchaseRequests T0 inner join PurchaseRequestDtls T1 on T0.ID = T1.PurchaseRequest_ID and T0.ID = @PRID and T1.ID = @PRDTLID
+		inner join [BSM_SIT]..[OPRQ] T10 on T10.U_FT_AMS_PR = 'Y' and T10.U_FT_AMS_PRNo collate database_default = CONVERT(nvarchar,T0.DocNum) collate database_default
+		inner join [BSM_SIT]..[PRQ1] T11 on T10.DocEntry = T11.DocEntry and T11.U_FT_AMS_PRLINEID = T1.ID
+
+		select @POCreated = count(T12.Quantity)
+		from PurchaseRequests T0 inner join PurchaseRequestDtls T1 on T0.ID = T1.PurchaseRequest_ID and T0.ID = @PRID and T1.ID = @PRDTLID
+		inner join [BSM_SIT]..[OPRQ] T10 on T10.U_FT_AMS_PR = 'Y' and T10.U_FT_AMS_PRNo collate database_default = CONVERT(nvarchar,T0.DocNum) collate database_default
+		inner join [BSM_SIT]..[PRQ1] T11 on T10.DocEntry = T11.DocEntry and T11.U_FT_AMS_PRLINEID = T1.ID
+		left join [BSM_SIT]..[POR1] T12 on T12.BaseType = 1470000113 and T11.DocEntry = T12.BaseEntry and T11.LineNum = T12.BaseLine
+
+		select @PRRejected = count(T11.Quantity)
+		from PurchaseRequests T0 inner join PurchaseRequestDtls T1 on T0.ID = T1.PurchaseRequest_ID and T0.ID = @PRID and T1.ID = @PRDTLID
+		inner join [BSM_SIT]..[OPRQ] T10 on T10.U_FT_AMS_PR = 'Y' and T10.CANCELED = 'Y' and T10.U_FT_AMS_PRNo collate database_default = CONVERT(nvarchar,T0.DocNum) collate database_default
+		inner join [BSM_SIT]..[PRQ1] T11 on T10.DocEntry = T11.DocEntry and T11.U_FT_AMS_PRLINEID = T1.ID
+
+		insert into @newtable
+		( PRNo, WONo, UserFullName, Requested, PRCreated, POCreated, PRRejected, ItemCode, ItemDesc)
+		select @PRNo, @WONo, @UserFullName, @Requested, @PRCreated, @POCreated, @PRRejected, @ItemCode, @ItemDesc
+		
+		FETCH NEXT FROM prtable   
+		INTO @PRNo, @WONo, @UserFullName, @PRID, @PRDTLID, @ItemCode, @ItemDesc, @Requested
+	end
+	CLOSE prtable
+	DEALLOCATE prtable
+
+	select @myplannergroup as PGGroup,
+	PRNo, 
+	WONo, 
+	UserFullName, 
+	Requested, 
+	PRCreated,
+	POCreated, 
+	PRRejected,
+	ItemCode,
+	ItemDesc
+	from @newtable
+
+end

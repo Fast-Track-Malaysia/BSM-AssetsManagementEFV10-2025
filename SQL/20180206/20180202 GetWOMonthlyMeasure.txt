@@ -1,0 +1,97 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWOPRCntByEquipmentGroup]    Script Date: 02/02/2018 12:28:00 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+create proc [dbo].[GetWOMonthlyMeasure]
+
+@WODataFrom DateTime,
+@WODataTo DateTime
+
+AS
+
+begin
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10), 
+	  PG01 int, 
+	  PG02 int,
+	  PG03 int,
+	  PG04 int
+	)
+
+	declare @id int
+	declare @analysisname nvarchar(200)
+	declare @analysisremarks nvarchar(10)
+
+	set @id = 1
+	set @analysisname = 'PM Compliance'
+	set @analysisremarks = '>85%'
+
+	insert into @newtable
+	select @id, @analysisname, @analysisremarks
+	, sum((case when T11.BoCode = 'PG01' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG02' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG03' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+	on T0.ID = T1.WorkOrder_ID
+	where T0.IsClosed = 1 and
+	T0.IsPreventiveMaintenance = 1 and
+	datediff (dd, T0.DocDate, T1.CreateDate) <= 30
+	
+	set @id = 2
+	set @analysisname = 'CM Compliance'
+	set @analysisremarks = '>85%'
+
+	insert into @newtable
+	select @id, @analysisname, @analysisremarks
+	, sum((case when T11.BoCode = 'PG01' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG02' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG03' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+	on T0.ID = T1.WorkOrder_ID
+	where T0.IsClosed = 1 and
+	T0.IsPreventiveMaintenance = 0 and
+	datediff (dd, T0.DocDate, T1.CreateDate) <= 30	 
+
+
+	set @id = 3
+	set @analysisname = 'Schedule Compliance'
+	set @analysisremarks = '>70%'
+
+	insert into @newtable
+	select @id, @analysisname, @analysisremarks
+	, sum((case when T11.BoCode = 'PG01' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG02' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG03' then 1 else 0 end))
+	, sum((case when T11.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+	inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+	on T0.ID = T1.WorkOrder_ID
+	where T0.IsClosed = 1 and
+	T1.CreateDate <= T0.ScheduleEndDate	 
+
+	select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04
+	from @newtable
+end
+

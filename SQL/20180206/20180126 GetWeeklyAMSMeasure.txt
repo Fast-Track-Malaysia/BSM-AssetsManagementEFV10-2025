@@ -1,0 +1,271 @@
+USE [AssetsManagementEF]
+GO
+/****** Object:  StoredProcedure [dbo].[GetWeeklyAMSMeasure]    Script Date: 26/01/2018 3:18:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+create proc [dbo].[GetWeeklyAMSMeasure]
+
+@myyear int,
+@mymonth int
+
+AS
+
+begin
+	declare @id int
+	declare @tolerentday int
+	declare @AnalysisName nvarchar(255)
+	declare @AnalysisRemarks nvarchar(255)
+	declare @today datetime
+	select @today = CONVERT (date, GETDATE())
+	
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(max), 
+	  AnalysisRemarks nvarchar(max), 
+	  W1PG01 int, 
+	  W1PG02 int,
+	  W1PG03 int,
+	  W1PG04 int,
+	  W2PG01 int, 
+	  W2PG02 int,
+	  W2PG03 int,
+	  W2PG04 int,
+	  W3PG01 int, 
+	  W3PG02 int,
+	  W3PG03 int,
+	  W3PG04 int,
+	  W4PG01 int, 
+	  W4PG02 int,
+	  W4PG03 int,
+	  W4PG04 int
+	)
+
+
+	select @tolerentday = 2
+	select @id = 1
+	select @AnalysisName = 'Open WR'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	where T0.DocPassed = 0 and T0.Rejected = 0 and T0.Cancelled = 0
+	and year(T0.DocDate) = @myyear and month(T0.DocDate) = @mymonth
+	and DATEDIFF(dd, T0.DocDate, @today) > @tolerentday
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+	end
+
+	select @tolerentday = 2
+	select @id = 2
+	select @AnalysisName = 'WR Request pending for approval'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	from WorkRequests T0 inner join PlannerGroups T1 on T0.PlannerGroup_ID = T1.ID
+	where T0.DocPassed = 1 and T0.Rejected = 0 and T0.Cancelled = 0
+	and year(T0.DocDate) = @myyear and month(T0.DocDate) = @mymonth
+	and DATEDIFF(dd, T0.DocDate, @today) > @tolerentday
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+	end
+
+
+
+	select @tolerentday = 2
+	select @id = 3
+	select @AnalysisName = 'Work Order pending for approval'
+	select @AnalysisRemarks = '>2 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	where T0.DocPassed = 1 and T0.Rejected = 0 and T0.Cancelled = 0 and T0.IsClosed = 0
+	and year(T0.DocDate) = @myyear and month(T0.DocDate) = @mymonth
+	and DATEDIFF(dd, T0.DocDate, @today) > @tolerentday
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+	end
+
+
+
+	select @tolerentday = 7
+	select @id = 4
+	select @AnalysisName = 'PR pending for approval'
+	select @AnalysisRemarks = '>7 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	inner join [BSM_SIT]..OPRQ T10 on T10.U_FT_AMS_PR = 'Y' and T10.WddStatus not in ('Y', 'N') and T2.DocNum collate database_default = T10.U_FT_AMS_PRNo
+	where T0.Approved = 1 and T0.Rejected = 0 and T0.Cancelled = 0 and T0.IsClosed = 0
+	and year(T10.DocDate) = @myyear and month(T10.DocDate) = @mymonth
+	and DATEDIFF(dd, T10.DocDate, @today) > @tolerentday
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+	end
+
+
+
+	select @tolerentday = 21
+	select @id = 5
+	select @AnalysisName = 'Approved PR without PO'
+	select @AnalysisRemarks = '>21 days'
+	insert into @newtable
+	select @id, @AnalysisName, @AnalysisRemarks
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) <= 7 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 7 and day(T0.DocDate) <= 14 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 14 and day(T0.DocDate) <= 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG01' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG02' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG03' then 1 else 0 end))
+	,sum((case when day(T0.DocDate) > 21 and T1.BoCode = 'PG04' then 1 else 0 end))
+	from WorkOrders T0 inner join PlannerGroups T1 on T0.AssignPlannerGroup_ID = T1.ID
+	inner join PurchaseRequests T2 on T0.ID = T2.WorkOrder_ID
+	inner join [BSM_SIT]..OPRQ T10 on T10.U_FT_AMS_PR = 'Y' and T10.WddStatus in ('Y') and T2.DocNum collate database_default = T10.U_FT_AMS_PRNo
+	left join [BSM_SIT]..POR1 T11 on T11.BaseType = 1470000113 and T10.DocEntry = T11.BaseEntry
+	where T11.LineNum is null and
+	T0.Approved = 1 and T0.Rejected = 0 and T0.Cancelled = 0 and T0.IsClosed = 0
+	and year(T10.DocDate) = @myyear and month(T10.DocDate) = @mymonth
+	and DATEDIFF(dd, T10.DocDate, @today) > @tolerentday
+
+	if not exists(select 1 from @newtable where ID = @id)
+	begin
+		insert into @newtable
+		select @id, @AnalysisName, @AnalysisRemarks
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+		,0,0,0,0
+	end
+
+
+
+	select ID, AnalysisName, AnalysisRemarks,
+	  W1PG01, 
+	  W1PG02,
+	  W1PG03,
+	  W1PG04,
+	  W2PG01, 
+	  W2PG02,
+	  W2PG03,
+	  W2PG04,
+	  W3PG01, 
+	  W3PG02,
+	  W3PG03,
+	  W3PG04,
+	  W4PG01, 
+	  W4PG02,
+	  W4PG03,
+	  W4PG04 
+	from @newtable
+
+end
+
+

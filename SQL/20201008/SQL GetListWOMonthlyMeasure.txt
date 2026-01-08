@@ -1,0 +1,192 @@
+
+/****** Object:  StoredProcedure [dbo].[GetListWOMonthlyMeasure]    Script Date: 15/12/2020 3:43:01 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+create proc [dbo].[GetListWOMonthlyMeasure]
+
+@WODateFrom DateTime,
+@WODateTo DateTime
+
+AS
+
+begin
+	-- ME Monthly KPI measures
+	--Create = 0,
+    --DocPassed = 1,
+    --Approved = 2,
+    --Cancelled = 3,
+    --Rejected = 4,
+    --Closed = 5,
+    --Active = 6,
+    --Posted = 7
+
+	DECLARE @newtable2 TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10),
+	  WorkOrder nvarchar(100),
+	  WorkOrderDate datetime,
+	  WorkRequest nvarchar(100),
+	  WorkRequestDate datetime,
+	  PlannerGroup nvarchar(100),
+	  PlanStartDate datetime,
+	  PlanEndDate datetime,
+	  ScheduleStartDate datetime,
+	  ScheduleEndDate datetime,
+	  DocStatus int,
+	  ActualStartDate datetime,
+	  ActualEndDate datetime
+	)
+
+	declare @id int
+	declare @analysisname nvarchar(200)
+	declare @analysisremarks nvarchar(10)
+	declare @pg01done numeric(10,2)
+	declare @pg02done numeric(10,2)
+	declare @pg03done numeric(10,2)
+	declare @pg04done numeric(10,2)
+	declare @pg01total numeric(10,2)
+	declare @pg02total numeric(10,2)
+	declare @pg03total numeric(10,2)
+	declare @pg04total numeric(10,2)
+
+	set @id = 0;
+	begin --PM-start
+
+		set @analysisname = 'PM Job Compliance'
+		set @analysisremarks = 'No'
+
+		select @id = isnull(max(ID),0) from @newtable2
+		insert into @newtable2
+		select @id + ROW_NUMBER() over(order by T0.ID), @analysisname, @analysisremarks, T0.DocNum, T0.DocDate, '', null, T11.BoCode, T0.PlanStartDate, T0.PlanEndDate, T0.ScheduleStartDate, T0.ScheduleEndDate, T2.DocStatus
+		,T0.ActualStartDate, T0.ActualEndDate
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, max(ID) as WorkOrderDocStatuses_ID from WorkOrderDocStatuses group by WorkOrder_ID) T1 on T0.ID = T1.WorkOrder_ID
+		inner join (select WorkOrder_ID, ID as WorkOrderDocStatuses_ID, DocStatus from WorkOrderDocStatuses) T2 on T0.ID = T2.WorkOrder_ID and T1.WorkOrderDocStatuses_ID = T2.WorkOrderDocStatuses_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.PlanStartDate >= @WODateFrom and T0.PlanStartDate <= @WODateTo
+
+		update T11
+		set T11.analysisremarks = 'Yes'
+		from @newtable2 T11 inner join WorkOrders T0 on T11.analysisname = @analysisname and T11.WorkOrder = T0.DocNum
+		inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 1
+		and T0.IsClosed = 1	
+		and T0.PlanStartDate >= @WODateFrom and T0.PlanStartDate <= @WODateTo
+		and T0.PlanStartDate <= T1.CreateDate and T0.PlanEndDate >= T1.CreateDate
+
+	end
+
+	begin --CM-start
+
+		set @analysisname = 'CM Job Compliance'
+		set @analysisremarks = 'No'
+
+		select @id = isnull(max(ID),0) from @newtable2
+		insert into @newtable2
+		select @id + ROW_NUMBER() over(order by T0.ID), @analysisname, @analysisremarks, T0.DocNum, T0.DocDate, T9.DocNum, T9.DocDate, T11.BoCode, T0.PlanStartDate, T0.PlanEndDate, T0.ScheduleStartDate, T0.ScheduleEndDate, T2.DocStatus
+		,T0.ActualStartDate, T0.ActualEndDate
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, max(ID) as WorkOrderDocStatuses_ID from WorkOrderDocStatuses group by WorkOrder_ID) T1 on T0.ID = T1.WorkOrder_ID
+		inner join (select WorkOrder_ID, ID as WorkOrderDocStatuses_ID, DocStatus from WorkOrderDocStatuses) T2 on T0.ID = T2.WorkOrder_ID and T1.WorkOrderDocStatuses_ID = T2.WorkOrderDocStatuses_ID
+		left join WorkRequests T9 on T0.WorkRequest_ID = T9.ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.ScheduleStartDate >= @WODateFrom and T0.ScheduleStartDate <= @WODateTo
+
+		update T11
+		set T11.analysisremarks = 'Yes'
+		from @newtable2 T11 inner join WorkOrders T0 on T11.analysisname = @analysisname and T11.WorkOrder = T0.DocNum
+		inner join (select WorkOrder_ID, CreateDate from WorkOrderDocStatuses where DocStatus = 5) T1
+		on T0.ID = T1.WorkOrder_ID
+		where T0.IsPreventiveMaintenance = 0
+		and T0.IsClosed = 1	
+		and T0.ScheduleStartDate >= @WODateFrom and T0.ScheduleStartDate <= @WODateTo
+		and T0.ScheduleStartDate <= T1.CreateDate and T0.ScheduleStartDate >= T1.CreateDate
+	end
+
+	begin --Schedule-start
+		set @analysisname = 'Schedule Job Compliance'
+		set @analysisremarks = 'No'
+
+		select @id = isnull(max(ID),0) from @newtable2
+		insert into @newtable2
+		select @id + ROW_NUMBER() over(order by T0.ID), @analysisname, @analysisremarks, T0.DocNum, T0.DocDate, T9.DocNum, T9.DocDate, T11.BoCode, T0.PlanStartDate, T0.PlanEndDate, T0.ScheduleStartDate, T0.ScheduleEndDate, T2.DocStatus
+		,T0.ActualStartDate, T0.ActualEndDate
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, max(ID) as WorkOrderDocStatuses_ID from WorkOrderDocStatuses group by WorkOrder_ID) T1 on T0.ID = T1.WorkOrder_ID
+		inner join (select WorkOrder_ID, ID as WorkOrderDocStatuses_ID, DocStatus from WorkOrderDocStatuses) T2 on T0.ID = T2.WorkOrder_ID and T1.WorkOrderDocStatuses_ID = T2.WorkOrderDocStatuses_ID
+		left join WorkRequests T9 on T0.WorkRequest_ID = T9.ID
+		where T0.ScheduleStartDate >= @WODateFrom and T0.ScheduleStartDate <= @WODateTo
+		--and T0.ScheduleStartDate = T0.ActualStartDate
+		--and T0.ScheduleStartDate <= T0.ActualEndDate and T0.ScheduleEndDate >= T0.ActualEndDate
+
+		update T11
+		set T11.analysisremarks = 'Yes'
+		from @newtable2 T11 inner join WorkOrders T0 on T11.analysisname = @analysisname and T11.WorkOrder = T0.DocNum
+		where T0.ScheduleStartDate >= @WODateFrom and T0.ScheduleStartDate <= @WODateTo
+		and T0.ScheduleStartDate = T0.ActualStartDate
+		and T0.ScheduleStartDate <= T0.ActualEndDate and T0.ScheduleEndDate >= T0.ActualEndDate
+	end
+
+	begin --Schedule-start
+		set @analysisname = 'Non-schedule PM'
+		set @analysisremarks = ''
+
+		select @id = isnull(max(ID),0) from @newtable2
+		insert into @newtable2
+		select @id + ROW_NUMBER() over(order by T0.ID), @analysisname, @analysisremarks, T0.DocNum, T0.DocDate, '', null, T11.BoCode, T0.PlanStartDate, T0.PlanEndDate, T0.ScheduleStartDate, T0.ScheduleEndDate, T2.DocStatus
+		,T0.ActualStartDate, T0.ActualEndDate
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, max(ID) as WorkOrderDocStatuses_ID from WorkOrderDocStatuses group by WorkOrder_ID) T1 on T0.ID = T1.WorkOrder_ID
+		inner join (select WorkOrder_ID, ID as WorkOrderDocStatuses_ID, DocStatus from WorkOrderDocStatuses) T2 on T0.ID = T2.WorkOrder_ID and T1.WorkOrderDocStatuses_ID = T2.WorkOrderDocStatuses_ID
+		where T0.IsPreventiveMaintenance = 1 and
+			T0.DocDate >= @WODateFrom and T0.DocDate <= @WODateTo and
+			(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+		set @analysisname = 'Non-schedule CM'
+		set @analysisremarks = ''
+
+		select @id = isnull(max(ID),0) from @newtable2
+		insert into @newtable2
+		select @id + ROW_NUMBER() over(order by T0.ID), @analysisname, @analysisremarks, T0.DocNum, T0.DocDate, T9.DocNum, T9.DocDate, T11.BoCode, T0.PlanStartDate, T0.PlanEndDate, T0.ScheduleStartDate, T0.ScheduleEndDate, T2.DocStatus
+		,T0.ActualStartDate, T0.ActualEndDate
+		from WorkOrders T0 inner join PlannerGroups T11 on T0.AssignPlannerGroup_ID = T11.ID
+		inner join (select WorkOrder_ID, max(ID) as WorkOrderDocStatuses_ID from WorkOrderDocStatuses group by WorkOrder_ID) T1 on T0.ID = T1.WorkOrder_ID
+		inner join (select WorkOrder_ID, ID as WorkOrderDocStatuses_ID, DocStatus from WorkOrderDocStatuses) T2 on T0.ID = T2.WorkOrder_ID and T1.WorkOrderDocStatuses_ID = T2.WorkOrderDocStatuses_ID
+		left join WorkRequests T9 on T0.WorkRequest_ID = T9.ID
+		where T0.IsPreventiveMaintenance = 0 and
+			T0.DocDate >= @WODateFrom and T0.DocDate <= @WODateTo and
+			(T0.ScheduleStartDate is null or T0.ScheduleEndDate is null)
+
+	end
+
+	--select ID, AnalysisName, AnalysisRemarks, sum(PG01) as PG01, sum(PG02) as PG02, sum(PG03) as PG03, sum(PG04) as PG04
+	--select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04
+	--from @newtable
+	--order by ID
+	
+	select ID, 
+		AnalysisName, 
+		AnalysisRemarks,
+		WorkOrder,
+		WorkOrderDate,
+		WorkRequest,
+		WorkRequestDate,
+		PlannerGroup,
+		PlanStartDate,
+		PlanEndDate,
+		ScheduleStartDate,
+		ScheduleEndDate,
+		DocStatus,
+		ActualStartDate,
+		ActualEndDate
+	from @newtable2
+	order by ID
+end
+

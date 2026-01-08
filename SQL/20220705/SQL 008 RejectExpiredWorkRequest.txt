@@ -1,0 +1,64 @@
+
+ALTER proc [dbo].[RejectExpiredWorkRequest]
+@cnt int
+AS
+
+begin
+        --Create = 0,
+        --DocPassed = 1,
+        --Approved = 2,
+        --Cancelled = 3,
+        --Rejected = 4,
+        --Closed = 5,
+        --Active = 6,
+        --Posted = 7
+
+	DECLARE @newtable TABLE
+	(
+      ID int,
+      Cnt int
+	)
+	declare @user int
+	declare @today datetime
+	declare @rejectdate datetime
+	select @today = GETDATE()
+	select @rejectdate = DATEADD(DAY, @cnt, cast(@today as Date))
+
+	select @user = ID from PermissionPolicyUsers where UserName = 'admin'
+
+	--passed no action
+	insert into @newtable
+	(ID, Cnt)
+	select T0.ID, 1 from WorkRequestDocStatuses T1
+	inner join
+	(
+	select WorkRequest_ID, max(ID) as ID from WorkRequestDocStatuses
+	where isnull(WorkRequest_ID, 0) > 0 and IsReverse = 0
+	group by WorkRequest_ID
+	) T2 on T1.ID = T2.ID
+	inner join WorkRequests T0 on T1.WorkRequest_ID = T0.ID
+	where isnull(T1.WorkRequest_ID, 0) > 0 and T1.DocStatus = 1 and CAST(T1.CreateDate as date) <= @rejectdate
+	and T0.DocPassed = 1 and T0.Approved = 0 and T0.Cancelled = 0 and T0.Rejected = 0
+
+	--created no action
+	--insert into @newtable
+	--(ID, Cnt)
+	--select T0.ID, count(*) from WorkRequests T0 left join WorkRequestDocStatuses T1 on T1.WorkRequest_ID = T0.ID
+	--where CAST(T0.CreateDate as date) <= @rejectdate
+	--and T0.DocPassed = 0 and T0.Approved = 0 and T0.Cancelled = 0 and T0.Rejected = 0
+	--group by T0.ID
+	--Having count(*) <= 1
+
+	update T0 set T0.Rejected = 1, T0.DocPassed = 0
+	from WorkRequests T0 inner join @newtable T9 on T0.ID = T9.ID
+
+	insert into WorkRequestDocStatuses
+	(CreateDate, UpdateDate, CreateUser_ID, UpdateUser_ID, DocStatus, DocRemarks, IsReverse, WorkRequest_ID)
+	select @today, @today, @user, @user, 4, 'Auto Rejected by System', 0, ID
+	from @newtable
+
+	select @@ROWCOUNT
+end
+go
+
+

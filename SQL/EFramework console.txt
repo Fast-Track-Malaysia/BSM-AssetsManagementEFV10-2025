@@ -1,0 +1,4 @@
+Add-Migration update_mitigation_user_pos
+
+
+Update-Database -Script -Target update_mitigation_user_pos
