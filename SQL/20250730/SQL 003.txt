@@ -16,7 +16,7 @@ select 'Expired', 'Expired'
 union all
 select 'Draft Extension', 'Draft Extension'
 union all
-select 'Approved Extension', 'Approved Extension'
+select 'Approved Extension', 'Not Approved'
 union all
 select 'Withdrawn', 'Withdrawn'
 

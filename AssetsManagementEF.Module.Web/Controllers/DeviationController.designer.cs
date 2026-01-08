@@ -86,7 +86,7 @@
             // 
             this.DeviationApprovedExtend.AcceptButtonCaption = null;
             this.DeviationApprovedExtend.CancelButtonCaption = null;
-            this.DeviationApprovedExtend.Caption = "Approved Extend";
+            this.DeviationApprovedExtend.Caption = "Reject";
             this.DeviationApprovedExtend.ConfirmationMessage = null;
             this.DeviationApprovedExtend.Id = "DeviationApprovedExtend";
             this.DeviationApprovedExtend.ToolTip = null;

@@ -23,7 +23,7 @@
           <Item Id="Deviation2025_ListView_UnderReview_Done" ViewId="Deviation2025_ListView_UnderReview_Done" Caption="Deviation (Acknowledged)" Index="2" IsNewNode="True" />
           <Item Id="Deviation2025_ListView_PendingApp" Caption="Deviation (Pending Approval)" Index="3" ViewId="Deviation2025_ListView_PendingApp" IsNewNode="True" />
           <Item Id="Deviation2025_ListView_App" Caption="Deviation (Approved)" Index="4" ViewId="Deviation2025_ListView_App" IsNewNode="True" />
-          <Item Id="Deviation2025_ListView_Appext" Caption="Deviation (Approved Extension)" ViewId="Deviation2025_ListView_Appext" IsNewNode="True" />
+          <Item Id="Deviation2025_ListView_Appext" Caption="Deviation (Not Approved)" ViewId="Deviation2025_ListView_Appext" IsNewNode="True" />
         </Items>
       </Item>
       <Item Id="KPI" Visible="False" />
@@ -705,6 +705,11 @@
       </Columns>
     </ListView>
     <DetailView Id="DeviationMitigations_DetailView">
+      <Items>
+        <PropertyEditor Id="AcceptanceCriteria" RowCount="6" />
+        <PropertyEditor Id="Dscription" RowCount="6" />
+        <PropertyEditor Id="Reason" RowCount="6" />
+      </Items>
       <Layout>
         <LayoutGroup Id="Main" RelativeSize="100">
           <LayoutGroup Id="SimpleEditors" RelativeSize="100">
