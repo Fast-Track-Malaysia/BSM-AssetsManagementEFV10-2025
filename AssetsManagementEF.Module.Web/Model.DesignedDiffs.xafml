@@ -298,7 +298,7 @@
         <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
       </Columns>
     </ListView>
-    <ListView Id="Deviation2025_ListView_Appext" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Approved Extension'" Caption="Deviation (Approved Extension)" IsNewNode="True">
+    <ListView Id="Deviation2025_ListView_Appext" ClassName="AssetsManagementEF.Module.BusinessObjects.Deviation2025" Filter="[DeviationStatus.BoCode] = 'Approved Extension'" Caption="Deviation (Not Approved)" IsNewNode="True">
       <Columns IsNewNode="True">
         <ColumnInfo Id="Assets" PropertyName="Assets" Width="70" Index="-1" IsNewNode="True" />
         <ColumnInfo Id="Community" PropertyName="Community" Width="70" Index="-1" IsNewNode="True" />
