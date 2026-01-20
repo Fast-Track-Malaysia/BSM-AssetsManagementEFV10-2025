@@ -1,0 +1,15 @@
+
+ALTER view [dbo].[vw_SCEWorkOrders]
+as
+select T0.ID, T0.DocNum, T0.AssignPlannerGroup_ID, T0.IsPreventiveMaintenance, min(isnull(T10.ID,0)) as woeqid, min(isnull(T11.ID,0)) as wocomid
+from WorkOrders T0
+left join WorkOrderEquipments T10 on T0.ID = T10.WorkOrder_ID
+left join Equipments T8 on T8.ID = T10.Equipment_ID
+left join Criticalities on Criticalities.ID = T8.Criticality_ID and Criticalities.BoCode = 'SCE'
+left join WorkOrderEqComponents T11 on T0.ID = T11.WorkOrder_ID
+left join EquipmentComponents T9 on T11.EquipmentComponent_ID = T9.ID
+left join Criticalities ComCriticalities on ComCriticalities.ID = T9.Criticality_ID and ComCriticalities.BoCode = 'SCE'
+where (Criticalities.ID is not null or ComCriticalities.ID is not null)
+and T0.Cancelled = 0
+group by T0.ID, T0.DocNum, T0.AssignPlannerGroup_ID, T0.IsPreventiveMaintenance
+GO

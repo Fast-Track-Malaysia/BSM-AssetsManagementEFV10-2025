@@ -1,0 +1,144 @@
+
+create proc [dbo].[GetWOMonthlyDeviationSCEAll]
+
+@WODataFrom DateTime,
+@WODataTo DateTime,
+@type int -- 1 = all, 2 = retail (PG03), 3 = terminal (PG01,02,04), 4 = facility (PG05)
+
+AS
+
+begin
+
+	DECLARE @newtable TABLE
+	(
+	  SCECat nvarchar(200), 
+	  SCESubCat nvarchar(200), 
+	  PMMeasure1 int, 
+	  PMMeasure2 int,
+	  PMMeasure3 int, 
+	  CMMeasure1 int, 
+	  CMMeasure2 int,
+	  CMMeasure3 int, 
+	  Total int
+	)
+
+	declare @Deviation table
+	( 
+		ID int
+		, DocNum nvarchar(50)
+		, WorkOrderid int
+		, measure int
+		, plannerid int
+		, woeqid int
+		, wocomid int
+		, SCESubCatid int
+		, ispm bit
+	)
+
+	;with cte as (
+	--1 Measures the number of Deviation Orders which are = 8 days from the date of Deviation Approved Valid Date
+	select T0.ID, T0.DocNum, T0.WorkOrder_ID, 1 as measure
+	from Deviation2025 T0
+	inner join DeviationStatus T10 on T0.DeviationStatus_ID = T10.ID
+	where T0.CreateDate >= @WODataFrom and T0.CreateDate <= @WODataTo
+	and T10.BoCode in ('Approved','Closed')
+	and T0.ApprovedValidDate is not null
+	and DATEDIFF(day,T0.CreateDate, T0.ApprovedValidDate) >= 8
+	union all
+	--2 Measures the number of Deviation Work Orders which are  = 7 days from the date of Deviation Approved Valid Date
+	select T0.ID, T0.DocNum, T0.WorkOrder_ID, 2 as measure
+	from Deviation2025 T0
+	inner join DeviationStatus T10 on T0.DeviationStatus_ID = T10.ID
+	where T0.CreateDate >= @WODataFrom and T0.CreateDate <= @WODataTo
+	and T10.BoCode in ('Approved','Closed')
+	and T0.ApprovedValidDate is not null
+	and DATEDIFF(day,T0.CreateDate, T0.ApprovedValidDate) < 8
+	union all
+	--3 Measures the number of Deviation Work Orders which are Passed from the date of Deviation Approved Valid Date
+	select T0.ID, T0.DocNum, T0.WorkOrder_ID, 3 as measure
+	from Deviation2025 T0
+	inner join DeviationStatus T10 on T0.DeviationStatus_ID = T10.ID
+	where T0.CreateDate >= @WODataFrom and T0.CreateDate <= @WODataTo
+	and T10.BoCode not in ('Approved','Closed','Cancel')
+	)
+	insert into @Deviation
+	( ID, DocNum, WorkOrderid, measure, plannerid, woeqid, wocomid, SCESubCatid, ispm )
+	select T0.ID, T0.DocNum, T0.WorkOrder_ID, measure, T1.AssignPlannerGroup_ID, T1.woeqid, T1.wocomid, 0, T1.IsPreventiveMaintenance
+	from cte T0
+	inner join vw_SCEWorkOrders T1 on T0.WorkOrder_ID = T1.ID
+
+	-- check equipment subsce id
+	update T0
+	set SCESubCatid = T4.ID
+	from @Deviation T0
+	inner join WorkOrderEquipments T1 on T0.woeqid = T1.ID
+	inner join Equipments T2 on T1.Equipment_ID = T2.ID
+	inner join SCESubCategories T4 on T2.SCESubCategory_ID = T4.ID
+	where T0.woeqid > 0
+
+	-- check component only subsce id
+	update T0
+	set SCESubCatid = T4.ID
+	from @Deviation T0
+	inner join WorkOrderEqComponents T1 on T0.woeqid = T1.ID
+	inner join EquipmentComponents T2 on T1.Equipment_ID = T2.ID
+	inner join SCESubCategories T4 on T2.SCESubCategory_ID = T4.ID
+	where T0.woeqid = 0
+
+	if (@type) = 2 -- PG03
+	begin
+		delete from T0
+		from @Deviation T0
+		inner join PlannerGroups T1 on T0.plannerid = T1.ID
+		where T1.BoCode <> 'PG03'
+	end
+	else if (@type) = 3 -- ('PG01','PG02','PG04')
+	begin
+		delete from T0
+		from @Deviation T0
+		inner join PlannerGroups T1 on T0.plannerid = T1.ID
+		where T1.BoCode not in ('PG01','PG02','PG04')
+	end
+	else if (@type) = 4 -- PG05
+	begin
+		delete from T0
+		from @Deviation T0
+		inner join PlannerGroups T1 on T0.plannerid = T1.ID
+		where T1.BoCode <> 'PG05'
+	end
+
+	--insert into @newtable
+	--( SCECat, SCESubCat, PMMeasure1, PMMeasure2, PMMeasure3, CMMeasure1, CMMeasure2, CMMeasure3, Total )
+	--select T1.BoName, T2.BoName
+	--, sum(case when isnull(T0.ispm,0) = 1 and isnull(T0.measure,0) = 1 then 1 else 0 end)
+	--, sum(case when isnull(T0.ispm,0) = 1 and isnull(T0.measure,0) = 2 then 1 else 0 end)
+	--, sum(case when isnull(T0.ispm,0) = 1 and isnull(T0.measure,0) = 3 then 1 else 0 end)
+	--, sum(case when isnull(T0.ispm,0) = 0 and isnull(T0.measure,0) = 1 then 1 else 0 end)
+	--, sum(case when isnull(T0.ispm,0) = 0 and isnull(T0.measure,0) = 2 then 1 else 0 end)
+	--, sum(case when isnull(T0.ispm,0) = 0 and isnull(T0.measure,0) = 3 then 1 else 0 end)
+	--, sum(case when isnull(T0.measure,0) > 0 then 1 else 0 end)
+	--from SCESubCategories T2
+	--inner join SCECategories T1 on T2.SCECategory_ID = T1.ID
+	--left join @Deviation T0 on T0.SCESubCatid = T2.ID
+	--group by T1.BoName, T2.BoName
+
+	insert into @newtable
+	( SCECat, SCESubCat, PMMeasure1, PMMeasure2, PMMeasure3, CMMeasure1, CMMeasure2, CMMeasure3, Total )
+	select T1.BoName, T2.BoName
+	, sum(case when T0.ispm = 1 and T0.measure = 1 then 1 else 0 end)
+	, sum(case when T0.ispm = 1 and T0.measure = 2 then 1 else 0 end)
+	, sum(case when T0.ispm = 1 and T0.measure = 3 then 1 else 0 end)
+	, sum(case when T0.ispm = 0 and T0.measure = 1 then 1 else 0 end)
+	, sum(case when T0.ispm = 0 and T0.measure = 2 then 1 else 0 end)
+	, sum(case when T0.ispm = 0 and T0.measure = 3 then 1 else 0 end)
+	, sum(1)
+	from @Deviation T0
+	inner join SCESubCategories T2 on T0.SCESubCatid = T2.ID
+	inner join SCECategories T1 on T2.SCECategory_ID = T1.ID
+	group by T1.BoName, T2.BoName
+
+
+	select SCECat, SCESubCat, PMMeasure1, PMMeasure2, PMMeasure3, CMMeasure1, CMMeasure2, CMMeasure3, Total
+	from @newtable
+
+end
