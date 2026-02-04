@@ -46,6 +46,27 @@ begin
 			and T1.BoCode not in (@UnderReview)
 			goto returnstep
 		end
+
+		if exists(select 1
+			from Deviation2025 T0
+			inner join PermissionPolicyUsers T1 on T0.CreateUser_ID = T1.ID
+			where T0.ID = @docid
+			and T1.UserName in (@username))
+		begin
+			if not exists(select 1 
+				from Deviation2025 T0 
+				inner join DeviationReviewers T1 on T1.Deviation_ID = T0.ID
+				where T0.ID = @docid
+				and T1.ActReviewer = 1)
+			begin
+				select Top 1 @id = -1, @msg = 'Required at least 1 Reviewer to complete acknowledgement.'
+				from Deviation2025 T0 
+				inner join DeviationReviewers T1 on T1.Deviation_ID = T0.ID
+				where T0.ID = @docid
+				and T1.KeyReviewer = 1 and T1.ActReviewer = 0
+			end
+		end
+		else
 		if exists(select 1 
 			from Deviation2025 T0 
 			inner join DeviationReviewers T1 on T1.Deviation_ID = T0.ID

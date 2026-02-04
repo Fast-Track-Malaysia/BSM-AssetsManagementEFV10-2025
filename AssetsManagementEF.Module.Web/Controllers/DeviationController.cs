@@ -56,12 +56,15 @@ namespace AssetsManagementEF.Module.Web.Controllers
             bool IsUser = user.Roles.Where(p => p.Name == GeneralSettings.DeviationUser).Count() > 0 ? true : false;
             bool IsManager = user.Roles.Where(p => p.Name == GeneralSettings.DeviationManager).Count() > 0 ? true : false;
             bool IsReviewer = user.Roles.Where(p => p.Name == GeneralSettings.DeviationReviewer).Count() > 0 ? true : false;
+            bool IsAdmin = user.Roles.Where(p => p.Name == GeneralSettings.AdminRole).Count() > 0 ? true : false;
 
             if (this.View is DetailView)
             {
                 if (View.ObjectTypeInfo.Type == typeof(Deviation2025))
                 {
                     Deviation2025 selectedobject = (Deviation2025)View.CurrentObject;
+                    bool IsCreator = user.ID == selectedobject.CreateUser.ID;
+
                     if (selectedobject.DeviationStatus.BoCode == GeneralSettings.DeviationStatusDraft || selectedobject.DeviationStatus.BoCode == GeneralSettings.DeviationStatusUnderReview)
                     {
                         this.DeviationDraftExtend.Active.SetItemValue("Enabled", IsUser || IsManager);
@@ -70,7 +73,7 @@ namespace AssetsManagementEF.Module.Web.Controllers
                     {
                         this.DeviationSubmitAck.Active.SetItemValue("Enabled", IsReviewer);
                         this.DeviationWithdraw.Active.SetItemValue("Enabled", IsReviewer);
-                        this.DeviationSubmitApp.Active.SetItemValue("Enabled", IsReviewer || IsUser || IsManager);
+                        this.DeviationSubmitApp.Active.SetItemValue("Enabled", IsCreator);
                     }
                     if (selectedobject.DeviationStatus.BoCode == GeneralSettings.DeviationStatusPendingApproval)
                     {
@@ -392,26 +395,51 @@ namespace AssetsManagementEF.Module.Web.Controllers
 
         private void DeviationSubmitAck_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
         {
-            DeviationReviewerAck p = (DeviationReviewerAck)e.PopupWindow.View.CurrentObject;
-            if (p.IsErr) return;
-            if (string.IsNullOrEmpty(p.ParamString))
+            bool reject = false;
+            string paramString = "";
+            DateTime? paramDate = null;
+            int reviewID = 0;
+            if (e.Action.Id == "DeviationWithdraw")
             {
-                genCon.showMsg("Failed", "Comment cannot empty.", InformationType.Error);
-                return;
+                reject = true;
+                DeviationWithdraw p = (DeviationWithdraw)e.PopupWindow.View.CurrentObject;
+                if (p.IsErr) return;
+                paramString = p.ParamString;
+                paramDate = p.ParamDate;
+                reviewID = p.ReviewID;
+                if (string.IsNullOrEmpty(paramString))
+                {
+                    genCon.showMsg("Failed", "Comment cannot empty.", InformationType.Error);
+                    return;
+                }
             }
+            else if (e.Action.Id == "DeviationSubmitAck")
+            {
+                DeviationReviewerAck p = (DeviationReviewerAck)e.PopupWindow.View.CurrentObject;
+                if (p.IsErr) return;
+                paramString = p.ParamString;
+                paramDate = p.ParamDate;
+                reviewID = p.ReviewID;
+                if (string.IsNullOrEmpty(paramString))
+                {
+                    genCon.showMsg("Failed", "Comment cannot empty.", InformationType.Error);
+                    return;
+                }
+            }
+
 
             IObjectSpace ios = Application.CreateObjectSpace();
             Deviation2025 selectedObject = ios.GetObjectByKey<Deviation2025>(((Deviation2025)e.CurrentObject).ID);
             string newstatus = "";
 
-            if (p.Reject)
+            if (reject)
             {
                 foreach (DeviationReviewers reviewer in selectedObject.Detail2)
                 {
-                    if (reviewer.ID == p.ReviewID)
+                    if (reviewer.ID == reviewID)
                     {
-                        reviewer.ReviewDate = p.ParamDate;
-                        reviewer.Comments = p.ParamString;
+                        reviewer.ReviewDate = paramDate;
+                        reviewer.Comments = paramString;
                         reviewer.ActReviewer = false;
                     }
                 }
@@ -420,7 +448,7 @@ namespace AssetsManagementEF.Module.Web.Controllers
 
                 DeviationDocStatus ds = ios.CreateObject<DeviationDocStatus>();
                 ds.DocStatus = ios.FindObject<DeviationStatus>(CriteriaOperator.Parse("BoCode=?", newstatus));
-                ds.DocRemarks = $"[User Withdrawn] {p.ParamString}";
+                ds.DocRemarks = $"[User Withdrawn] {paramString}";
                 ds.CreateDate = DateTime.Now;
                 ds.CreateUser = ios.GetObjectByKey<SystemUsers>(SecuritySystem.CurrentUserId);
                 selectedObject.Detail4.Add(ds);
@@ -434,10 +462,10 @@ namespace AssetsManagementEF.Module.Web.Controllers
                 int reviewerackcount = 0;
                 foreach (DeviationReviewers reviewer in selectedObject.Detail2)
                 {
-                    if (reviewer.ID == p.ReviewID)
+                    if (reviewer.ID == reviewID)
                     {
-                        reviewer.ReviewDate = p.ParamDate;
-                        reviewer.Comments = p.ParamString;
+                        reviewer.ReviewDate = paramDate;
+                        reviewer.Comments = paramString;
                         reviewer.ActReviewer = true;
                     }
                     if (reviewer.ActReviewer) reviewerackcount++;
@@ -448,7 +476,7 @@ namespace AssetsManagementEF.Module.Web.Controllers
 
                 DeviationDocStatus ds = ios.CreateObject<DeviationDocStatus>();
                 ds.DocStatus = ios.FindObject<DeviationStatus>(CriteriaOperator.Parse("BoCode=?", newstatus));
-                ds.DocRemarks = $"[User Acknowledged] {p.ParamString}";
+                ds.DocRemarks = $"[User Acknowledged] {paramString}";
                 ds.CreateDate = DateTime.Now;
                 ds.CreateUser = ios.GetObjectByKey<SystemUsers>(SecuritySystem.CurrentUserId);
                 selectedObject.Detail4.Add(ds);
@@ -813,21 +841,39 @@ namespace AssetsManagementEF.Module.Web.Controllers
                 }
             }
 
-            IObjectSpace os = Application.CreateObjectSpace();
-            DetailView dv = Application.CreateDetailView(os, new DeviationReviewerAck());
-            dv.ViewEditMode = DevExpress.ExpressApp.Editors.ViewEditMode.Edit;
+            if (reject)
+            {
+                IObjectSpace os = Application.CreateObjectSpace();
+                DetailView dv = Application.CreateDetailView(os, new DeviationWithdraw());
+                dv.ViewEditMode = DevExpress.ExpressApp.Editors.ViewEditMode.Edit;
 
-            ((DeviationReviewerAck)dv.CurrentObject).ReviewID = ReviewID;
-            ((DeviationReviewerAck)dv.CurrentObject).RowNumber = RowNumber;
-            ((DeviationReviewerAck)dv.CurrentObject).UserID = UserID;
-            ((DeviationReviewerAck)dv.CurrentObject).UserName = UserName;
+                ((DeviationWithdraw)dv.CurrentObject).ReviewID = ReviewID;
+                ((DeviationWithdraw)dv.CurrentObject).RowNumber = RowNumber;
+                ((DeviationWithdraw)dv.CurrentObject).UserID = UserID;
+                ((DeviationWithdraw)dv.CurrentObject).UserName = UserName;
 
-            ((DeviationReviewerAck)dv.CurrentObject).Reject = reject;
-            ((DeviationReviewerAck)dv.CurrentObject).ParamDate = DateTime.Today;
-            ((DeviationReviewerAck)dv.CurrentObject).IsErr = err;
-            ((DeviationReviewerAck)dv.CurrentObject).ActionMessage = msg;
+                ((DeviationWithdraw)dv.CurrentObject).ParamDate = DateTime.Today;
+                ((DeviationWithdraw)dv.CurrentObject).IsErr = err;
+                ((DeviationWithdraw)dv.CurrentObject).ActionMessage = msg;
+                e.View = dv;
+            }
+            else
+            {
+                IObjectSpace os = Application.CreateObjectSpace();
+                DetailView dv = Application.CreateDetailView(os, new DeviationReviewerAck());
+                dv.ViewEditMode = DevExpress.ExpressApp.Editors.ViewEditMode.Edit;
 
-            e.View = dv;
+                ((DeviationReviewerAck)dv.CurrentObject).ReviewID = ReviewID;
+                ((DeviationReviewerAck)dv.CurrentObject).RowNumber = RowNumber;
+                ((DeviationReviewerAck)dv.CurrentObject).UserID = UserID;
+                ((DeviationReviewerAck)dv.CurrentObject).UserName = UserName;
+
+                ((DeviationReviewerAck)dv.CurrentObject).ParamDate = DateTime.Today;
+                ((DeviationReviewerAck)dv.CurrentObject).IsErr = err;
+                ((DeviationReviewerAck)dv.CurrentObject).ActionMessage = msg;
+                e.View = dv;
+            }
+
         }
 
         private void DeviationSubmitApp_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)

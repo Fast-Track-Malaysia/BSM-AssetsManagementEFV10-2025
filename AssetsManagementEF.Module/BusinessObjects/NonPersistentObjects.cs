@@ -2187,15 +2187,18 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [Browsable(false)]  // Hide the entity identifier from UI.
         public int ID { get; set; }
 
-        [XafDisplayName("Date To")]
+        [XafDisplayName("Approve Valid To")]
+        [Index(0)]
         [Appearance("ParamDate", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
         public DateTime ParamDate { get; set; }
 
-        [XafDisplayName("Remarks")]
+        [XafDisplayName("Comments")]
+        [Index(1)]
         [Appearance("ParamString", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
         public string ParamString { get; set; }
 
         [XafDisplayName("Important")]
+        [Index(2)]
         //[Appearance("ActionMessage", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
         [Appearance("ActionMessage2", Enabled = false, FontColor = "Red")]
         public string ActionMessage { get; set; }
@@ -2301,10 +2304,122 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [Appearance("UserName2", Enabled = false)]
         public string UserName { get; set; }
 
-        [XafDisplayName("Withdrawn")]
-        [Appearance("Reject", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
-        [Appearance("Reject2", Enabled = false)]
-        public bool Reject { get; set; }
+        [XafDisplayName("Date Ack")]
+        [Appearance("ParamDate", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        public DateTime ParamDate { get; set; }
+
+        [XafDisplayName("Comment")]
+        [Appearance("ParamString", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [FieldSize(1024)]
+        [RuleRequiredField(DefaultContexts.Save)]
+        public string ParamString { get; set; }
+
+        [XafDisplayName("Important")]
+        //[Appearance("ActionMessage", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("ActionMessage2", Enabled = false, FontColor = "Red")]
+        [FieldSize(1024)]
+        public string ActionMessage { get; set; }
+
+        [Browsable(false)]
+        public bool IsErr { get; set; }
+        //private string sampleProperty;
+        //[XafDisplayName("My display name"), ToolTip("My hint message")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[RuleRequiredField(DefaultContexts.Save)]
+        //public string SampleProperty
+        //{
+        //    get { return sampleProperty; }
+        //    set
+        //    {
+        //        if (sampleProperty != value)
+        //        {
+        //            sampleProperty = value;
+        //            OnPropertyChanged("SampleProperty");
+        //        }
+        //    }
+        //}
+
+        //[Action(Caption = "My UI Action", ConfirmationMessage = "Are you sure?", ImageName = "Attention", AutoCommit = true)]
+        //public void ActionMethod() {
+        //    // Trigger custom business logic for the current record in the UI (https://documentation.devexpress.com/eXpressAppFramework/CustomDocument112619.aspx).
+        //    this.SampleProperty = "Paid";
+        //}
+
+        #region IXafEntityObject members (see https://documentation.devexpress.com/eXpressAppFramework/clsDevExpressExpressAppIXafEntityObjecttopic.aspx)
+        void IXafEntityObject.OnCreated()
+        {
+            // Place the entity initialization code here.
+            // You can initialize reference properties using Object Space methods; e.g.:
+            // this.Address = objectSpace.CreateObject<Address>();
+        }
+        void IXafEntityObject.OnLoaded()
+        {
+            // Place the code that is executed each time the entity is loaded here.
+        }
+        void IXafEntityObject.OnSaving()
+        {
+            // Place the code that is executed each time the entity is saved here.
+        }
+        #endregion
+
+        #region IObjectSpaceLink members (see https://documentation.devexpress.com/eXpressAppFramework/clsDevExpressExpressAppIObjectSpaceLinktopic.aspx)
+        // Use the Object Space to access other entities from IXafEntityObject methods (see https://documentation.devexpress.com/eXpressAppFramework/CustomDocument113707.aspx).
+        IObjectSpace IObjectSpaceLink.ObjectSpace
+        {
+            get { return objectSpace; }
+            set { objectSpace = value; }
+        }
+        #endregion
+
+        #region INotifyPropertyChanged members (see http://msdn.microsoft.com/en-us/library/system.componentmodel.inotifypropertychanged(v=vs.110).aspx)
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
+    }
+
+
+    [DomainComponent]
+    //[DefaultClassOptions]
+    //[ImageName("BO_Unknown")]
+    //[DefaultProperty("SampleProperty")]
+    //[DefaultListViewOptions(MasterDetailMode.ListViewOnly, false, NewItemRowPosition.None)]
+    // Specify more UI options using a declarative approach (https://documentation.devexpress.com/#eXpressAppFramework/CustomDocument112701).
+    public class DeviationWithdraw : IXafEntityObject, IObjectSpaceLink, INotifyPropertyChanged
+    {
+        private IObjectSpace objectSpace;
+        private void OnPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        public DeviationWithdraw()
+        {
+        }
+        // Add this property as the key member in the CustomizeTypesInfo event
+        [Browsable(false)]  // Hide the entity identifier from UI.
+        public int ID { get; set; }
+
+        [Browsable(false)]  // Hide the entity identifier from UI.
+        public int ReviewID { get; set; }
+
+        [XafDisplayName("#")]
+        //[Appearance("ActionMessage", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("RowNumber", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("RowNumber2", Enabled = false)]
+        public int RowNumber { get; set; }
+
+        [XafDisplayName("User ID")]
+        //[Appearance("ActionMessage", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("UserID", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("UserID2", Enabled = false)]
+        public string UserID { get; set; }
+
+        [XafDisplayName("User Name")]
+        //[Appearance("ActionMessage", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("UserName", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]
+        [Appearance("UserName2", Enabled = false)]
+        public string UserName { get; set; }
 
         [XafDisplayName("Date Ack")]
         [Appearance("ParamDate", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Criteria = "IsErr")]

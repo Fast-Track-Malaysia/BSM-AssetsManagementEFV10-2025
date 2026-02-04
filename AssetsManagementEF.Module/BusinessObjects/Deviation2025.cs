@@ -365,6 +365,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
 
 
         private SCECategories _SCECategory;
+        [XafDisplayName("SCE Category")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(10), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
         //[DataSourceProperty("Criticality.SCECateogry", DataSourcePropertyIsNullMode.SelectNothing)]

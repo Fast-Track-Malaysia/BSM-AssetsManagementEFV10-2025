@@ -704,6 +704,11 @@
         <ColumnInfo Id="Company" PropertyName="Company" Width="70" Index="23" IsNewNode="True" />
       </Columns>
     </ListView>
+    <DetailView Id="DeviationAppParameters_DetailView">
+      <Items>
+        <PropertyEditor Id="ParamString" RowCount="0" />
+      </Items>
+    </DetailView>
     <DetailView Id="DeviationMitigations_DetailView">
       <Items>
         <PropertyEditor Id="AcceptanceCriteria" RowCount="6" />
