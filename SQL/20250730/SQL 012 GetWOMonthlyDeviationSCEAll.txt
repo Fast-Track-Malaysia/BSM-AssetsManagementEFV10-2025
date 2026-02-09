@@ -35,6 +35,86 @@ begin
 		, ispm bit
 	)
 
+	declare @scetable table
+	(
+		SCECatID int,
+		SCESubCatID int
+	)
+
+	if @type = 2
+	begin
+		insert into @scetable
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'PC'
+		and T1.BoCode in ('PC004','PC005','PC007','PC011')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'IC'
+		and T1.BoCode in ('IC008')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'DS'
+		and T1.BoCode in ('DS001','DS002')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'PS'
+		and T1.BoCode in ('PS020')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'SD'
+		and T1.BoCode in ('SD001')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'ER'
+		and T1.BoCode in ('ER010')
+
+	end
+	else if @type = 3
+	begin
+		insert into @scetable
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'SI'
+		and T1.BoCode in ('SI001','SI002','SI005','SI006')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'PC'
+		and T1.BoCode in ('PC001','PC003','PC004','PC005','PC007','PC011')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'IC'
+		and T1.BoCode in ('IC003','IC005','IC008')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'DS'
+		and T1.BoCode in ('DS001','DS002')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'PS'
+		and T1.BoCode in ('PS004','PS005','PS009','PS011','PS014','PS018','PS020')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) = 'SD'
+		and T1.BoCode in ('SD001','SD006')
+		union all
+		select T0.ID, T1.ID
+		from SCECategories T0 inner join SCESubCategories T1 on T0.ID = T1.SCECategory_ID
+		where left(T0.BoCode,2) in ('ER','LS')
+		and T1.BoCode in ('ER001','ER002','ER003','ER004','ER005','ER007','ER010','LS001')
+
+	end
+
 	;with cte as (
 	--1 Measures the number of Deviation Orders which are = 8 days from the date of Deviation Approved Valid Date
 	select T0.ID, T0.DocNum, T0.WorkOrder_ID, 1 as measure
@@ -131,12 +211,13 @@ begin
 	, sum(case when T0.ispm = 0 and T0.measure = 1 then 1 else 0 end)
 	, sum(case when T0.ispm = 0 and T0.measure = 2 then 1 else 0 end)
 	, sum(case when T0.ispm = 0 and T0.measure = 3 then 1 else 0 end)
-	, sum(1)
-	from @Deviation T0
-	inner join SCESubCategories T2 on T0.SCESubCatid = T2.ID
-	inner join SCECategories T1 on T2.SCECategory_ID = T1.ID
+	, sum(case when isnull(T0.SCESubCatid, 0) = 0 then 0 else 1 end)
+	from 
+	@scetable T9
+	inner join SCECategories T1 on T9.SCECatID = T1.ID
+	inner join SCESubCategories T2 on T9.SCESubCatID = T2.ID
+	left join @Deviation T0 on T0.SCESubCatid = T9.SCESubCatID
 	group by T1.BoName, T2.BoName
-
 
 	select SCECat, SCESubCat, PMMeasure1, PMMeasure2, PMMeasure3, CMMeasure1, CMMeasure2, CMMeasure3, Total
 	from @newtable

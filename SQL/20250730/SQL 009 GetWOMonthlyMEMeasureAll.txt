@@ -1,0 +1,148 @@
+
+create proc [dbo].[GetWOMonthlyMEMeasureAll]
+
+@WODataFrom DateTime,
+@WODataTo DateTime,
+@type int -- 1 = all, 2 = retail (PG03), 3 = terminal (PG01,02,04), 4 = facility (PG05)
+
+AS
+
+begin
+
+	DECLARE @newtable TABLE
+	(
+	  ID int, 
+	  AnalysisName nvarchar(200), 
+	  AnalysisRemarks nvarchar(10), 
+	  PG01 int, 
+	  PG02 int,
+	  PG03 int,
+	  PG04 int,
+	  PG05 int,
+	  Total int,
+	  TargetKPI int,
+	  AchieveKPI int,
+	  PMCompliance int,
+	  CMCompliance int
+	)
+	declare @PMCompliance int
+	declare @CMCompliance int
+	declare @temp numeric(19,6)
+	declare @temp2 numeric(19,6)
+
+	insert into @newtable
+	( ID, AnalysisName,	AnalysisRemarks
+	, PG01
+	, PG02
+	, PG03
+	, PG04
+	, PG05
+	, TargetKPI
+	, AchieveKPI)
+	select T0.ID, T0.AnalysisName, T0.AnalysisRemarks
+	, sum(case when T0.PG = 'PG01' then T0.Done else 0 end)
+	, sum(case when T0.PG = 'PG02' then T0.Done else 0 end)
+	, sum(case when T0.PG = 'PG03' then T0.Done else 0 end)
+	, sum(case when T0.PG = 'PG04' then T0.Done else 0 end)
+	, sum(case when T0.PG = 'PG05' then T0.Done else 0 end)
+	, T0.TargetKPI
+	, 0
+	from tf_WOMonthlyMeasure(@WODataFrom, @WODataTo) T0
+	group by T0.ID, T0.AnalysisName, T0.AnalysisRemarks, T0.TargetKPI
+	order by T0.ID
+
+	delete from @newtable
+	where ID in (10, 11, 110, 111)
+
+	if @type = 2
+	begin
+		update @newtable
+		set PG01 = 0
+		, PG02 = 0
+		, PG04 = 0
+		, PG05 = 0
+	end
+	if @type = 3
+	begin
+		update @newtable
+		set PG03 = 0
+		, PG05 = 0
+	end
+	if @type = 4
+	begin
+		update @newtable
+		set PG01 = 0
+		, PG02 = 0
+		, PG03 = 0
+		, PG04 = 0
+	end
+
+	update @newtable set Total = PG01 + PG02 + PG03 + PG04 + PG05
+
+	begin
+		select @temp = Total
+		from @newtable
+		where ID = 4 -- 'PM Scheduled Total'
+
+		select @temp2 = Total
+		from @newtable
+		where ID = 5 -- 'PM Scheduled Compliance'
+
+		update @newtable
+		set AchieveKPI = round(case when @temp = 0 then 0 else @temp2 / @temp * 100 end,0)
+		where ID = 5 -- 'PM Scheduled Compliance'
+	end
+	begin
+		select @temp = Total
+		from @newtable
+		where ID = 3 -- 'PM Planned Total'
+
+		select @temp2 = Total
+		from @newtable
+		where ID = 8 -- 'PM Planned Compliance'
+
+		update @newtable
+		set AchieveKPI = round(case when @temp = 0 then 0 else @temp2 / @temp * 100 end,0)
+		where ID = 8 -- 'PM Planned Compliance'
+	end
+
+	--------------------------------------
+	begin
+		select @temp = Total
+		from @newtable
+		where ID = 104 -- 'CM Scheduled Total'
+
+		select @temp2 = Total
+		from @newtable
+		where ID = 105 -- 'CM Scheduled Compliance'
+
+		update @newtable
+		set AchieveKPI = round(case when @temp = 0 then 0 else @temp2 / @temp * 100 end,0)
+		where ID = 105 -- 'CM Scheduled Compliance'
+	end
+	begin
+		select @temp = Total
+		from @newtable
+		where ID = 103 -- 'CM Planned Total'
+
+		select @temp2 = Total
+		from @newtable
+		where ID = 108 -- 'CM Planned Compliance'
+
+		update @newtable
+		set AchieveKPI = round(case when @temp = 0 then 0 else @temp2 / @temp * 100 end,0)
+		where ID = 108 -- 'CM Planned Compliance'
+	end
+
+	select @PMCompliance = AchieveKPI from @newtable where id = 8
+	select @CMCompliance = AchieveKPI from @newtable where id = 108
+
+	update @newtable set PMCompliance = @PMCompliance
+		, CMCompliance = @CMCompliance
+
+	select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04, PG05, Total, TargetKPI, AchieveKPI
+	, PMCompliance, CMCompliance
+	from @newtable
+	order by ID
+end
+go
