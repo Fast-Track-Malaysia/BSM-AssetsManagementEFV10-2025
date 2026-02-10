@@ -1,6 +1,6 @@
 /// <XRTypeInfo>
 ///   <AssemblyFullName>DevExpress.XtraReports.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a</AssemblyFullName>
-///   <AssemblyLocation>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraReports.v17.1\v4.0_17.1.4.0__b88d1754d700e49a\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
+///   <AssemblyLocation>C:\Users\ykw\Desktop\AMS windows Apps\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
 ///   <TypeName>DevExpress.XtraReports.UI.XtraReport</TypeName>
 ///   <Localization>en-US</Localization>
 ///   <Version>17.1</Version>
@@ -56,6 +56,8 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.XRLabel xrLabel6;
         private DevExpress.XtraReports.UI.XRLabel xrLabel2;
         private DevExpress.XtraReports.UI.XRLabel xrLabel1;
+        private DevExpress.XtraReports.UI.FormattingRule cm;
+        private DevExpress.XtraReports.UI.FormattingRule pm;
         private DevExpress.XtraReports.UI.TopMarginBand TopMargin;
         private DevExpress.XtraReports.UI.BottomMarginBand BottomMargin;
         private DevExpress.XtraReports.UI.PageFooterBand PageFooter;
@@ -141,6 +143,8 @@ namespace XtraReportSerialization {
             this.myyear = new DevExpress.XtraReports.Parameters.Parameter();
             this.mymonth = new DevExpress.XtraReports.Parameters.Parameter();
             this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
+            this.pm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.cm = new DevExpress.XtraReports.UI.FormattingRule();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // Detail
@@ -285,6 +289,8 @@ namespace XtraReportSerialization {
                         | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.xrLabel1.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
                         new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWeeklyTodayAMSMeasureAll.AnalysisName")});
+            this.xrLabel1.FormattingRules.Add(this.cm);
+            this.xrLabel1.FormattingRules.Add(this.pm);
             this.xrLabel1.LocationFloat = new DevExpress.Utils.PointFloat(10.00001F, 0F);
             this.xrLabel1.Name = "xrLabel1";
             this.xrLabel1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -361,7 +367,7 @@ namespace XtraReportSerialization {
             this.xrLabel24.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.xrLabel24.SizeF = new System.Drawing.SizeF(205.8745F, 23F);
             this.xrLabel24.StylePriority.UseBorders = false;
-            this.xrLabel24.Text = "Weekly Measures";
+            this.xrLabel24.Text = "Current Measures";
             // 
             // xrLabel23
             // 
@@ -587,6 +593,18 @@ namespace XtraReportSerialization {
             this.reporttype.ValueInfo = "2";
             this.reporttype.Visible = false;
             // 
+            // pm
+            // 
+            this.pm.Condition = "[AnalysisName]=\'Preventive Maintenance\'";
+            this.pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.pm.Name = "pm";
+            // 
+            // cm
+            // 
+            this.cm.Condition = "[AnalysisName]=\'Corrective Maintenance\'";
+            this.cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.cm.Name = "cm";
+            // 
             // xtraReport1
             // 
             this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
@@ -604,7 +622,9 @@ namespace XtraReportSerialization {
             this.Extensions.Add("DataEditorExtension", "XtraReport");
             this.Extensions.Add("ParameterEditorExtension", "XtraReport");
             this.FormattingRuleSheet.AddRange(new DevExpress.XtraReports.UI.FormattingRule[] {
-                        this.emptyvalue});
+                        this.emptyvalue,
+                        this.pm,
+                        this.cm});
             this.Margins = new System.Drawing.Printing.Margins(5, 5, 19, 11);
             this.Name = "xtraReport1";
             this.PageHeight = 1100;
