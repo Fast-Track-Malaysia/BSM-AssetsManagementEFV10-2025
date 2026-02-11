@@ -1,5 +1,4 @@
 
-
 create proc [dbo].[GetWOYearlyMEMeasureAll]
 
 @year int,
@@ -73,10 +72,12 @@ begin
 		yearly int,
 		monthly int
 	)
-	declare @targetkpi int = 95
+	declare @targetkpi int = 100
 	declare @WODataFrom date
 	declare @WODataTo date
 	declare @cnt int = 0
+	declare @lastmonth int = 0
+	declare @totalmonth int = 0
 
 	;WITH Nums AS (
 		SELECT 1 AS n -- Starting value of the range
@@ -126,44 +127,48 @@ begin
 		, case when T0.PG = 'PG05' and T0.ID in (8, 108) then T0.Done else 0 end
 		, case when T0.ID in (3, 8) then 1 else 0 end
 		from tf_WOMonthlyMeasure(@WODataFrom, @WODataTo) T0
+		where T0.ID in (3, 8, 103, 108)
 
-		insert into @newtable
-		( yearly
-		, monthly
-		, PG01T
-		, PG02T
-		, PG03T
-		, PG04T
-		, PG05T
-		, PG01
-		, PG02
-		, PG03
-		, PG04
-		, PG05
-		, PG01C
-		, PG02C
-		, PG03C
-		, PG04C
-		, PG05C
-		, compliance
-		, PM
-		)
-		select T0.yearly, T0.monthly
-		, sum(PG01T)
-		, sum(PG02T)
-		, sum(PG03T)
-		, sum(PG04T)
-		, sum(PG05T)
-		, sum(PG01)
-		, sum(PG02)
-		, sum(PG03)
-		, sum(PG04)
-		, sum(PG05)
-		, 0 , 0 , 0 , 0 , 0
-		, 0
-		, PM
-		from @newtabletemp T0
-		group by T0.yearly, T0.monthly, T0.PM
+		if (getdate() > @WODataFrom)
+		begin
+			insert into @newtable
+			( yearly
+			, monthly
+			, PG01T
+			, PG02T
+			, PG03T
+			, PG04T
+			, PG05T
+			, PG01
+			, PG02
+			, PG03
+			, PG04
+			, PG05
+			, PG01C
+			, PG02C
+			, PG03C
+			, PG04C
+			, PG05C
+			, compliance
+			, PM
+			)
+			select T0.yearly, T0.monthly
+			, sum(PG01T)
+			, sum(PG02T)
+			, sum(PG03T)
+			, sum(PG04T)
+			, sum(PG05T)
+			, sum(PG01)
+			, sum(PG02)
+			, sum(PG03)
+			, sum(PG04)
+			, sum(PG05)
+			, 0 , 0 , 0 , 0 , 0
+			, 0
+			, PM
+			from @newtabletemp T0
+			group by T0.yearly, T0.monthly, T0.PM
+		end
 	end
 
 	insert into @newtable
@@ -191,12 +196,11 @@ begin
 	, 0 , 0 , 0 , 0 , 0
 	, 0 , 0 , 0 , 0 , 0
 	, 0 , 0 , 0 , 0 , 0
-	, 0
+	, -1
 	, 1
 	from @monthly T0
 	left join @newtable T10 on T0.yearly = T10.yearly and T0.monthly = T10.monthly
-	where T10.PM = 1 
-	and T10.monthly is null
+	where T10.monthly is null
 
 	update @newtable set
 	PG01C = round(convert(numeric, PG01) / convert(numeric, PG01T) * 100, 0)
@@ -256,67 +260,81 @@ begin
 	if @type = 1
 	begin
 		update @table set compliance = 1
-		where (PG01PM = 0 or PG01PM >= @targetkpi)
-		and (PG02PM = 0 or PG02PM >= @targetkpi)
-		and (PG03PM = 0 or PG03PM >= @targetkpi)
-		and (PG04PM = 0 or PG04PM >= @targetkpi)
-		and (PG01CM = 0 or PG01CM >= @targetkpi)
-		and (PG02CM = 0 or PG02CM >= @targetkpi)
-		and (PG03CM = 0 or PG03CM >= @targetkpi)
-		and (PG04CM = 0 or PG04CM >= @targetkpi)
-
-		update @table set compliance = -1 
-		where PG01PM = 0
-		and PG02PM = 0
-		and PG03PM = 0
-		and PG04PM = 0
-		and PG05PM = 0
-		and PG01CM = 0
-		and PG02CM = 0
-		and PG03CM = 0
-		and PG04CM = 0
-		and PG05CM = 0
+		where (PG01PM >= @targetkpi)
+		and (PG02PM >= @targetkpi)
+		and (PG03PM >= @targetkpi)
+		and (PG04PM >= @targetkpi)
+		and (PG01CM >= @targetkpi)
+		and (PG02CM >= @targetkpi)
+		and (PG03CM >= @targetkpi)
+		and (PG04CM >= @targetkpi)
+		and compliance = 0
 
 	end
 	else if @type = 2
 	begin
 		update @table set compliance = 1
-		where (PG02PM = 0 or PG02PM >= @targetkpi)
-		and (PG02CM = 0 or PG02CM >= @targetkpi)
+		where (PG02PM >= @targetkpi)
+		and (PG02CM >= @targetkpi)
+		and compliance = 0
 
-		update @table set compliance = -1 
-		where PG02PM = 0
-		and PG02CM = 0
 	end
 	if @type = 3
 	begin
 		update @table set compliance = 1
-		where (PG01PM = 0 or PG01PM >= @targetkpi)
-		and (PG03PM = 0 or PG03PM >= @targetkpi)
-		and (PG04PM = 0 or PG04PM >= @targetkpi)
-		and (PG01CM = 0 or PG01CM >= @targetkpi)
-		and (PG03CM = 0 or PG03CM >= @targetkpi)
-		and (PG04CM = 0 or PG04CM >= @targetkpi)
-
-		update @table set compliance = -1 
-		where PG01PM = 0
-		and PG03PM = 0
-		and PG04PM = 0
-		and PG01CM = 0
-		and PG03CM = 0
-		and PG04CM = 0
+		where (PG01PM >= @targetkpi)
+		and (PG03PM >= @targetkpi)
+		and (PG04PM >= @targetkpi)
+		and (PG01CM >= @targetkpi)
+		and (PG03CM >= @targetkpi)
+		and (PG04CM >= @targetkpi)
+		and compliance = 0
 
 	end
 	else if @type = 4
 	begin
 		update @table set compliance = 1
-		where (PG05PM = 0 or PG05PM >= @targetkpi)
-		and (PG05CM = 0 or PG05CM >= @targetkpi)
+		where (PG05PM >= @targetkpi)
+		and (PG05CM >= @targetkpi)
+		and compliance = 0
 
-		update @table set compliance = -1 
-		where PG05PM = 0
-		and PG05CM = 0
 	end
+
+	select @totalmonth = count(*), @lastmonth = max(monthly)
+	from @table
+	where compliance in (0,1)
+
+	insert into @table
+	select @year, 13
+	, 9, 0, 'Year to Date'
+	, case when @totalmonth > 0 then sum(PG01PM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG02PM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG03PM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG04PM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG05PM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG01CM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG02CM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG03CM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG04CM) / @totalmonth else 0 end
+	, case when @totalmonth > 0 then sum(PG05CM) / @totalmonth else 0 end
+	from @table
+	where compliance in (0,1)
+
+	insert into @table
+	select @year, 14
+	, 9, 0, 'Full Year Latest Estimate'
+	, sum(case when PG01PM > 0 then PG01PM else targetkpi end) / 12
+	, sum(case when PG02PM > 0 then PG02PM else targetkpi end) / 12
+	, sum(case when PG03PM > 0 then PG03PM else targetkpi end) / 12
+	, sum(case when PG04PM > 0 then PG04PM else targetkpi end) / 12
+	, sum(case when PG05PM > 0 then PG05PM else targetkpi end) / 12
+	, sum(case when PG01CM > 0 then PG01CM else targetkpi end) / 12
+	, sum(case when PG02CM > 0 then PG02CM else targetkpi end) / 12
+	, sum(case when PG03CM > 0 then PG03CM else targetkpi end) / 12
+	, sum(case when PG04CM > 0 then PG04CM else targetkpi end) / 12
+	, sum(case when PG05CM > 0 then PG05CM else targetkpi end) / 12
+	from @table
+	where monthly <= 12
 
 	select yearly, monthly
 	, compliance, targetkpi, monthlyname

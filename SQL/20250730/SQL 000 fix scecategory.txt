@@ -1,0 +1,12 @@
+
+alter table SCECategories add tempcode nvarchar(100)
+go
+update SCECategories set tempcode = BoCode
+go
+update SCECategories set BoCode = BoName
+go
+update SCECategories set BoName = tempcode
+go
+alter table SCECategories drop column tempcode
+go
+

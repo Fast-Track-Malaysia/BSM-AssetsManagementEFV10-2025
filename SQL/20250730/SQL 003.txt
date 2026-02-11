@@ -213,5 +213,3 @@ union all select 'C5', 'C5 - Red'
 union all select 'D5', 'D5 - Red'
 union all select 'E5', 'E5 - Red'
 
-
-
