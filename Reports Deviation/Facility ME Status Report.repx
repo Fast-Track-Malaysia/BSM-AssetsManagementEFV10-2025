@@ -70,6 +70,7 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.FormattingRule green_pg05cm;
         private DevExpress.XtraReports.UI.FormattingRule red_pg05cm;
         private DevExpress.XtraReports.UI.XRLabel label6;
+        private DevExpress.XtraReports.UI.FormattingRule hide9;
         private DevExpress.XtraReports.UI.XRLabel label7;
         private DevExpress.XtraReports.UI.XRLabel label8;
         private DevExpress.XtraReports.UI.FormattingRule green_status;
@@ -139,6 +140,7 @@ namespace XtraReportSerialization {
             this.red_pg05pm = new DevExpress.XtraReports.UI.FormattingRule();
             this.green_pg05cm = new DevExpress.XtraReports.UI.FormattingRule();
             this.red_pg05cm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.hide9 = new DevExpress.XtraReports.UI.FormattingRule();
             this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
             this.yearly = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
@@ -353,6 +355,7 @@ namespace XtraReportSerialization {
             // 
             this.label6.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
                         new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.targetkpi", "{0:#,#}%")});
+            this.label6.FormattingRules.Add(this.hide9);
             this.label6.LocationFloat = new DevExpress.Utils.PointFloat(263.7501F, 0F);
             this.label6.Name = "label6";
             this.label6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -377,6 +380,7 @@ namespace XtraReportSerialization {
             this.label8.FormattingRules.Add(this.hide);
             this.label8.FormattingRules.Add(this.green_status);
             this.label8.FormattingRules.Add(this.red_status);
+            this.label8.FormattingRules.Add(this.hide9);
             this.label8.LocationFloat = new DevExpress.Utils.PointFloat(370.0001F, 0F);
             this.label8.Name = "label8";
             this.label8.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -488,27 +492,33 @@ namespace XtraReportSerialization {
             // 
             // green_pg05pm
             // 
-            this.green_pg05pm.Condition = "[PG05PM]>=[targetkpi]";
+            this.green_pg05pm.Condition = "[PG05PM]>=[targetkpi] And  [monthly]<=12";
             this.green_pg05pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.green_pg05pm.Name = "green_pg05pm";
             // 
             // red_pg05pm
             // 
-            this.red_pg05pm.Condition = "[PG05PM]<[targetkpi]";
+            this.red_pg05pm.Condition = "[PG05PM]<[targetkpi] And  [monthly]<=12";
             this.red_pg05pm.Formatting.ForeColor = System.Drawing.Color.Red;
             this.red_pg05pm.Name = "red_pg05pm";
             // 
             // green_pg05cm
             // 
-            this.green_pg05cm.Condition = "[PG05CM]>=[targetkpi]";
+            this.green_pg05cm.Condition = "[PG05CM]>=[targetkpi] And  [monthly]<=12";
             this.green_pg05cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
             this.green_pg05cm.Name = "green_pg05cm";
             // 
             // red_pg05cm
             // 
-            this.red_pg05cm.Condition = "[PG05CM]<[targetkpi]";
+            this.red_pg05cm.Condition = "[PG05CM]<[targetkpi] And  [monthly]<=12";
             this.red_pg05cm.Formatting.ForeColor = System.Drawing.Color.Red;
             this.red_pg05cm.Name = "red_pg05cm";
+            // 
+            // hide9
+            // 
+            this.hide9.Condition = "[compliance]=9";
+            this.hide9.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
+            this.hide9.Name = "hide9";
             // 
             // reporttype
             // 
@@ -548,7 +558,8 @@ namespace XtraReportSerialization {
                         this.green_pg05pm,
                         this.red_pg05pm,
                         this.green_pg05cm,
-                        this.red_pg05cm});
+                        this.red_pg05cm,
+                        this.hide9});
             this.Margins = new System.Drawing.Printing.Margins(18, 12, 9, 11);
             this.Name = "xtraReport1";
             this.PageHeight = 1100;

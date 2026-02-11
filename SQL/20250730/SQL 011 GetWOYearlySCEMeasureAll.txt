@@ -275,8 +275,8 @@ begin
 	else if @type = 2
 	begin
 		update @table set compliance = 1
-		where (PG02PM >= @targetkpi)
-		and (PG02CM >= @targetkpi)
+		where (PG03PM >= @targetkpi)
+		and (PG03CM >= @targetkpi)
 		and compliance = 0
 
 	end
@@ -284,10 +284,10 @@ begin
 	begin
 		update @table set compliance = 1
 		where (PG01PM >= @targetkpi)
-		and (PG03PM >= @targetkpi)
+		and (PG02PM >= @targetkpi)
 		and (PG04PM >= @targetkpi)
 		and (PG01CM >= @targetkpi)
-		and (PG03CM >= @targetkpi)
+		and (PG02CM >= @targetkpi)
 		and (PG04CM >= @targetkpi)
 		and compliance = 0
 
@@ -307,7 +307,7 @@ begin
 
 	insert into @table
 	select @year, 13
-	, 9, 0, 'Year to Date'
+	, 9, @targetkpi, 'Year to Date'
 	, case when @totalmonth > 0 then sum(PG01PM) / @totalmonth else 0 end
 	, case when @totalmonth > 0 then sum(PG02PM) / @totalmonth else 0 end
 	, case when @totalmonth > 0 then sum(PG03PM) / @totalmonth else 0 end
@@ -323,17 +323,17 @@ begin
 
 	insert into @table
 	select @year, 14
-	, 9, 0, 'Full Year Latest Estimate'
-	, sum(case when PG01PM > 0 then PG01PM else targetkpi end) / 12
-	, sum(case when PG02PM > 0 then PG02PM else targetkpi end) / 12
-	, sum(case when PG03PM > 0 then PG03PM else targetkpi end) / 12
-	, sum(case when PG04PM > 0 then PG04PM else targetkpi end) / 12
-	, sum(case when PG05PM > 0 then PG05PM else targetkpi end) / 12
-	, sum(case when PG01CM > 0 then PG01CM else targetkpi end) / 12
-	, sum(case when PG02CM > 0 then PG02CM else targetkpi end) / 12
-	, sum(case when PG03CM > 0 then PG03CM else targetkpi end) / 12
-	, sum(case when PG04CM > 0 then PG04CM else targetkpi end) / 12
-	, sum(case when PG05CM > 0 then PG05CM else targetkpi end) / 12
+	, 9, @targetkpi, 'Full Year Latest Estimate'
+	, sum(case when compliance in (0,1) then PG01PM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG02PM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG03PM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG04PM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG05PM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG01CM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG02CM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG03CM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG04CM else targetkpi end) / 12
+	, sum(case when compliance in (0,1) then PG05CM else targetkpi end) / 12
 	from @table
 	where monthly <= 12
 

@@ -70,6 +70,7 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.FormattingRule green_pg05cm;
         private DevExpress.XtraReports.UI.FormattingRule red_pg05cm;
         private DevExpress.XtraReports.UI.XRLabel label6;
+        private DevExpress.XtraReports.UI.FormattingRule hide9;
         private DevExpress.XtraReports.UI.XRLabel label7;
         private DevExpress.XtraReports.UI.XRLabel label8;
         private DevExpress.XtraReports.UI.FormattingRule green_status;
@@ -123,24 +124,25 @@ namespace XtraReportSerialization {
             this.label5 = new DevExpress.XtraReports.UI.XRLabel();
             this.label6 = new DevExpress.XtraReports.UI.XRLabel();
             this.label7 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label8 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label20 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label19 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label18 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label17 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrPageInfo1 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.xrPageInfo2 = new DevExpress.XtraReports.UI.XRPageInfo();
             this.xrLabel11 = new DevExpress.XtraReports.UI.XRLabel();
             this.sqlDataSource1 = new DevExpress.DataAccess.Sql.SqlDataSource();
             this.green_status = new DevExpress.XtraReports.UI.FormattingRule();
             this.red_status = new DevExpress.XtraReports.UI.FormattingRule();
-            this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
-            this.yearly = new DevExpress.XtraReports.Parameters.Parameter();
-            this.label17 = new DevExpress.XtraReports.UI.XRLabel();
-            this.label18 = new DevExpress.XtraReports.UI.XRLabel();
-            this.label19 = new DevExpress.XtraReports.UI.XRLabel();
-            this.label20 = new DevExpress.XtraReports.UI.XRLabel();
-            this.label8 = new DevExpress.XtraReports.UI.XRLabel();
             this.hide = new DevExpress.XtraReports.UI.FormattingRule();
             this.green_pg05pm = new DevExpress.XtraReports.UI.FormattingRule();
             this.red_pg05pm = new DevExpress.XtraReports.UI.FormattingRule();
             this.green_pg05cm = new DevExpress.XtraReports.UI.FormattingRule();
             this.red_pg05cm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
+            this.yearly = new DevExpress.XtraReports.Parameters.Parameter();
+            this.hide9 = new DevExpress.XtraReports.UI.FormattingRule();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // TopMargin
@@ -353,6 +355,7 @@ namespace XtraReportSerialization {
             // 
             this.label6.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
                         new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlySCEMeasureAll.targetkpi", "{0:#,#}%")});
+            this.label6.FormattingRules.Add(this.hide9);
             this.label6.LocationFloat = new DevExpress.Utils.PointFloat(263.7501F, 0F);
             this.label6.Name = "label6";
             this.label6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -368,6 +371,57 @@ namespace XtraReportSerialization {
             this.label7.Name = "label7";
             this.label7.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label7.SizeF = new System.Drawing.SizeF(253.75F, 23F);
+            // 
+            // label8
+            // 
+            this.label8.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+                        | DevExpress.XtraPrinting.BorderSide.Right) 
+                        | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.label8.FormattingRules.Add(this.green_status);
+            this.label8.FormattingRules.Add(this.red_status);
+            this.label8.FormattingRules.Add(this.hide9);
+            this.label8.FormattingRules.Add(this.hide);
+            this.label8.LocationFloat = new DevExpress.Utils.PointFloat(369.9999F, 0F);
+            this.label8.Name = "label8";
+            this.label8.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label8.SizeF = new System.Drawing.SizeF(100F, 23F);
+            this.label8.StylePriority.UseBorders = false;
+            // 
+            // label20
+            // 
+            this.label20.LocationFloat = new DevExpress.Utils.PointFloat(110.0001F, 32.99998F);
+            this.label20.Name = "label20";
+            this.label20.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label20.SizeF = new System.Drawing.SizeF(699.9999F, 23F);
+            this.label20.Text = "Measures the number of PM or CM Work Orders which are  NOT compliance to 95% KPI " +
+                "target";
+            // 
+            // label19
+            // 
+            this.label19.LocationFloat = new DevExpress.Utils.PointFloat(110.0001F, 10F);
+            this.label19.Name = "label19";
+            this.label19.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label19.SizeF = new System.Drawing.SizeF(699.9999F, 23F);
+            this.label19.Text = "Measures the number of PM or CM Work Orders which are  compliance to 95% KPI targ" +
+                "et";
+            // 
+            // label18
+            // 
+            this.label18.BackColor = System.Drawing.Color.Red;
+            this.label18.LocationFloat = new DevExpress.Utils.PointFloat(10.00008F, 32.99998F);
+            this.label18.Name = "label18";
+            this.label18.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label18.SizeF = new System.Drawing.SizeF(100F, 23F);
+            this.label18.StylePriority.UseBackColor = false;
+            // 
+            // label17
+            // 
+            this.label17.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.label17.LocationFloat = new DevExpress.Utils.PointFloat(10.00008F, 10F);
+            this.label17.Name = "label17";
+            this.label17.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label17.SizeF = new System.Drawing.SizeF(100F, 23F);
+            this.label17.StylePriority.UseBackColor = false;
             // 
             // xrPageInfo1
             // 
@@ -428,6 +482,36 @@ namespace XtraReportSerialization {
             this.red_status.Formatting.BackColor = System.Drawing.Color.Red;
             this.red_status.Name = "red_status";
             // 
+            // hide
+            // 
+            this.hide.Condition = "[compliance]=-1";
+            this.hide.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
+            this.hide.Name = "hide";
+            // 
+            // green_pg05pm
+            // 
+            this.green_pg05pm.Condition = "[PG05PM]>=[targetkpi] And  [monthly]<=12";
+            this.green_pg05pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.green_pg05pm.Name = "green_pg05pm";
+            // 
+            // red_pg05pm
+            // 
+            this.red_pg05pm.Condition = "[PG05PM]<[targetkpi] And  [monthly]<=12";
+            this.red_pg05pm.Formatting.ForeColor = System.Drawing.Color.Red;
+            this.red_pg05pm.Name = "red_pg05pm";
+            // 
+            // green_pg05cm
+            // 
+            this.green_pg05cm.Condition = "[PG05CM]>=[targetkpi] And  [monthly]<=12";
+            this.green_pg05cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.green_pg05cm.Name = "green_pg05cm";
+            // 
+            // red_pg05cm
+            // 
+            this.red_pg05cm.Condition = "[PG05CM]<[targetkpi] And  [monthly]<=12";
+            this.red_pg05cm.Formatting.ForeColor = System.Drawing.Color.Red;
+            this.red_pg05cm.Name = "red_pg05cm";
+            // 
             // reporttype
             // 
             this.reporttype.Description = "reporttype";
@@ -443,85 +527,11 @@ namespace XtraReportSerialization {
             this.yearly.Type = typeof(int);
             this.yearly.ValueInfo = "2025";
             // 
-            // label17
+            // hide9
             // 
-            this.label17.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.label17.LocationFloat = new DevExpress.Utils.PointFloat(10.00008F, 10F);
-            this.label17.Name = "label17";
-            this.label17.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.label17.SizeF = new System.Drawing.SizeF(100F, 23F);
-            this.label17.StylePriority.UseBackColor = false;
-            // 
-            // label18
-            // 
-            this.label18.BackColor = System.Drawing.Color.Red;
-            this.label18.LocationFloat = new DevExpress.Utils.PointFloat(10.00008F, 32.99998F);
-            this.label18.Name = "label18";
-            this.label18.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.label18.SizeF = new System.Drawing.SizeF(100F, 23F);
-            this.label18.StylePriority.UseBackColor = false;
-            // 
-            // label19
-            // 
-            this.label19.LocationFloat = new DevExpress.Utils.PointFloat(110.0001F, 10F);
-            this.label19.Name = "label19";
-            this.label19.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.label19.SizeF = new System.Drawing.SizeF(699.9999F, 23F);
-            this.label19.Text = "Measures the number of PM or CM Work Orders which are  compliance to 95% KPI targ" +
-                "et";
-            // 
-            // label20
-            // 
-            this.label20.LocationFloat = new DevExpress.Utils.PointFloat(110.0001F, 32.99998F);
-            this.label20.Name = "label20";
-            this.label20.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
-            this.label20.SizeF = new System.Drawing.SizeF(699.9999F, 23F);
-            this.label20.Text = "Measures the number of PM or CM Work Orders which are  NOT compliance to 95% KPI " +
-                "target";
-            // 
-            // label8
-            // 
-            this.label8.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
-                        | DevExpress.XtraPrinting.BorderSide.Right) 
-                        | DevExpress.XtraPrinting.BorderSide.Bottom)));
-            this.label8.FormattingRules.Add(this.green_status);
-            this.label8.FormattingRules.Add(this.hide);
-            this.label8.FormattingRules.Add(this.red_status);
-            this.label8.LocationFloat = new DevExpress.Utils.PointFloat(369.9999F, 0F);
-            this.label8.Name = "label8";
-            this.label8.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
-            this.label8.SizeF = new System.Drawing.SizeF(100F, 23F);
-            this.label8.StylePriority.UseBorders = false;
-            // 
-            // hide
-            // 
-            this.hide.Condition = "[compliance]=-1";
-            this.hide.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
-            this.hide.Name = "hide";
-            // 
-            // green_pg05pm
-            // 
-            this.green_pg05pm.Condition = "[PG05PM]>=[targetkpi]";
-            this.green_pg05pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.green_pg05pm.Name = "green_pg05pm";
-            // 
-            // red_pg05pm
-            // 
-            this.red_pg05pm.Condition = "[PG05PM]<[targetkpi]";
-            this.red_pg05pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.red_pg05pm.Name = "red_pg05pm";
-            // 
-            // green_pg05cm
-            // 
-            this.green_pg05cm.Condition = "[PG05CM]>=[targetkpi]";
-            this.green_pg05cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.green_pg05cm.Name = "green_pg05cm";
-            // 
-            // red_pg05cm
-            // 
-            this.red_pg05cm.Condition = "[PG05CM]<[targetkpi]";
-            this.red_pg05cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.red_pg05cm.Name = "red_pg05cm";
+            this.hide9.Condition = "[compliance]=9";
+            this.hide9.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
+            this.hide9.Name = "hide9";
             // 
             // xtraReport1
             // 
@@ -546,7 +556,8 @@ namespace XtraReportSerialization {
                         this.green_pg05pm,
                         this.red_pg05pm,
                         this.green_pg05cm,
-                        this.red_pg05cm});
+                        this.red_pg05cm,
+                        this.hide9});
             this.Margins = new System.Drawing.Printing.Margins(18, 12, 9, 11);
             this.Name = "xtraReport1";
             this.PageHeight = 1100;

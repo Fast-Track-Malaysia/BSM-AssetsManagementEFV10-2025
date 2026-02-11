@@ -63,13 +63,14 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.XRLabel label3;
         private DevExpress.XtraReports.UI.DetailBand Detail;
         private DevExpress.XtraReports.UI.XRLabel label4;
-        private DevExpress.XtraReports.UI.FormattingRule green_pg02pm;
-        private DevExpress.XtraReports.UI.FormattingRule red_pg02pm;
+        private DevExpress.XtraReports.UI.FormattingRule green_pg03pm;
+        private DevExpress.XtraReports.UI.FormattingRule red_pg03pm;
         private DevExpress.XtraReports.UI.FormattingRule hide;
         private DevExpress.XtraReports.UI.XRLabel label5;
-        private DevExpress.XtraReports.UI.FormattingRule green_pg02cm;
-        private DevExpress.XtraReports.UI.FormattingRule red_pg02cm;
+        private DevExpress.XtraReports.UI.FormattingRule green_pg03cm;
+        private DevExpress.XtraReports.UI.FormattingRule red_pg03cm;
         private DevExpress.XtraReports.UI.XRLabel label6;
+        private DevExpress.XtraReports.UI.FormattingRule hide9;
         private DevExpress.XtraReports.UI.XRLabel label7;
         private DevExpress.XtraReports.UI.XRLabel label8;
         private DevExpress.XtraReports.UI.FormattingRule green_status;
@@ -134,11 +135,12 @@ namespace XtraReportSerialization {
             this.sqlDataSource1 = new DevExpress.DataAccess.Sql.SqlDataSource();
             this.green_status = new DevExpress.XtraReports.UI.FormattingRule();
             this.red_status = new DevExpress.XtraReports.UI.FormattingRule();
-            this.green_pg02pm = new DevExpress.XtraReports.UI.FormattingRule();
-            this.red_pg02pm = new DevExpress.XtraReports.UI.FormattingRule();
-            this.green_pg02cm = new DevExpress.XtraReports.UI.FormattingRule();
-            this.red_pg02cm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.green_pg03pm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.red_pg03pm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.green_pg03cm = new DevExpress.XtraReports.UI.FormattingRule();
+            this.red_pg03cm = new DevExpress.XtraReports.UI.FormattingRule();
             this.hide = new DevExpress.XtraReports.UI.FormattingRule();
+            this.hide9 = new DevExpress.XtraReports.UI.FormattingRule();
             this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
             this.yearly = new DevExpress.XtraReports.Parameters.Parameter();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
@@ -324,9 +326,9 @@ namespace XtraReportSerialization {
             // label4
             // 
             this.label4.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
-                        new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.PG02PM", "{0:#,#}%")});
-            this.label4.FormattingRules.Add(this.green_pg02pm);
-            this.label4.FormattingRules.Add(this.red_pg02pm);
+                        new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.PG03PM", "{0:#,#}%")});
+            this.label4.FormattingRules.Add(this.green_pg03pm);
+            this.label4.FormattingRules.Add(this.red_pg03pm);
             this.label4.FormattingRules.Add(this.hide);
             this.label4.LocationFloat = new DevExpress.Utils.PointFloat(470.0001F, 0F);
             this.label4.Name = "label4";
@@ -338,9 +340,9 @@ namespace XtraReportSerialization {
             // label5
             // 
             this.label5.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
-                        new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.PG02CM", "{0:#,#}%")});
-            this.label5.FormattingRules.Add(this.green_pg02cm);
-            this.label5.FormattingRules.Add(this.red_pg02cm);
+                        new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.PG03CM", "{0:#,#}%")});
+            this.label5.FormattingRules.Add(this.green_pg03cm);
+            this.label5.FormattingRules.Add(this.red_pg03cm);
             this.label5.FormattingRules.Add(this.hide);
             this.label5.LocationFloat = new DevExpress.Utils.PointFloat(640F, 0F);
             this.label5.Name = "label5";
@@ -353,6 +355,7 @@ namespace XtraReportSerialization {
             // 
             this.label6.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
                         new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOYearlyMEMeasureAll.targetkpi", "{0:#,#}%")});
+            this.label6.FormattingRules.Add(this.hide9);
             this.label6.LocationFloat = new DevExpress.Utils.PointFloat(263.7501F, 0F);
             this.label6.Name = "label6";
             this.label6.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -377,6 +380,7 @@ namespace XtraReportSerialization {
             this.label8.FormattingRules.Add(this.green_status);
             this.label8.FormattingRules.Add(this.red_status);
             this.label8.FormattingRules.Add(this.hide);
+            this.label8.FormattingRules.Add(this.hide9);
             this.label8.LocationFloat = new DevExpress.Utils.PointFloat(370F, 0F);
             this.label8.Name = "label8";
             this.label8.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -480,35 +484,41 @@ namespace XtraReportSerialization {
             this.red_status.Formatting.ForeColor = System.Drawing.Color.Red;
             this.red_status.Name = "red_status";
             // 
-            // green_pg02pm
+            // green_pg03pm
             // 
-            this.green_pg02pm.Condition = "[PG02PM]>=[targetkpi]";
-            this.green_pg02pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.green_pg02pm.Name = "green_pg02pm";
+            this.green_pg03pm.Condition = "[PG03PM]>=[targetkpi] And  [monthly]<=12";
+            this.green_pg03pm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.green_pg03pm.Name = "green_pg03pm";
             // 
-            // red_pg02pm
+            // red_pg03pm
             // 
-            this.red_pg02pm.Condition = "[PG02PM]<[targetkpi]";
-            this.red_pg02pm.Formatting.ForeColor = System.Drawing.Color.Red;
-            this.red_pg02pm.Name = "red_pg02pm";
+            this.red_pg03pm.Condition = "[PG03PM]<[targetkpi] And  [monthly]<=12";
+            this.red_pg03pm.Formatting.ForeColor = System.Drawing.Color.Red;
+            this.red_pg03pm.Name = "red_pg03pm";
             // 
-            // green_pg02cm
+            // green_pg03cm
             // 
-            this.green_pg02cm.Condition = "[PG02CM]>=[targetkpi]";
-            this.green_pg02cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
-            this.green_pg02cm.Name = "green_pg02cm";
+            this.green_pg03cm.Condition = "[PG03CM]>=[targetkpi] And  [monthly]<=12";
+            this.green_pg03cm.Formatting.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.green_pg03cm.Name = "green_pg03cm";
             // 
-            // red_pg02cm
+            // red_pg03cm
             // 
-            this.red_pg02cm.Condition = "[PG02CM]<[targetkpi]";
-            this.red_pg02cm.Formatting.ForeColor = System.Drawing.Color.Red;
-            this.red_pg02cm.Name = "red_pg02cm";
+            this.red_pg03cm.Condition = "[PG03CM]<[targetkpi] And  [monthly]<=12";
+            this.red_pg03cm.Formatting.ForeColor = System.Drawing.Color.Red;
+            this.red_pg03cm.Name = "red_pg03cm";
             // 
             // hide
             // 
             this.hide.Condition = "[compliance]=-1";
             this.hide.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
             this.hide.Name = "hide";
+            // 
+            // hide9
+            // 
+            this.hide9.Condition = "[compliance]=9";
+            this.hide9.Formatting.Visible = DevExpress.Utils.DefaultBoolean.False;
+            this.hide9.Name = "hide9";
             // 
             // reporttype
             // 
@@ -544,11 +554,12 @@ namespace XtraReportSerialization {
             this.FormattingRuleSheet.AddRange(new DevExpress.XtraReports.UI.FormattingRule[] {
                         this.green_status,
                         this.red_status,
-                        this.green_pg02pm,
-                        this.red_pg02pm,
-                        this.green_pg02cm,
-                        this.red_pg02cm,
-                        this.hide});
+                        this.green_pg03pm,
+                        this.red_pg03pm,
+                        this.green_pg03cm,
+                        this.red_pg03cm,
+                        this.hide,
+                        this.hide9});
             this.Margins = new System.Drawing.Printing.Margins(18, 12, 9, 18);
             this.Name = "xtraReport1";
             this.PageHeight = 1100;
