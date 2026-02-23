@@ -165,7 +165,7 @@ begin
 		--end
 		--------------------------------------------------------
 		set @id = 6
-		set @analysisname = @space + @space + @space + 'PM Planned Non-Compliance'
+		set @analysisname = @space + @space + @space + 'PM Scheduled Non-Compliance'
 		set @analysisremarks = '-'
 		select @targetkpi = 0
 		
@@ -447,7 +447,7 @@ begin
 		--------------------------------------------------------
 		
 		set @id = 106
-		set @analysisname = @space + @space + @space + 'CM Planned Non-Compliance'
+		set @analysisname = @space + @space + @space + 'CM Scheduled Non-Compliance'
 		set @analysisremarks = '-'
 		select @targetkpi = 0
 		

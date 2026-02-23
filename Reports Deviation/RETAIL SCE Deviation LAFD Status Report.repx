@@ -1,6 +1,6 @@
 /// <XRTypeInfo>
 ///   <AssemblyFullName>DevExpress.XtraReports.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a</AssemblyFullName>
-///   <AssemblyLocation>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraReports.v17.1\v4.0_17.1.4.0__b88d1754d700e49a\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
+///   <AssemblyLocation>C:\Users\ykw\Desktop\AMS windows Apps\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
 ///   <TypeName>DevExpress.XtraReports.UI.XtraReport</TypeName>
 ///   <Localization>en-US</Localization>
 ///   <Version>17.1</Version>
@@ -95,13 +95,13 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.XRLabel label22;
         private DevExpress.XtraReports.UI.XRLabel label23;
         private DevExpress.XtraReports.UI.XRLabel label24;
+        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;
+        private DevExpress.XtraReports.UI.XRLabel label33;
         private DevExpress.DataAccess.Sql.SqlDataSource sqlDataSource1;
         private DevExpress.XtraReports.UI.FormattingRule TargetKPI0;
         private DevExpress.XtraReports.UI.FormattingRule AnalysisNameEmpty;
         private DevExpress.XtraReports.UI.FormattingRule Target_Achieve_KPI_0;
         private DevExpress.XtraReports.Parameters.Parameter reporttype;
-        private DevExpress.XtraReports.UI.GroupFooterBand GroupFooter1;
-        private DevExpress.XtraReports.UI.XRLabel label33;
         private System.Resources.ResourceManager _resources;
         private string _resourceString;
         public xtraReport1() {
@@ -128,6 +128,7 @@ namespace XtraReportSerialization {
             this.PageFooter = new DevExpress.XtraReports.UI.PageFooterBand();
             this.BottomMargin = new DevExpress.XtraReports.UI.BottomMarginBand();
             this.GroupHeader1 = new DevExpress.XtraReports.UI.GroupHeaderBand();
+            this.GroupFooter1 = new DevExpress.XtraReports.UI.GroupFooterBand();
             this.label14 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel2 = new DevExpress.XtraReports.UI.XRLabel();
             this.xrLabel1 = new DevExpress.XtraReports.UI.XRLabel();
@@ -146,6 +147,7 @@ namespace XtraReportSerialization {
             this.label19 = new DevExpress.XtraReports.UI.XRLabel();
             this.label20 = new DevExpress.XtraReports.UI.XRLabel();
             this.label21 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label26 = new DevExpress.XtraReports.UI.XRLabel();
             this.label8 = new DevExpress.XtraReports.UI.XRLabel();
             this.label7 = new DevExpress.XtraReports.UI.XRLabel();
             this.label6 = new DevExpress.XtraReports.UI.XRLabel();
@@ -168,6 +170,7 @@ namespace XtraReportSerialization {
             this.label22 = new DevExpress.XtraReports.UI.XRLabel();
             this.label23 = new DevExpress.XtraReports.UI.XRLabel();
             this.label24 = new DevExpress.XtraReports.UI.XRLabel();
+            this.label33 = new DevExpress.XtraReports.UI.XRLabel();
             this.sqlDataSource1 = new DevExpress.DataAccess.Sql.SqlDataSource();
             this.TargetKPI0 = new DevExpress.XtraReports.UI.FormattingRule();
             this.AnalysisNameEmpty = new DevExpress.XtraReports.UI.FormattingRule();
@@ -175,9 +178,6 @@ namespace XtraReportSerialization {
             this.WODateFrom = new DevExpress.XtraReports.Parameters.Parameter();
             this.WODateTo = new DevExpress.XtraReports.Parameters.Parameter();
             this.reporttype = new DevExpress.XtraReports.Parameters.Parameter();
-            this.label26 = new DevExpress.XtraReports.UI.XRLabel();
-            this.GroupFooter1 = new DevExpress.XtraReports.UI.GroupFooterBand();
-            this.label33 = new DevExpress.XtraReports.UI.XRLabel();
             ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
             // 
             // TopMargin
@@ -263,14 +263,23 @@ namespace XtraReportSerialization {
             this.GroupHeader1.HeightF = 23F;
             this.GroupHeader1.Name = "GroupHeader1";
             // 
+            // GroupFooter1
+            // 
+            this.GroupFooter1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+                        this.label33});
+            this.GroupFooter1.HeightF = 23F;
+            this.GroupFooter1.Name = "GroupFooter1";
+            // 
             // label14
             // 
             this.label14.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.label14.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.label14.LocationFloat = new DevExpress.Utils.PointFloat(499F, 179F);
             this.label14.Name = "label14";
             this.label14.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label14.SizeF = new System.Drawing.SizeF(52.50003F, 23F);
             this.label14.StylePriority.UseBackColor = false;
+            this.label14.StylePriority.UseBorders = false;
             this.label14.StylePriority.UseTextAlignment = false;
             this.label14.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
             // 
@@ -384,18 +393,20 @@ namespace XtraReportSerialization {
             // label15
             // 
             this.label15.BackColor = System.Drawing.Color.Yellow;
+            this.label15.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.label15.LocationFloat = new DevExpress.Utils.PointFloat(551.5001F, 179F);
             this.label15.Name = "label15";
             this.label15.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label15.SizeF = new System.Drawing.SizeF(52.50003F, 23F);
             this.label15.StylePriority.UseBackColor = false;
+            this.label15.StylePriority.UseBorders = false;
             this.label15.StylePriority.UseTextAlignment = false;
             this.label15.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
             // 
             // label16
             // 
             this.label16.BackColor = System.Drawing.Color.Red;
-            this.label16.Borders = DevExpress.XtraPrinting.BorderSide.Right;
+            this.label16.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Right | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label16.LocationFloat = new DevExpress.Utils.PointFloat(604.0001F, 179F);
             this.label16.Name = "label16";
             this.label16.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -408,29 +419,33 @@ namespace XtraReportSerialization {
             // label17
             // 
             this.label17.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(0)))));
+            this.label17.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.label17.LocationFloat = new DevExpress.Utils.PointFloat(656.5002F, 179F);
             this.label17.Name = "label17";
             this.label17.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label17.SizeF = new System.Drawing.SizeF(52.50003F, 23F);
             this.label17.StylePriority.UseBackColor = false;
+            this.label17.StylePriority.UseBorders = false;
             this.label17.StylePriority.UseTextAlignment = false;
             this.label17.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
             // 
             // label18
             // 
             this.label18.BackColor = System.Drawing.Color.Yellow;
+            this.label18.Borders = DevExpress.XtraPrinting.BorderSide.Bottom;
             this.label18.LocationFloat = new DevExpress.Utils.PointFloat(709.0002F, 179F);
             this.label18.Name = "label18";
             this.label18.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label18.SizeF = new System.Drawing.SizeF(52.50003F, 23F);
             this.label18.StylePriority.UseBackColor = false;
+            this.label18.StylePriority.UseBorders = false;
             this.label18.StylePriority.UseTextAlignment = false;
             this.label18.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter;
             // 
             // label19
             // 
             this.label19.BackColor = System.Drawing.Color.Red;
-            this.label19.Borders = DevExpress.XtraPrinting.BorderSide.Right;
+            this.label19.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Right | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label19.LocationFloat = new DevExpress.Utils.PointFloat(761.5002F, 179F);
             this.label19.Name = "label19";
             this.label19.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
@@ -442,7 +457,7 @@ namespace XtraReportSerialization {
             // 
             // label20
             // 
-            this.label20.Borders = DevExpress.XtraPrinting.BorderSide.Right;
+            this.label20.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Right | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label20.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
                         new DevExpress.XtraReports.UI.XRBinding("Text", null, "GetWOMonthlyDeviationSCEAll.Total")});
             this.label20.LocationFloat = new DevExpress.Utils.PointFloat(446.5F, 179F);
@@ -455,12 +470,22 @@ namespace XtraReportSerialization {
             // 
             // label21
             // 
-            this.label21.Borders = DevExpress.XtraPrinting.BorderSide.Left;
+            this.label21.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label21.LocationFloat = new DevExpress.Utils.PointFloat(10F, 179F);
             this.label21.Name = "label21";
             this.label21.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label21.SizeF = new System.Drawing.SizeF(18.54169F, 23F);
             this.label21.StylePriority.UseBorders = false;
+            // 
+            // label26
+            // 
+            this.label26.Borders = ((DevExpress.XtraPrinting.BorderSide)((DevExpress.XtraPrinting.BorderSide.Right | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.label26.LocationFloat = new DevExpress.Utils.PointFloat(28.54169F, 179F);
+            this.label26.Name = "label26";
+            this.label26.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label26.SizeF = new System.Drawing.SizeF(417.9583F, 23F);
+            this.label26.StylePriority.UseBorders = false;
+            this.label26.Text = "SCE Sub Category";
             // 
             // label8
             // 
@@ -658,6 +683,7 @@ namespace XtraReportSerialization {
             // 
             // label1
             // 
+            this.label1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.label1.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
                         | DevExpress.XtraPrinting.BorderSide.Right) 
                         | DevExpress.XtraPrinting.BorderSide.Bottom)));
@@ -667,11 +693,13 @@ namespace XtraReportSerialization {
             this.label1.Name = "label1";
             this.label1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label1.SizeF = new System.Drawing.SizeF(436.5F, 23F);
+            this.label1.StylePriority.UseBackColor = false;
             this.label1.StylePriority.UseBorders = false;
             this.label1.Text = "label1";
             // 
             // label22
             // 
+            this.label22.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.label22.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Right) 
                         | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label22.DataBindings.AddRange(new DevExpress.XtraReports.UI.XRBinding[] {
@@ -680,6 +708,7 @@ namespace XtraReportSerialization {
             this.label22.Name = "label22";
             this.label22.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label22.SizeF = new System.Drawing.SizeF(52.50003F, 23F);
+            this.label22.StylePriority.UseBackColor = false;
             this.label22.StylePriority.UseBorders = false;
             this.label22.StylePriority.UseTextAlignment = false;
             summary1.Running = DevExpress.XtraReports.UI.SummaryRunning.Group;
@@ -688,23 +717,38 @@ namespace XtraReportSerialization {
             // 
             // label23
             // 
+            this.label23.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.label23.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Right) 
                         | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label23.LocationFloat = new DevExpress.Utils.PointFloat(499F, 0F);
             this.label23.Name = "label23";
             this.label23.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label23.SizeF = new System.Drawing.SizeF(157.5001F, 23F);
+            this.label23.StylePriority.UseBackColor = false;
             this.label23.StylePriority.UseBorders = false;
             // 
             // label24
             // 
+            this.label24.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(192)))));
             this.label24.Borders = ((DevExpress.XtraPrinting.BorderSide)(((DevExpress.XtraPrinting.BorderSide.Top | DevExpress.XtraPrinting.BorderSide.Right) 
                         | DevExpress.XtraPrinting.BorderSide.Bottom)));
             this.label24.LocationFloat = new DevExpress.Utils.PointFloat(656.5001F, 0F);
             this.label24.Name = "label24";
             this.label24.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.label24.SizeF = new System.Drawing.SizeF(157.5001F, 23F);
+            this.label24.StylePriority.UseBackColor = false;
             this.label24.StylePriority.UseBorders = false;
+            // 
+            // label33
+            // 
+            this.label33.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
+                        | DevExpress.XtraPrinting.BorderSide.Right) 
+                        | DevExpress.XtraPrinting.BorderSide.Bottom)));
+            this.label33.LocationFloat = new DevExpress.Utils.PointFloat(9.999974F, 0F);
+            this.label33.Name = "label33";
+            this.label33.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.label33.SizeF = new System.Drawing.SizeF(804.0001F, 23F);
+            this.label33.StylePriority.UseBorders = false;
             // 
             // sqlDataSource1
             // 
@@ -767,34 +811,6 @@ namespace XtraReportSerialization {
             this.reporttype.Type = typeof(int);
             this.reporttype.ValueInfo = "2";
             this.reporttype.Visible = false;
-            // 
-            // label26
-            // 
-            this.label26.Borders = DevExpress.XtraPrinting.BorderSide.Right;
-            this.label26.LocationFloat = new DevExpress.Utils.PointFloat(28.54169F, 179F);
-            this.label26.Name = "label26";
-            this.label26.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
-            this.label26.SizeF = new System.Drawing.SizeF(417.9583F, 23F);
-            this.label26.StylePriority.UseBorders = false;
-            this.label26.Text = "SCE Sub Category";
-            // 
-            // GroupFooter1
-            // 
-            this.GroupFooter1.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
-                        this.label33});
-            this.GroupFooter1.HeightF = 23F;
-            this.GroupFooter1.Name = "GroupFooter1";
-            // 
-            // label33
-            // 
-            this.label33.Borders = ((DevExpress.XtraPrinting.BorderSide)((((DevExpress.XtraPrinting.BorderSide.Left | DevExpress.XtraPrinting.BorderSide.Top) 
-                        | DevExpress.XtraPrinting.BorderSide.Right) 
-                        | DevExpress.XtraPrinting.BorderSide.Bottom)));
-            this.label33.LocationFloat = new DevExpress.Utils.PointFloat(9.999974F, 0F);
-            this.label33.Name = "label33";
-            this.label33.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 96F);
-            this.label33.SizeF = new System.Drawing.SizeF(804.0001F, 23F);
-            this.label33.StylePriority.UseBorders = false;
             // 
             // xtraReport1
             // 

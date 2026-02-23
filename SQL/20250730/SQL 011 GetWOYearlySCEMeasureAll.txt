@@ -260,45 +260,58 @@ begin
 
 	if @type = 1
 	begin
+		--update @table set compliance = 1
+		--where (PG01PM >= @targetkpi)
+		--and (PG02PM >= @targetkpi)
+		--and (PG03PM >= @targetkpi)
+		--and (PG04PM >= @targetkpi)
+		--and (PG01CM >= @targetkpi)
+		--and (PG02CM >= @targetkpi)
+		--and (PG03CM >= @targetkpi)
+		--and (PG04CM >= @targetkpi)
+		--and compliance = 0
+
 		update @table set compliance = 1
-		where (PG01PM >= @targetkpi)
-		and (PG02PM >= @targetkpi)
-		and (PG03PM >= @targetkpi)
-		and (PG04PM >= @targetkpi)
-		and (PG01CM >= @targetkpi)
-		and (PG02CM >= @targetkpi)
-		and (PG03CM >= @targetkpi)
-		and (PG04CM >= @targetkpi)
+		where (PG01PM + PG02PM + PG03PM + PG04PM + PG01CM + PG02PM + PG03CM + PG04CM) / 8 >= @targetkpi
 		and compliance = 0
 
 	end
 	else if @type = 2
 	begin
-		update @table set compliance = 1
-		where (PG03PM >= @targetkpi)
-		and (PG03CM >= @targetkpi)
-		and compliance = 0
+		--update @table set compliance = 1
+		--where (PG03PM >= @targetkpi)
+		--and (PG03CM >= @targetkpi)
+		--and compliance = 0
 
+		update @table set compliance = 1
+		where (PG03PM + PG03CM) / 2 >= @targetkpi
+		and compliance = 0
 	end
 	if @type = 3
 	begin
-		update @table set compliance = 1
-		where (PG01PM >= @targetkpi)
-		and (PG02PM >= @targetkpi)
-		and (PG04PM >= @targetkpi)
-		and (PG01CM >= @targetkpi)
-		and (PG02CM >= @targetkpi)
-		and (PG04CM >= @targetkpi)
-		and compliance = 0
+		--update @table set compliance = 1
+		--where (PG01PM >= @targetkpi)
+		--and (PG02PM >= @targetkpi)
+		--and (PG04PM >= @targetkpi)
+		--and (PG01CM >= @targetkpi)
+		--and (PG02CM >= @targetkpi)
+		--and (PG04CM >= @targetkpi)
+		--and compliance = 0
 
+		update @table set compliance = 1
+		where (PG01PM + PG02PM + PG04PM + PG01CM + PG02PM + PG04CM) / 6 >= @targetkpi
+		and compliance = 0
 	end
 	else if @type = 4
 	begin
-		update @table set compliance = 1
-		where (PG05PM >= @targetkpi)
-		and (PG05CM >= @targetkpi)
-		and compliance = 0
+		--update @table set compliance = 1
+		--where (PG05PM >= @targetkpi)
+		--and (PG05CM >= @targetkpi)
+		--and compliance = 0
 
+		update @table set compliance = 1
+		where (PG05PM + PG05CM) / 2 >= @targetkpi
+		and compliance = 0
 	end
 
 	select @totalmonth = count(*), @lastmonth = max(monthly)

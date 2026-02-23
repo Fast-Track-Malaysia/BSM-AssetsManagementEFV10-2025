@@ -169,11 +169,8 @@ begin
 	update @newtable set PMCompliance = @PMCompliance
 		, CMCompliance = @CMCompliance
 
-	select ID, AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04, PG05, Total, TargetKPI, AchieveKPI
+	select ID, replace(replace (AnalysisName,'PM', 'SCE PM'),'CM', 'SCE CM') as AnalysisName, AnalysisRemarks, PG01, PG02, PG03, PG04, PG05, Total, TargetKPI, AchieveKPI
 	, PMCompliance, CMCompliance
 	from @newtable
 	order by ID
 end
-go
-
-

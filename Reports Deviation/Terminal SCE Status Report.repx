@@ -1,6 +1,6 @@
 /// <XRTypeInfo>
 ///   <AssemblyFullName>DevExpress.XtraReports.v17.1, Version=17.1.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a</AssemblyFullName>
-///   <AssemblyLocation>C:\Windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraReports.v17.1\v4.0_17.1.4.0__b88d1754d700e49a\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
+///   <AssemblyLocation>C:\Users\ykw\Desktop\AMS windows Apps\DevExpress.XtraReports.v17.1.dll</AssemblyLocation>
 ///   <TypeName>DevExpress.XtraReports.UI.XtraReport</TypeName>
 ///   <Localization>en-US</Localization>
 ///   <Version>17.1</Version>
@@ -70,11 +70,11 @@ namespace XtraReportSerialization {
         private DevExpress.XtraReports.UI.FormattingRule green_pg01pm;
         private DevExpress.XtraReports.UI.FormattingRule hide;
         private DevExpress.XtraReports.UI.FormattingRule red_pg01pm;
-        private DevExpress.XtraReports.UI.FormattingRule hide9;
         private DevExpress.XtraReports.UI.XRLabel label5;
         private DevExpress.XtraReports.UI.FormattingRule green_pg01cm;
         private DevExpress.XtraReports.UI.FormattingRule red_pg01cm;
         private DevExpress.XtraReports.UI.XRLabel label6;
+        private DevExpress.XtraReports.UI.FormattingRule hide9;
         private DevExpress.XtraReports.UI.XRLabel label7;
         private DevExpress.XtraReports.UI.XRLabel label12;
         private DevExpress.XtraReports.UI.FormattingRule green_pg02pm;
@@ -418,7 +418,6 @@ namespace XtraReportSerialization {
             this.label4.FormattingRules.Add(this.green_pg01pm);
             this.label4.FormattingRules.Add(this.hide);
             this.label4.FormattingRules.Add(this.red_pg01pm);
-            this.label4.FormattingRules.Add(this.hide9);
             this.label4.LocationFloat = new DevExpress.Utils.PointFloat(447.5005F, 0F);
             this.label4.Name = "label4";
             this.label4.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
