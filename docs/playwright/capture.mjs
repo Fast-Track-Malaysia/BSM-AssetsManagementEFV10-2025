@@ -77,6 +77,8 @@ async function navTo(page, label) {
     }
     await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
     await page.waitForTimeout(1500);
+    const title = await page.title().catch(() => '');
+    console.log(`  (matched='${matched}', title='${title}')`);
 }
 
 // Open the first row of the current list view (double-click the data cell).
@@ -92,22 +94,88 @@ async function openFirstRow(page) {
     return true;
 }
 
-// Click a tab by label. DX tab strip uses .dxtc-tab spans inside .dxtc containers.
+// Click a tab by label. The DX client API is unreliable when the page has
+// multiple hidden tab controls — SetActiveTab on the wrong control produces
+// no visible change. We therefore prefer a DOM click on the VISIBLE tab cell.
 async function clickTab(page, label) {
-    const clicked = await page.evaluate((wanted) => {
+    const clickedVia = await page.evaluate((wanted) => {
+        const rx = new RegExp('^\\s*' + wanted.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$', 'i');
+        const isVisible = (el) => {
+            if (!el) return false;
+            const r = el.getBoundingClientRect();
+            if (r.width < 2 || r.height < 2) return false;
+            const cs = window.getComputedStyle(el);
+            return cs.visibility !== 'hidden' && cs.display !== 'none' && cs.opacity !== '0';
+        };
+
+        // Approach 1: find a VISIBLE tab strip cell/link and click its nearest
+        // clickable ancestor. DX tab cells are typically td.dxtc-tab or similar.
         const candidates = [
-            ...document.querySelectorAll('.dxtc-tab, .dxtcTab, .dxtc-tabContainer a, .dxtc a'),
+            ...document.querySelectorAll('.dxtc-tab, .dxtcTab, .dxtc-tabContainer a, .dxtc a, .dxtc td'),
         ];
-        const rx = new RegExp(wanted, 'i');
-        const hit = candidates.find(e => rx.test(e.innerText || ''));
-        if (hit) { hit.click(); return (hit.innerText || '').trim(); }
+        const visibleHits = candidates.filter(e => rx.test(e.innerText || '') && isVisible(e));
+        if (visibleHits.length > 0) {
+            // Prefer the largest visible candidate (main tab strip, not a sub-widget)
+            visibleHits.sort((a, b) => {
+                const ra = a.getBoundingClientRect();
+                const rb = b.getBoundingClientRect();
+                return (rb.width * rb.height) - (ra.width * ra.height);
+            });
+            const hit = visibleHits[0];
+            const clickable = hit.closest('td, a') || hit;
+            clickable.click();
+            return 'dom-visible';
+        }
+
+        // Approach 2: fall back to the DX client API on any tab control
+        try {
+            for (const k of Object.keys(window)) {
+                let v;
+                try { v = window[k]; } catch { continue; }
+                if (v && typeof v.GetTabCount === 'function' && typeof v.SetActiveTab === 'function' && typeof v.GetTab === 'function') {
+                    // Skip tab controls whose main element isn't in the DOM / visible
+                    const mainEl = v.GetMainElement ? v.GetMainElement() : null;
+                    if (mainEl && !isVisible(mainEl)) continue;
+                    const n = v.GetTabCount();
+                    for (let i = 0; i < n; i++) {
+                        let tab;
+                        try { tab = v.GetTab(i); } catch { continue; }
+                        if (!tab) continue;
+                        const tabText = (tab.GetText && tab.GetText()) || (tab.name) || '';
+                        if (rx.test((tabText || '').trim())) {
+                            v.SetActiveTab(tab);
+                            return 'dx-api';
+                        }
+                    }
+                }
+            }
+        } catch (e) { /* fallthrough */ }
+
+        // Approach 3: any matching element (visible or not), click closest td/a
+        const anyHit = candidates.find(e => rx.test(e.innerText || ''));
+        if (anyHit) {
+            const clickable = anyHit.closest('td, a') || anyHit;
+            clickable.click();
+            return 'dom-any';
+        }
         return null;
     }, label);
-    if (!clicked) {
+    if (!clickedVia) {
         console.log(`  tab not found: ${label}`);
         return false;
     }
-    await page.waitForTimeout(1000);
+    console.log(`  tab '${label}' via ${clickedVia}`);
+    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(2000);
+    // Scroll the tab strip (and its active content) to the top of the viewport
+    // so the next screenshot actually captures the switched tab content.
+    await page.evaluate((wanted) => {
+        const rx = new RegExp('^\\s*' + wanted.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$', 'i');
+        const candidates = [...document.querySelectorAll('.dxtc-tab, .dxtcTab')];
+        const hit = candidates.find(e => rx.test(e.innerText || ''));
+        if (hit) hit.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }, label);
+    await page.waitForTimeout(500);
     return true;
 }
 
@@ -129,19 +197,35 @@ async function clickNew(page) {
     await page.waitForTimeout(1200);
 }
 
-// Close the current detail view and return to list, using Close / toolbar cancel.
+// Close the current detail view. In XAF web the toolbar "Close" action is
+// typically a menu item with id ending in "_Close" inside the main actions menu.
 async function closeView(page) {
-    const closeBtn = page.locator('a, span, div', { hasText: /^\s*Close\s*$/ }).first();
-    if (await closeBtn.count() > 0) {
-        await closeBtn.click({ timeout: 3000 }).catch(() => {});
-        await page.waitForTimeout(800);
-        // Dismiss any "discard changes" dialog
-        const yes = page.getByText(/^\s*OK\s*$|^\s*Yes\s*$/).first();
-        if (await yes.count() > 0) {
-            await yes.click({ timeout: 2000 }).catch(() => {});
-            await page.waitForTimeout(500);
-        }
-    }
+    await page.evaluate(() => {
+        // Find any DX menu/action item whose caption is "Close" and click it.
+        const items = [...document.querySelectorAll('a, div.dxm-item, td.dxm-item, .dxbButton, span')];
+        const target = items.find(el => {
+            const t = (el.innerText || el.getAttribute('aria-label') || '').trim();
+            return /^Close$/i.test(t);
+        });
+        if (target) target.click();
+    });
+    await page.waitForTimeout(1200);
+    // Dismiss any confirmation dialog
+    await page.evaluate(() => {
+        const buttons = [...document.querySelectorAll('a, div, td, span, input')];
+        const ok = buttons.find(b => /^(OK|Yes|Discard)$/i.test((b.innerText || b.value || '').trim()));
+        if (ok) ok.click();
+    });
+    await page.waitForTimeout(800);
+}
+
+// Force a hard return to "home" by going directly to Default.aspx. This resets
+// the application state between screenshot groups that might otherwise leave
+// modal dialogs / detail views on screen.
+async function goHome(page) {
+    await page.goto(`${BASE}/Default.aspx`, { waitUntil: 'networkidle' }).catch(() => {});
+    await page.waitForTimeout(1500);
+    await expandAllNavGroups(page);
 }
 
 async function safe(label, fn) {
@@ -168,93 +252,119 @@ async function safe(label, fn) {
 
     // --- EQUIPMENT LIST
     await safe('equipment-list', async () => {
+        await goHome(page);
         await navTo(page, 'Equipment');
         await shoot(page, 'equipment-list');
-        await shoot(page, 'list-view');  // reuse same shot as the generic list-view example
+        await shoot(page, 'list-view');
     });
 
     // --- EQUIPMENT DETAIL
     await safe('equipment-detail', async () => {
+        await goHome(page);
+        await navTo(page, 'Equipment');
         if (await openFirstRow(page)) {
             await shoot(page, 'equipment-detail');
             await shoot(page, 'detail-view');
-            await closeView(page);
         }
     });
 
     // --- LOCATION SETUP (Areas)
     await safe('location-setup', async () => {
+        await goHome(page);
         await navTo(page, 'Areas');
         await shoot(page, 'location-setup');
     });
 
     // --- EQUIPMENT CLASS
     await safe('eq-class', async () => {
+        await goHome(page);
         await navTo(page, 'Equipment Classes');
         await shoot(page, 'eq-class');
     });
 
     // --- PM SCHEDULE
     await safe('pm-schedule', async () => {
+        await goHome(page);
         await navTo(page, 'PM Schedule');
         if (await openFirstRow(page)) {
             await shoot(page, 'pm-schedule');
-            await closeView(page);
         }
     });
 
     // --- PM PATCH
     await safe('pm-patch', async () => {
+        await goHome(page);
         await navTo(page, 'PM Batches');
         await shoot(page, 'pm-patch');
     });
 
     // --- WORK REQUEST
     await safe('wr-detail', async () => {
+        await goHome(page);
         await navTo(page, 'Work Request');
         if (await openFirstRow(page)) {
             await shoot(page, 'wr-detail');
-            await closeView(page);
         }
     });
 
     await safe('wr-new', async () => {
+        await goHome(page);
         await navTo(page, 'Work Request');
         await clickNew(page);
         await shoot(page, 'wr-new');
-        await closeView(page);
     });
 
-    // --- WORK ORDER (CM and PM are tree nodes; reports come last as fallback)
-    await safe('wo-header', async () => {
-        for (const label of ['CM Work Order', 'PM Work Order', 'Work Full List']) {
-            try { await navTo(page, label); } catch { continue; }
+    // --- WORK ORDER — each tab gets its own fresh navigation.
+    // DX detail views in this app appear to cache the visible panel, so clicking
+    // tabs on a cached view doesn't always produce a re-render. Re-opening the
+    // detail for each tab shot is slower but reliable.
+    const captureWoTab = async (tabLabel, shotName) => {
+        await goHome(page);
+        for (const navLabel of ['CM Work Order', 'PM Work Order', 'Work Full List']) {
+            try { await navTo(page, navLabel); } catch { continue; }
             if (await openFirstRow(page)) {
-                await shoot(page, 'wo-header');
-                await listTabs(page);
-                if (await clickTab(page, 'Equipment List')) await shoot(page, 'wo-operations');
-                if (await clickTab(page, 'Man Hours')) await shoot(page, 'wo-manhours');
-                if (await clickTab(page, 'Job Status List')) await shoot(page, 'wo-jobstatus');
-                if (await clickTab(page, 'Purchase Request')) await shoot(page, 'pr-from-wo');
-                await closeView(page);
-                return;
+                if (tabLabel === null) {
+                    await shoot(page, shotName);
+                    return true;
+                }
+                if (await clickTab(page, tabLabel)) {
+                    await shoot(page, shotName);
+                    return true;
+                }
             }
         }
-        console.log('  all WO nav targets were empty');
+        return false;
+    };
+
+    await safe('wo-header', async () => {
+        await captureWoTab(null, 'wo-header');
+    });
+    await safe('wo-operations', async () => {
+        await captureWoTab('Equipment List', 'wo-operations');
+    });
+    await safe('wo-manhours', async () => {
+        await captureWoTab('Man Hours', 'wo-manhours');
+    });
+    await safe('wo-jobstatus', async () => {
+        await captureWoTab('Job Status List', 'wo-jobstatus');
+    });
+    await safe('pr-from-wo', async () => {
+        await captureWoTab('Purchase Request', 'pr-from-wo');
     });
 
     // --- PURCHASE REQUEST
     await safe('pr-detail', async () => {
+        await goHome(page);
         await navTo(page, 'Purchase Requests');
         if (await openFirstRow(page)) {
             await shoot(page, 'pr-detail');
-            await shoot(page, 'pr-post-sap');  // same view shows the Post to SAP action
-            await closeView(page);
+            await shoot(page, 'pr-post-sap');
         }
     });
 
-    // --- DEVIATION (the All-Status view is a treeview node under the Deviation group)
-    await safe('deviation', async () => {
+    // --- DEVIATION — each shot starts fresh for the same reason as WO tabs.
+    const captureDeviation = async (tabLabel, shotName) => {
+        await goHome(page);
         const clicked = await page.evaluate(() => {
             const nodes = [...document.querySelectorAll('.dxtv-nd, a.dxnb-link')];
             const target = nodes.find(n => /Deviation.*All Status/i.test(n.innerText || ''));
@@ -265,16 +375,19 @@ async function safe(label, fn) {
         await page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
         await page.waitForTimeout(1500);
         if (await openFirstRow(page)) {
-            await shoot(page, 'deviation-new');
-            await shoot(page, 'deviation-workflow');
-            await listTabs(page);
-            if (await clickTab(page, 'Risk Assessment')) await shoot(page, 'deviation-risk');
-            await closeView(page);
+            if (tabLabel === null) { await shoot(page, shotName); return true; }
+            if (await clickTab(page, tabLabel)) { await shoot(page, shotName); return true; }
         }
-    });
+        return false;
+    };
+
+    await safe('deviation-new', async () => { await captureDeviation(null, 'deviation-new'); });
+    await safe('deviation-workflow', async () => { await captureDeviation(null, 'deviation-workflow'); });
+    await safe('deviation-risk', async () => { await captureDeviation('Risk Assessment', 'deviation-risk'); });
 
     // --- REPORT PREVIEW (run the first report in the Reports group)
     await safe('report-preview', async () => {
+        await goHome(page);
         const clicked = await page.evaluate(() => {
             const candidates = [...document.querySelectorAll('a.dxnb-link, .dxtv-nd')];
             const r = candidates.find(c => /monthly kpi|bad actor|weekly ams|status report|layout/i.test(c.innerText || ''));
@@ -288,29 +401,36 @@ async function safe(label, fn) {
         await shoot(page, 'report-preview');
     });
 
-    // --- ADMIN: System Users, Role, Job Statuses, Contractor
+    // --- ADMIN: each admin shot starts from a fresh home navigation so that
+    // previous closeView() / detail-view state can't bleed into the next shot.
     await safe('admin-users', async () => {
+        await goHome(page);
         await navTo(page, 'System Users');
         await shoot(page, 'admin-users');
-        if (await openFirstRow(page)) {
-            await shoot(page, 'admin-role');
-            await closeView(page);
-        }
+    });
+
+    await safe('admin-role', async () => {
+        await goHome(page);
+        await navTo(page, 'Role');
+        await shoot(page, 'admin-role');
     });
 
     await safe('job-status-setup', async () => {
+        await goHome(page);
         await navTo(page, 'Job Statuses');
         await shoot(page, 'job-status-setup');
     });
 
     await safe('contractor-setup', async () => {
-        await navTo(page, 'Contractor');
+        await goHome(page);
+        await navTo(page, 'Contractors');
         await shoot(page, 'contractor-setup');
     });
 
     // --- REPORTS
     await safe('reports', async () => {
-        await navTo(page, 'Report');
+        await goHome(page);
+        await navTo(page, 'Reports');
         await shoot(page, 'report-list');
     });
 
