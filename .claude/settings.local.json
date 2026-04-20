@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where pandoc *)",
+      "Bash(powershell -NoProfile -Command 'try { $w = New-Object -ComObject Word.Application; $w.Quit\\(\\); '\\\\''word-ok'\\\\'' } catch { '\\\\''no-word'\\\\'' }')",
+      "Bash(powershell *)",
+      "Bash(where node *)",
+      "Bash(where npm *)",
+      "Bash(npm --version)",
+      "Bash(mkdir -p \"C:/YKW/BSM-AssetsManagementEFV10-2025/docs/playwright\")",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(npx playwright *)",
+      "Bash(node capture.mjs)",
+      "Bash(node probe.mjs)",
+      "Bash(grep -v -E \"^\\(admin-report-upload|admin-webconfig\\)\\\\.png$\")"
+    ]
+  }
+}
