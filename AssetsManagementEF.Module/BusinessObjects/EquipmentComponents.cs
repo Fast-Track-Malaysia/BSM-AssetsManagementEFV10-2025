@@ -320,7 +320,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         }
 
         private string _LifeSpan;
-        [XafDisplayName("Remarks"), ToolTip("Enter Text")]
+        [XafDisplayName("Life Span"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
         [Index(73), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
@@ -337,11 +337,29 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
+        private string _Remarks;
+        [XafDisplayName("Remarks"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[RuleRequiredField(DefaultContexts.Save)]
+        [Index(74), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
+        public string Remarks
+        {
+            get { return _Remarks; }
+            set
+            {
+                if (_Remarks != value)
+                {
+                    _Remarks = value;
+                    OnPropertyChanged("Remarks");
+                }
+            }
+        }
+        
         private string _Manufacture;
         [XafDisplayName("Manufacture"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
-        [Index(74), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
+        [Index(75), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
         public string Manufacture
         {
             get { return _Manufacture; }
@@ -355,24 +373,24 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
-        private string _Remarks;
-        [XafDisplayName("Remarks"), ToolTip("Enter Text")]
+        private string _Specification;
+        [XafDisplayName("Specification"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
-        [Index(75), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
-        public string Remarks
+        [Aggregated, ExpandObjectMembers(ExpandObjectMembers.Never)]
+        [Index(76), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
+        public string Specification
         {
-            get { return _Remarks; }
+            get { return _Specification; }
             set
             {
-                if (_Remarks != value)
+                if (_Specification != value)
                 {
-                    _Remarks = value;
-                    OnPropertyChanged("Remarks");
+                    _Specification = value;
+                    OnPropertyChanged("Specification");
                 }
             }
         }
-
 
         private Criticalities _Criticality;
         [ImmediatePostData]
@@ -439,7 +457,12 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
+        [Index(99), VisibleInDetailView(true), VisibleInListView(false), VisibleInLookupListView(false)]
+        [Appearance("Equipment", Enabled = false)]
+        public virtual Equipments Equipment { get; set; }
+
         private string _BoFullCode;
+        [Index(100), VisibleInDetailView(true), VisibleInListView(false), VisibleInLookupListView(false)]
         [XafDisplayName("Interface Code")]
         public string BoFullCode
         {
@@ -454,8 +477,8 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
-        [Browsable(false)]
         private bool _IsActive;
+        [Index(101), VisibleInDetailView(true), VisibleInListView(false), VisibleInLookupListView(false)]
         [XafDisplayName("Active"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         public bool IsActive
@@ -478,15 +501,29 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [Browsable(false), System.ComponentModel.DataAnnotations.Schema.NotMapped]
         public bool IsNew { get; protected set; }
 
-        [Index(99), VisibleInDetailView(false), VisibleInListView(false), VisibleInLookupListView(false)]
-        [Appearance("Equipment", Enabled = false)]
-        public virtual Equipments Equipment { get; set; }
 
         // Collection property:
         //public virtual IList<AssociatedEntityObject> AssociatedEntities { get; set; }
+        [XafDisplayName("Attachment")]
+        public virtual IList<EquipmentComponentAttachments> EquipmentComponentAttachment { get; set; }
+
+        [XafDisplayName("Photo")]
+        public virtual IList<EquipmentComponentPhotos> EquipmentComponentPhoto { get; set; }
+
         [XafDisplayName("PM Schedule")]
         [Appearance("PMScheduleEquipment", Enabled = false)]
         public virtual IList<PMScheduleEqComponents> PMScheduleEqComponent { get; set; }
+
+        [XafDisplayName("Work Request")]
+        [Appearance("WorkRequestEqComponent", Enabled = false)]
+        public virtual IList<WorkRequestEqComponents> WorkRequestEqComponent { get; set; }
+
+        [XafDisplayName("Work Order")]
+        [Appearance("WorkOrderEqComponent", Enabled = false)]
+        public virtual IList<WorkOrderEqComponents> WorkOrderEqComponent { get; set; }
+
+        [XafDisplayName("Part Lists")]
+        public virtual IList<EquipmentComponentParts> EquipmentComponentPart { get; set; }
 
         #region PMSchedule
 

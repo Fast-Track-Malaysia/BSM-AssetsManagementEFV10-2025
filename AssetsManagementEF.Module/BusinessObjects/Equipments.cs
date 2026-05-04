@@ -319,6 +319,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
 
         private string _BoFullCode;
         [XafDisplayName("Interface Code")]
+        [Index(76), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
         public string BoFullCode
         {
             get { return _BoFullCode; }
@@ -536,6 +537,24 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
+        private string _Specification;
+        [XafDisplayName("Specification"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[RuleRequiredField(DefaultContexts.Save)]
+        [Aggregated, ExpandObjectMembers(ExpandObjectMembers.Never)]
+        [Index(77), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(true)]
+        public string Specification
+        {
+            get { return _Specification; }
+            set
+            {
+                if (_Specification != value)
+                {
+                    _Specification = value;
+                    OnPropertyChanged("Specification");
+                }
+            }
+        }
 
         private bool _IsApproved;
         [XafDisplayName("Approved"), ToolTip("Enter Text")]
@@ -601,6 +620,8 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [Appearance("WorkOrderEquipment", Enabled = false)]
         public virtual IList<WorkOrderEquipments> WorkOrderEquipment { get; set; }
 
+        [XafDisplayName("Part Lists")]
+        public virtual IList<EquipmentParts> EquipmentPart { get; set; }
 
 
         //public void refPMSchedule (ref BindingList<PMScheduleDC> mylist)
@@ -612,7 +633,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         //}
 
         #region PMSchedule
-        
+
         private BindingList<PMScheduleDC> _PMSchedule;
         [XafDisplayName("Schedule List")]
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]

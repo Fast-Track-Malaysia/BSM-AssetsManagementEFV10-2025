@@ -383,6 +383,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
 
 
         private Priorities _Priority;
+        [ImmediatePostData]
         [Appearance("Priority", Enabled = false, Criteria = "Approved")]
         [Index(40), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
         public virtual Priorities Priority
@@ -393,7 +394,9 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 if (_Priority != value)
                 {
                     _Priority = value;
+                    _WRTargetDate = DocDate.AddDays(_Priority.AllowedDayTo);
                     OnPropertyChanged("Priority");
+                    OnPropertyChanged("WRTargetDate");
                 }
             }
         }
@@ -417,6 +420,41 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
+        private CostCentres _CostCentre;
+        [XafDisplayName("Cost Centre"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[Appearance("CostCentre", Enabled = false, Criteria = "Approved")]
+        [Index(51), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        public virtual CostCentres CostCentre
+        {
+            get { return _CostCentre; }
+            set
+            {
+                if (_CostCentre != value)
+                {
+                    _CostCentre = value;
+                    OnPropertyChanged("CostCentre");
+                }
+            }
+        }
+
+        private bool _MoCRequired;
+        [Index(52), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        //[FieldSizeAttribute(1024)]
+        [XafDisplayName("MoC Required")]
+        //[Appearance("MoCRequire", Enabled = false)]
+        public bool MoCRequired
+        {
+            get { return _MoCRequired; }
+            set
+            {
+                if (_MoCRequired != value)
+                {
+                    _MoCRequired = value;
+                    OnPropertyChanged("MoCRequired");
+                }
+            }
+        }
 
 
         [Index(20), VisibleInListView(true), VisibleInDetailView(false), VisibleInLookupListView(true)]

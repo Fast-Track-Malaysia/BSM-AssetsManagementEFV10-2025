@@ -1,0 +1,18 @@
+INSERT INTO CostCentres ([BoCode], [BoName], [Section], [Department])
+VALUES
+('BMD00R', 'S&D Routine OPEX', 'BMD', 'BMD'),
+('BMD02R', 'Logistics Routine OPEX', 'BMD2', 'BMD'),
+('BMD03R', 'Engineering Routine OPEX', 'BMD3', 'BMD'),
+('BMD11R', 'Muara Terminal Operations', 'BMD11', 'BMD'),
+('BMD12R', 'Aviation Terminal Operations', 'BMD12', 'BMD'),
+('BMD13R', 'Packed Operations', 'BMD13', 'BMD'),
+('BMD14R', 'LPG Operations', 'BMD14', 'BMD'),
+('BMF00R', 'Finance Routine Opex', 'BMF', 'BMF'),
+('BMH01R', 'HR & Corp Affairs Routine OPEX', 'BMH', 'BMH'),
+('BML01R', 'Legal Routine OPEX', 'BML', 'BML'),
+('BMM01R', 'Sales & Marketing Routine OPEX', 'BMM', 'BMM'),
+('BMM03R', 'Commercial Routine OPEX', 'BMM3', 'BMM'),
+('BMM04R', 'Retail Routine OPEX', 'BMM4', 'BMM'),
+('BMS01R', 'HSSE Non Routine Opex', 'BMS', 'BMS'),
+('BMT01R', 'Business Transition Dev', 'BMT', 'BMT'),
+('BMX01R', 'CustomerExcellenceRoutine OPEX', 'BMX', 'BMX');

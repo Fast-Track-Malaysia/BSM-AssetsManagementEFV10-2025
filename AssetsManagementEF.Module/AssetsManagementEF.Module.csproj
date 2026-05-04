@@ -198,6 +198,8 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BusinessObjects\WorkOrderTrades.cs" />
+    <Compile Include="BusinessObjects\CostCentres.cs" />
     <Compile Include="BusinessObjects\DeviationFrequencies.cs" />
     <Compile Include="BusinessObjects\DeviationLocations.cs" />
     <Compile Include="BusinessObjects\DeviationDocStatus.cs" />
@@ -208,6 +210,10 @@
     <Compile Include="BusinessObjects\DeviationTypes.cs" />
     <Compile Include="BusinessObjects\DeviationMitigations.cs" />
     <Compile Include="BusinessObjects\DeviationWRTypes.cs" />
+    <Compile Include="BusinessObjects\EquipmentComponentAttachments.cs" />
+    <Compile Include="BusinessObjects\EquipmentComponentParts.cs" />
+    <Compile Include="BusinessObjects\EquipmentParts.cs" />
+    <Compile Include="BusinessObjects\EquipmentComponentPhotos.cs" />
     <Compile Include="BusinessObjects\RiskAssets.cs" />
     <Compile Include="BusinessObjects\RiskCommunities.cs" />
     <Compile Include="BusinessObjects\RiskEnvironments.cs" />
@@ -527,6 +533,14 @@
     <Compile Include="Migrations\202511240407268_add_workorder_LAFD.Designer.cs">
       <DependentUpon>202511240407268_add_workorder_LAFD.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202604300758004_add_costcenter.cs" />
+    <Compile Include="Migrations\202604300758004_add_costcenter.Designer.cs">
+      <DependentUpon>202604300758004_add_costcenter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202605040651024_add_WorkOrderTrades.cs" />
+    <Compile Include="Migrations\202605040651024_add_WorkOrderTrades.Designer.cs">
+      <DependentUpon>202605040651024_add_WorkOrderTrades.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Module.cs">
       <SubType>Component</SubType>
@@ -709,6 +723,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202511240407268_add_workorder_LAFD.resx">
       <DependentUpon>202511240407268_add_workorder_LAFD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202604300758004_add_costcenter.resx">
+      <DependentUpon>202604300758004_add_costcenter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605040651024_add_WorkOrderTrades.resx">
+      <DependentUpon>202605040651024_add_WorkOrderTrades.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
     <EmbeddedResource Include="Module.resx">

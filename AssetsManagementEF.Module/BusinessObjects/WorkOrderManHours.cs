@@ -98,7 +98,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         }
 
         private WorkOrderOpTypes _WorkOrderOpType;
-        [XafDisplayName("Type of work"), ToolTip("Enter Text")]
+        [XafDisplayName("Type of work/Labour"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(5), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
@@ -111,6 +111,23 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 {
                     _WorkOrderOpType = value;
                     OnPropertyChanged("WorkOrderOpType");
+                }
+            }
+        }
+        private WorkOrderTrades _WorkOrderTrade;
+        [XafDisplayName("Type of work/Labour"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        [Index(6), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[RuleRequiredField(DefaultContexts.Save)]
+        public virtual WorkOrderTrades WorkOrderTrade
+        {
+            get { return _WorkOrderTrade; }
+            set
+            {
+                if (_WorkOrderTrade != value)
+                {
+                    _WorkOrderTrade = value;
+                    OnPropertyChanged("WorkOrderTrade");
                 }
             }
         }
@@ -132,10 +149,79 @@ namespace AssetsManagementEF.Module.BusinessObjects
         //        }
         //    }
         //}
+        private int _EManCount;
+        [ImmediatePostData]
+        [XafDisplayName("Estimate Nos of Worker"), ToolTip("Enter Number")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        [RuleRequiredField(DefaultContexts.Save)]
+        [Index(91), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
+        [Appearance("EManCount", BackColor = "yellow")]
+        public int EManCount
+        {
+            get { return _EManCount; }
+            set
+            {
+                if (_EManCount != value)
+                {
+                    _EManCount = value;
+                    OnPropertyChanged("EManCount");
+                }
+            }
+        }
+        private long _EManHours;
+        [ImmediatePostData]
+        [XafDisplayName("Estimate Nos of Hours"), ToolTip("Enter Number")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        [RuleRequiredField(DefaultContexts.Save)]
+        [Appearance("EManHours", BackColor = "yellow")]
+        [Index(92), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
+        public long EManHours
+        {
+            get { return _EManHours; }
+            set
+            {
+                if (_EManHours != value)
+                {
+                    _EManHours = value;
+                    OnPropertyChanged("EManHours");
+                }
+            }
+        }
+
+        [XafDisplayName("Total Estimate Man Hours")]
+        [Index(93), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
+        [Appearance("ETotalHours", BackColor = "yellow", FontColor = "Black")]
+        public long ETotalHours
+        {
+            get { return _EManCount * _EManHours; }
+        }
+        [VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [Appearance("dummy01", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        public string dummy01
+        {
+            get { return ""; }
+        }
+        //[VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        //[Appearance("dummy02", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        //public string dummy02
+        //{
+        //    get { return ""; }
+        //}
+        //[VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        //[Appearance("dummy03", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        //public string dummy03
+        //{
+        //    get { return ""; }
+        //}
 
         private int _ManCount;
-        [XafDisplayName("Worker Count"), ToolTip("Enter Text")]
+        [ImmediatePostData]
+        [XafDisplayName("Actual Nos of Worker"), ToolTip("Enter Number")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        [Appearance("ManCount", BackColor = "lightgreen")]
         [RuleRequiredField(DefaultContexts.Save)]
         [Index(101), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
         public int ManCount
@@ -150,15 +236,42 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 }
             }
         }
+        private long _ManHours;
+        [ImmediatePostData]
+        [XafDisplayName("Actual Nos of Hours"), ToolTip("Enter Number")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        [Appearance("ManHours", BackColor = "lightgreen")]
+        [RuleRequiredField(DefaultContexts.Save)]
+        [Index(102), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
+        public long ManHours
+        {
+            get { return _ManHours; }
+            set
+            {
+                if (_ManHours != value)
+                {
+                    _ManHours = value;
+                    OnPropertyChanged("ManHours");
+                }
+            }
+        }
+        [XafDisplayName("Total Actual Man Hours")]
+        [Appearance("TotalHours", BackColor = "lightgreen", FontColor = "Black")]
+        [Index(103), VisibleInDetailView(true), VisibleInListView(true), VisibleInLookupListView(false)]
+        public long TotalHours
+        {
+            get { return _ManCount * _ManHours; }
+        }
 
 
         private TimeSpan? _TimeSpend;
-        [XafDisplayName("Total Man Hr (hh:mm)"), ToolTip("Enter Text")]
-        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
-        [ModelDefault("EditMask", @"hh:mm")]
-        [ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
-        [Index(10), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
-        [RuleRequiredField(DefaultContexts.Save)]
+        //[XafDisplayName("Total Man Hr (hh:mm)"), ToolTip("Enter Text")]
+        ////[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[ModelDefault("EditMask", @"hh:mm")]
+        //[ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
+        //[Index(102), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[RuleRequiredField(DefaultContexts.Save)]
+        [Browsable(false)]
         public TimeSpan? TimeSpend
         {
             get { return _TimeSpend; }
@@ -172,26 +285,13 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
-        private long _ManHours;
-        [Browsable(false)]
-        public long ManHours
-        {
-            get { return _ManHours; }
-            set
-            {
-                if (_ManHours != value)
-                {
-                    _ManHours = value;
-                    OnPropertyChanged("ManHours");
-                }
-            }
-        }
 
 
         private string _Remarks;
-        [XafDisplayName("Remarks"), ToolTip("Enter Text")]
+        [Browsable(false)]
+        //[XafDisplayName("Remarks"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
-        [Index(30), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[Index(30), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
         //[RuleRequiredField(DefaultContexts.Save, TargetCriteria = "IsDone")]
         public string Remarks
         {
@@ -248,12 +348,12 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 UpdateDate = DateTime.Now;
             }
 
-            ManHours = 0;
-            if (TimeSpend != null)
-            {
-                TimeSpan temp = (TimeSpan)TimeSpend;
-                ManHours = (long)temp.TotalMinutes;
-            }
+            //ManHours = 0;
+            //if (TimeSpend != null)
+            //{
+            //    TimeSpan temp = (TimeSpan)TimeSpend;
+            //    ManHours = (long)temp.TotalMinutes;
+            //}
 
             IsNew = false;
         }

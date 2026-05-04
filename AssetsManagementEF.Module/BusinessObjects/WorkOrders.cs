@@ -631,15 +631,30 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
 
-        private TimeSpan? _PlanManHour;
-        [XafDisplayName("Estimate Man Hr (hh:mm)"), ToolTip("Enter Text")]
-        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
-        //[RuleRequiredField(DefaultContexts.Save)]
-        //[ModelDefault("EditMaskType", "DateTime")]
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [XafDisplayName("Estimate Man Hr (hh:mm)")]
         [ModelDefault("EditMask", @"hh:mm")]
         [ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
+        [Appearance("EManHours", BackColor = "yellow", FontColor = "Black")]
         [Index(61), VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
-        [Appearance("PlanManHour", Enabled = false, Criteria = "IsContractorChecking")]
+        public TimeSpan EManHours
+        {
+            get
+            {
+                long rtn = 0;
+                if (DetailManHours != null)
+                    rtn = DetailManHours.Sum(p => p.ETotalHours);
+                return TimeSpan.FromMinutes(rtn);
+            }
+        }
+
+        private TimeSpan? _PlanManHour;
+        [Appearance("PlanManHour", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        //[XafDisplayName("Estimate Man Hr (hh:mm)"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", @"hh:mm")]
+        //[ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
+        //[Index(61), VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        //[Appearance("PlanManHour", Enabled = false, Criteria = "IsContractorChecking")]
         public TimeSpan? PlanManHour
         {
             get { return _PlanManHour; }
@@ -1031,6 +1046,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [XafDisplayName("Actual Man Hr (hh:mm)")]
         [ModelDefault("EditMask", @"hh:mm")]
         [ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
+        [Appearance("ManHours", BackColor = "lightgreen", FontColor = "Black")]
         [Index(112), VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
         public TimeSpan ManHours
         {
@@ -1038,7 +1054,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
             {
                 long rtn = 0;
                 if (DetailManHours != null)
-                    rtn = DetailManHours.Sum(p => p.ManHours);
+                    rtn = DetailManHours.Sum(p => p.TotalHours);
                 return TimeSpan.FromMinutes(rtn);
             }
         }
@@ -1363,6 +1379,114 @@ namespace AssetsManagementEF.Module.BusinessObjects
                     OnPropertyChanged("Contractor");
                 }
             }
+        }
+        private CostCentres _CostCentre;
+        [XafDisplayName("Cost Centre"), ToolTip("Enter Text")]
+        //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
+        //[Appearance("CostCentre", Enabled = false, Criteria = "Approved")]
+        [Index(207), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        public virtual CostCentres CostCentre
+        {
+            get { return _CostCentre; }
+            set
+            {
+                if (_CostCentre != value)
+                {
+                    _CostCentre = value;
+                    OnPropertyChanged("CostCentre");
+                }
+            }
+        }
+
+        private bool _MoCRequired;
+        [Index(208), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        //[FieldSizeAttribute(1024)]
+        [XafDisplayName("MoC Required")]
+        //[Appearance("MoCRequire", Enabled = false)]
+        public bool MoCRequired
+        {
+            get { return _MoCRequired; }
+            set
+            {
+                if (_MoCRequired != value)
+                {
+                    _MoCRequired = value;
+                    OnPropertyChanged("MoCRequired");
+                }
+            }
+        }
+
+        private string _SapPONo;
+        [Index(209), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        //[FieldSizeAttribute(1024)]
+        [XafDisplayName("SAP PO No")]
+        //[Appearance("MoCRequire", Enabled = false)]
+        public string SapPONo
+        {
+            get { return _SapPONo; }
+            set
+            {
+                if (_SapPONo != value)
+                {
+                    _SapPONo = value;
+                    OnPropertyChanged("SapPONo");
+                }
+            }
+        }
+        private string _DeviationNo;
+        [Index(210), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        //[FieldSizeAttribute(1024)]
+        [XafDisplayName("Deviation No")]
+        //[Appearance("MoCRequire", Enabled = false)]
+        public string DeviationNo
+        {
+            get { return _DeviationNo; }
+            set
+            {
+                if (_DeviationNo != value)
+                {
+                    _DeviationNo = value;
+                    OnPropertyChanged("DeviationNo");
+                }
+            }
+        }
+        private bool _DeviationRequired;
+        [Index(211), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        //[FieldSizeAttribute(1024)]
+        [XafDisplayName("Deviation Required")]
+        //[Appearance("MoCRequire", Enabled = false)]
+        public bool DeviationRequired
+        {
+            get { return _DeviationRequired; }
+            set
+            {
+                if (_DeviationRequired != value)
+                {
+                    _DeviationRequired = value;
+                    OnPropertyChanged("DeviationRequired");
+                }
+            }
+        }
+        [VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [Appearance("dummy01", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        public string dummy01
+        {
+            get { return ""; }
+        }
+        [VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [Appearance("dummy02", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        public string dummy02
+        {
+            get { return ""; }
+        }
+        [VisibleInListView(false), VisibleInDetailView(true), VisibleInLookupListView(false)]
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [Appearance("dummy03", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        public string dummy03
+        {
+            get { return ""; }
         }
 
         //private string _RejectRemarks;
