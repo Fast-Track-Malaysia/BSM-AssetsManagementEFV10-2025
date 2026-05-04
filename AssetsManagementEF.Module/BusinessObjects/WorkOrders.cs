@@ -632,7 +632,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         }
 
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-        [XafDisplayName("Estimate Man Hr (hh:mm)")]
+        [XafDisplayName("Estimate Man Hr (d:hh:mm)")]
         [ModelDefault("EditMask", @"hh:mm")]
         [ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
         [Appearance("EManHours", BackColor = "yellow", FontColor = "Black")]
@@ -649,7 +649,8 @@ namespace AssetsManagementEF.Module.BusinessObjects
         }
 
         private TimeSpan? _PlanManHour;
-        [Appearance("PlanManHour", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
+        [XafDisplayName("Estimate Man Hr (d:hh:mm) Hide")]
+        //[Appearance("PlanManHour", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide)]
         //[XafDisplayName("Estimate Man Hr (hh:mm)"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", @"hh:mm")]
         //[ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
@@ -1043,7 +1044,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         //}
 
         [System.ComponentModel.DataAnnotations.Schema.NotMapped]
-        [XafDisplayName("Actual Man Hr (hh:mm)")]
+        [XafDisplayName("Actual Man Hr (d:hh:mm)")]
         [ModelDefault("EditMask", @"hh:mm")]
         [ModelDefault("DisplayFormat", "{0:hh\\:mm}")]
         [Appearance("ManHours", BackColor = "lightgreen", FontColor = "Black")]
@@ -1837,7 +1838,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 if (this.ProposedLAFDValidDate == null)
                     this.ProposedLAFDValidDate = this.PlanEndDate;
             }
-
+            this.PlanManHour = this.EManHours;
             IsNew = false;
 
             string rtn = "";

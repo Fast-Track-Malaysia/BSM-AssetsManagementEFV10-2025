@@ -101,7 +101,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         [XafDisplayName("Type of work/Labour"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(5), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
-        //[RuleRequiredField(DefaultContexts.Save)]
+        [RuleRequiredField(DefaultContexts.Save)]
         public virtual WorkOrderOpTypes WorkOrderOpType
         {
             get { return _WorkOrderOpType; }
@@ -115,7 +115,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
         private WorkOrderTrades _WorkOrderTrade;
-        [XafDisplayName("Type of work/Labour"), ToolTip("Enter Text")]
+        [XafDisplayName("Trade"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(6), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
