@@ -693,6 +693,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         }
 
         private DateTime? _PlanEndDate;
+        [ImmediatePostData]
         [XafDisplayName("Planning End Date")]
         [Index(63), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
         //[RuleRequiredField(DefaultContexts.Save)]
@@ -710,6 +711,10 @@ namespace AssetsManagementEF.Module.BusinessObjects
                 {
                     _PlanEndDate = value;
                     OnPropertyChanged("PlanEndDate");
+                    if (objectSpace != null && objectSpace.IsModified && _PlanEndDate != null)
+                    {
+                        this.OriginalOLAFD = this.PlanEndDate;
+                    }
                 }
             }
         }
@@ -1093,7 +1098,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
         private DateTime? _ProposedLAFDValidDate;
         [XafDisplayName("Latest Allowed Finish Date")]
         [Index(115), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
-        [Appearance("ProposedLAFDValidDate", Enabled = false)]
+        //[Appearance("ProposedLAFDValidDate", Enabled = false)]
         public DateTime? ProposedLAFDValidDate
         {
             get { return _ProposedLAFDValidDate; }
@@ -1833,7 +1838,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
             UpdateDate = DateTime.Now;
             if (this.PlanEndDate != null)
             {
-                if (this.OriginalOLAFD == null)
+                if (this.OriginalOLAFD == null || this.OriginalOLAFD != this.PlanEndDate)
                     this.OriginalOLAFD = this.PlanEndDate;
                 if (this.ProposedLAFDValidDate == null)
                     this.ProposedLAFDValidDate = this.PlanEndDate;

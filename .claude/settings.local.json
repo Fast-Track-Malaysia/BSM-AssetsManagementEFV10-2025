@@ -13,7 +13,8 @@
       "Bash(npx playwright *)",
       "Bash(node capture.mjs)",
       "Bash(node probe.mjs)",
-      "Bash(grep -v -E \"^\\(admin-report-upload|admin-webconfig\\)\\\\.png$\")"
+      "Bash(grep -v -E \"^\\(admin-report-upload|admin-webconfig\\)\\\\.png$\")",
+      "Bash(dir /s C:\\\\YKW\\\\BSM-AssetsManagementEFV10-2025)"
     ]
   }
 }

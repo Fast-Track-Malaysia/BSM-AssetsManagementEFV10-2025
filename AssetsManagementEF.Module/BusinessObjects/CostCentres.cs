@@ -20,7 +20,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
     [NavigationItem("System Setup")]
     [XafDisplayName("Cost Centre/Project Centre")]
     //[ImageName("BO_Contact")]
-    //[DefaultProperty("Name")]
+    [DefaultProperty("BoCode")]
     //[DefaultListViewOptions(MasterDetailMode.ListViewOnly, false, NewItemRowPosition.None)]
     // Specify more UI options using a declarative approach (https://documentation.devexpress.com/#eXpressAppFramework/CustomDocument112701).
     public class CostCentres : IXafEntityObject, IObjectSpaceLink, INotifyPropertyChanged

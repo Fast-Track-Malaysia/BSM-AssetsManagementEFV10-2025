@@ -830,6 +830,11 @@
         </LayoutGroup>
       </Layout>
     </DetailView>
+    <DetailView Id="EquipmentComponents_DetailView">
+      <Items>
+        <PropertyEditor Id="Specification" RowCount="3" />
+      </Items>
+    </DetailView>
     <ListView Id="EquipmentComponents_ListView_Copy" ClassName="AssetsManagementEF.Module.BusinessObjects.EquipmentComponents" AllowEdit="False" AllowDelete="False" AllowNew="False" AllowLink="False" AllowUnlink="False" DataAccessMode="Server" IsNewNode="True">
       <Columns IsNewNode="True">
         <ColumnInfo Id="BoCode" PropertyName="BoCode" Width="70" Index="-1" IsNewNode="True" />
@@ -864,6 +869,11 @@
         <ColumnInfo Id="IsActive" PropertyName="IsActive" Width="50" Index="33" IsNewNode="True" />
       </Columns>
     </ListView>
+    <DetailView Id="Equipments_DetailView">
+      <Items>
+        <PropertyEditor Id="Specification" RowCount="3" />
+      </Items>
+    </DetailView>
     <ListView Id="IAMonthlyKPIMeasuresDetails_ListView" DataAccessMode="Client" AllowUnlink="False" AllowNew="False" AllowDelete="False" AllowLink="False" />
     <DetailView Id="ItemMasters_DetailView" AllowNew="False" />
     <ListView Id="ItemMasters_ListView" AllowNew="False" />
