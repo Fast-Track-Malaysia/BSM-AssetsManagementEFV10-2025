@@ -104,7 +104,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
             }
         }
         private bool _IsUp;
-        [XafDisplayName("Equipment Down"), ToolTip("Enter Text")]
+        [XafDisplayName("Equipment Up"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [ModelDefault("AllowEdit", "False")]
         public bool IsUp
