@@ -220,7 +220,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
 
         private decimal _Price;
         [ImmediatePostData]
-        [Appearance("Price", Enabled = false)]
+        //[Appearance("Price", Enabled = false)]
         [XafDisplayName("Price"), ToolTip("Enter Text")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(21), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(false)]
