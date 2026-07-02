@@ -212,6 +212,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
 
         private decimal _Price;
         [XafDisplayName("Price"), ToolTip("Enter Text")]
+        [Appearance("Price", Enabled = false, Criteria = "U_General")]
         //[ModelDefault("EditMask", "(000)-00"), VisibleInListView(false)]
         [Index(21), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
         //[ModelDefault("DisplayFormat", "{n:2}")]
@@ -237,6 +238,23 @@ namespace AssetsManagementEF.Module.BusinessObjects
             get
             {
                 return (decimal)QTY * Price;
+            }
+        }
+
+        private bool _U_General;
+        [XafDisplayName("General Item")]
+        [Index(23), VisibleInListView(true), VisibleInDetailView(true), VisibleInLookupListView(true)]
+        [Appearance("U_General", Enabled = false)]
+        public bool U_General
+        {
+            get { return _U_General; }
+            set
+            {
+                if (_U_General != value)
+                {
+                    _U_General = value;
+                    OnPropertyChanged("U_General");
+                }
             }
         }
 

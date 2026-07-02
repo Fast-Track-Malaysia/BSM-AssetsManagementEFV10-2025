@@ -533,6 +533,7 @@ namespace AssetsManagementEF.Module.Web.Controllers
                     prdtl.QTY = dtl.QTY;
                     prdtl.Price = dtl.Price;
                     prdtl.ContractDocDtl = os.FindObject<ContractDocDtls>(CriteriaOperator.Parse("ID=?", dtl.ID));
+                    prdtl.U_General = dtl.U_General;
                     selectedObject.Detail.Add(prdtl);
                 }
             }

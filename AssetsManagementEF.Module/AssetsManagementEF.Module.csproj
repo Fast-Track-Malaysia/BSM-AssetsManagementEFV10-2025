@@ -541,6 +541,10 @@
     <Compile Include="Migrations\202605040651024_add_WorkOrderTrades.Designer.cs">
       <DependentUpon>202605040651024_add_WorkOrderTrades.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202607020722153_add_U_General.cs" />
+    <Compile Include="Migrations\202607020722153_add_U_General.Designer.cs">
+      <DependentUpon>202607020722153_add_U_General.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Module.cs">
       <SubType>Component</SubType>
@@ -729,6 +733,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605040651024_add_WorkOrderTrades.resx">
       <DependentUpon>202605040651024_add_WorkOrderTrades.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607020722153_add_U_General.resx">
+      <DependentUpon>202607020722153_add_U_General.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
     <EmbeddedResource Include="Module.resx">
