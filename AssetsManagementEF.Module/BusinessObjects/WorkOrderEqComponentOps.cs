@@ -20,7 +20,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
     //[ImageName("BO_Contact")]
     //[DefaultProperty("Name")]
     //[DefaultListViewOptions(MasterDetailMode.ListViewOnly, false, NewItemRowPosition.None)]
-    [XafDisplayName("Operation Logs")]
+    [XafDisplayName("Com Operation Logs")]
     [RuleCriteria("WorkOrderEqComponentOpsDeleteRule", DefaultContexts.Delete, "1=0", "Cannot Delete.")]
     [RuleCriteria("WorkOrderEqComponentOpsEqSaveRule", DefaultContexts.Save, "ValidDate", "Date From and Date To is not valid.")]
     // Specify more UI options using a declarative approach (https://documentation.devexpress.com/#eXpressAppFramework/CustomDocument112701).

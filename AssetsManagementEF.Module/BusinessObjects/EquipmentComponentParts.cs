@@ -19,7 +19,7 @@ namespace AssetsManagementEF.Module.BusinessObjects
     //[DefaultClassOptions]
     //[ImageName("BO_Contact")]
     //[DefaultProperty("Name")]
-    [XafDisplayName("Part Lists")]
+    [XafDisplayName("Part Lists-Component")]
     [Appearance("HideLink", AppearanceItemType.Action, "True", TargetItems = "Link", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Context = "Any")]
     [Appearance("HideUnlink", AppearanceItemType.Action, "True", TargetItems = "Unlink", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide, Context = "Any")]
     //[DefaultListViewOptions(MasterDetailMode.ListViewOnly, false, NewItemRowPosition.None)]
